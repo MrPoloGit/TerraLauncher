@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TerraLauncher.Windows.ErrorMessageBox"
+        Title="Unhandled Exception"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Width="504" Height="230"
+        SizeToContent="Height">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <TextBlock Grid.Row="0" Margin="18,15,18,0"
+               Text="Unhandled Exception in Terra Launcher!"
+               Foreground="#952727" FontWeight="Bold" TextWrapping="Wrap"/>
+    <Border Grid.Row="1" Margin="18,10,18,54" BorderThickness="1" BorderBrush="#828790">
+      <ScrollViewer x:Name="scrollViewer" Background="#FBFBFB" HorizontalScrollBarVisibility="Auto">
+        <TextBlock x:Name="textBlockMessage" Text="Exception:" TextWrapping="Wrap" Margin="4"/>
+      </ScrollViewer>
+    </Border>
+    <Border Grid.Row="2" Background="#F0F0F0" Padding="8,12">
+      <Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="5">
+          <Button x:Name="buttonException" Content="See Full Exception" Width="128" Click="OnSeeFullException"/>
+          <Button x:Name="buttonCopy"      Content="Copy to Clipboard"  Width="128" Click="OnCopyToClipboard"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
+          <Button x:Name="buttonContinue" Content="Continue" Width="80" IsCancel="True"/>
+          <Button x:Name="buttonExit"     Content="Exit"     Width="80" IsDefault="True" Click="OnExit"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

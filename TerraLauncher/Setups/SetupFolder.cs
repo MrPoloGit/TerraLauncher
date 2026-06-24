@@ -1,133 +1,99 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using System.Xml;
+using Avalonia.Media.Imaging;
 using TerraLauncher.Controls.Terraria;
 using TerraLauncher.Windows;
 
-namespace TerraLauncher.Setups {
-	public class SetupFolder : ISetup {
-		//========== PROPERTIES ==========
-		#region Properties
+namespace TerraLauncher.Setups;
 
-		public TerrariaSetupFolder Entry { get; set; } = null;
-		public string Name { get; set; } = "Folder";
-		public string Details { get; set; } = "";
-		public string Icon { get; set; } = "Folder";
-		public SetupFolder Parent { get; set; } = null;
-		public List<ISetup> Entries { get; } = new List<ISetup>();
+public class SetupFolder : ISetup {
+	public TerrariaSetupFolder? Entry { get; set; } = null;
+	public string Name { get; set; } = "Folder";
+	public string Details { get; set; } = "";
+	public string Icon { get; set; } = "Folder";
+	public SetupFolder? Parent { get; set; } = null;
+	public List<ISetup> Entries { get; } = new();
 
-		#endregion
-		//========= CONSTRUCTORS =========
-		#region Constructors
+	public SetupFolder() { Name = "Root"; }
+	public SetupFolder(string name) { Name = name; }
+	public SetupFolder(SetupFolder parent) { Parent = parent; }
 
-		public SetupFolder() {
-			Name = "Root";
+	public ISetup Clone() {
+		var folder = new SetupFolder();
+		folder.Name = Name;
+		folder.Icon = Icon;
+		foreach (var entry in Entries)
+			folder.Entries.Add(entry.Clone());
+		return folder;
+	}
+
+	public SetupFolder CloneFolder() => (SetupFolder)Clone();
+
+	public void Read<T>(XmlElement folder) where T : Setup {
+		Entries.Clear();
+
+		if (Parent != null) {
+			var node = folder.SelectSingleNode("Name");
+			if (node != null) Name = node.InnerText;
+			node = folder.SelectSingleNode("Details");
+			if (node != null) Details = node.InnerText;
+			node = folder.SelectSingleNode("Icon");
+			if (node != null) Icon = node.InnerText;
 		}
-		public SetupFolder(string name) {
-			Name = name;
-		}
-		public SetupFolder(SetupFolder parent) {
-			Parent = parent;
-		}
-		public ISetup Clone() {
-			SetupFolder folder = new SetupFolder();
-			folder.Name = Name;
-			folder.Icon = Icon;
-			foreach (ISetup entry in Entries) {
-				folder.Entries.Add(entry.Clone());
+
+		foreach (XmlNode folderNode in folder) {
+			var element = folderNode as XmlElement;
+			if (element == null) continue;
+			if (element.Name == "Folder") {
+				var subFolder = new SetupFolder(this);
+				subFolder.Read<T>(element);
+				Entries.Add(subFolder);
 			}
-			return folder;
-		}
-		public SetupFolder CloneFolder() {
-			return (SetupFolder)Clone();
-		}
-
-		#endregion
-		//=========== LOADING ============
-		#region Loading
-
-		public void Read<T>(XmlElement folder) where T : Setup {
-			XmlNode node;
-			XmlElement element;
-			
-			Entries.Clear();
-
-			if (Parent != null) {
-				node = folder.SelectSingleNode("Name");
-				if (node != null) Name = node.InnerText;
-
-				node = folder.SelectSingleNode("Details");
-				if (node != null) Details = node.InnerText;
-
-				node = folder.SelectSingleNode("Icon");
-				if (node != null) Icon = node.InnerText;
-			}
-
-			foreach (XmlNode folderNode in folder) {
-				element = folderNode as XmlElement;
-				if (element != null) {
-					if (element.Name == "Folder") {
-						SetupFolder subFolder = new SetupFolder(this);
-						subFolder.Read<T>(element);
-						Entries.Add(subFolder);
-					}
-					else if (element.Name == typeof(T).Name) {
-						Setup setup = Activator.CreateInstance<T>();
-						setup.Read(element);
-						Entries.Add(setup);
-					}
-				}
+			else if (element.Name == typeof(T).Name) {
+				var setup = Activator.CreateInstance<T>();
+				setup.Read(element);
+				Entries.Add(setup);
 			}
 		}
-		public void Write<T>(XmlElement folder, XmlDocument doc) {
-			XmlElement element;
+	}
 
-			if (Parent != null) {
-				element = doc.CreateElement("Name");
-				element.AppendChild(doc.CreateTextNode(Name));
-				folder.AppendChild(element);
-
-				element = doc.CreateElement("Details");
-				element.AppendChild(doc.CreateTextNode(Details));
-				folder.AppendChild(element);
-
-				element = doc.CreateElement("Icon");
-				element.AppendChild(doc.CreateTextNode(Icon));
-				folder.AppendChild(element);
+	public void Write<T>(XmlElement folder, XmlDocument doc) {
+		if (Parent != null) {
+			void AppendText(string name, string value) {
+				var el = doc.CreateElement(name);
+				el.AppendChild(doc.CreateTextNode(value));
+				folder.AppendChild(el);
 			}
-
-			foreach (ISetup entry in Entries) {
-				if (entry is SetupFolder) {
-					SetupFolder subFolder = (SetupFolder)entry;
-					XmlElement subFolderElement = doc.CreateElement("Folder");
-					subFolder.Write<T>(subFolderElement, doc);
-					folder.AppendChild(subFolderElement);
-				}
-				else if (entry is Setup) {
-					Setup setup = (Setup)entry;
-					XmlElement setupElement = doc.CreateElement(typeof(T).Name);
-					setup.Write(setupElement, doc);
-					folder.AppendChild(setupElement);
-				}
-			}
+			AppendText("Name", Name);
+			AppendText("Details", Details);
+			AppendText("Icon", Icon);
 		}
 
-		#endregion
-
-		public BitmapSource LoadIcon() {
-			return Setup.LoadFolderIcon(Icon);
+		foreach (var entry in Entries) {
+			if (entry is SetupFolder subFolder) {
+				var subEl = doc.CreateElement("Folder");
+				subFolder.Write<T>(subEl, doc);
+				folder.AppendChild(subEl);
+			}
+			else if (entry is Setup setup) {
+				var setupEl = doc.CreateElement(typeof(T).Name);
+				setup.Write(setupEl, doc);
+				folder.AppendChild(setupEl);
+			}
 		}
-		public void EditFolder() {
-			if (EditFolderWindow.ShowDialog(Config.MainWindow, this)) {
+	}
+
+	public Bitmap? LoadIcon() => Setup.LoadFolderIcon(Icon);
+
+	public void EditFolder() {
+		if (Config.MainWindow == null) return;
+		Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+			if (await EditFolderWindow.ShowDialogAsync(Config.MainWindow, this)) {
 				Entry?.Update();
 				Config.Modified = true;
 				Config.SaveConfig();
 			}
-		}
-
+		});
 	}
 }

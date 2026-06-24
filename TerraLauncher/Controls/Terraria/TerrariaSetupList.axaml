@@ -1,0 +1,8 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TerraLauncher.Controls"
+             x:Class="TerraLauncher.Controls.Terraria.TerrariaSetupList">
+  <local:SpeedScrollViewer x:Name="scrollViewer" Margin="6">
+    <StackPanel x:Name="list"/>
+  </local:SpeedScrollViewer>
+</UserControl>

@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TerraLauncher.Windows.CreditsWindow"
+        Title="Credits"
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        SizeToContent="Height">
+  <StackPanel Margin="18" Spacing="8">
+    <TextBlock FontSize="16" FontWeight="Bold" Text="Terra Launcher Credits"/>
+    <TextBlock TextWrapping="Wrap" Text="Created by trigger_death (Robert Jordan)."/>
+    <TextBlock TextWrapping="Wrap">
+      <Run Text="GitHub: "/>
+      <TextBlock Text="https://github.com/trigger-death/TerraLauncher"
+                 Foreground="Blue" Cursor="Hand"
+                 PointerReleased="OnLinkClicked"
+                 Tag="https://github.com/trigger-death/TerraLauncher"/>
+    </TextBlock>
+    <TextBlock TextWrapping="Wrap" Text="Icons from various Terraria assets and custom-made resources."/>
+    <Button Content="Close" HorizontalAlignment="Right" Width="80" IsDefault="True" IsCancel="True" Margin="0,8,0,0"/>
+  </StackPanel>
+</Window>

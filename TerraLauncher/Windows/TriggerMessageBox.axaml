@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TerraLauncher.Windows.TriggerMessageBox"
+        Title="Message"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        MinWidth="280">
+  <Grid x:Name="clientArea" Width="400" MinHeight="110">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <TextBlock x:Name="textBlockMessage"
+               Grid.Row="0"
+               Text="Message"
+               TextWrapping="Wrap"
+               Margin="18,27,18,8"/>
+
+    <Border Grid.Row="1" Background="#F0F0F0" Padding="10,12">
+      <StackPanel x:Name="stackPanelButtons"
+                  HorizontalAlignment="Right"
+                  Orientation="Horizontal"
+                  Spacing="10">
+        <Button x:Name="button1" Content="Yes"    MinWidth="75" Padding="5,1" Click="OnButtonClicked"/>
+        <Button x:Name="button2" Content="No"     MinWidth="75" Padding="5,1" Click="OnButtonClicked"/>
+        <Button x:Name="button3" Content="Cancel" MinWidth="75" Padding="5,1" Click="OnButtonClicked"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

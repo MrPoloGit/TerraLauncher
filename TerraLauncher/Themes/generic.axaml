@@ -1,0 +1,73 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TerraLauncher.Controls.Terraria">
+
+  <!-- TerrariaButton: transparent template, rendering done in code -->
+  <Style Selector="local|TerrariaButton">
+    <Setter Property="Padding" Value="6"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter Margin="{TemplateBinding Padding}"
+                          Content="{TemplateBinding Content}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- TerrariaWindow: custom chrome with drag, resize, close, minimize -->
+  <Style Selector="local|TerrariaWindow">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid x:Name="windowGrid">
+          <!-- Client area background -->
+          <Border x:Name="clientArea" Margin="10" Background="#3F4197">
+            <ContentPresenter Content="{TemplateBinding Content}"/>
+          </Border>
+
+          <!-- Title bar for drag -->
+          <Panel x:Name="titleBar" Height="44" VerticalAlignment="Top" Background="Transparent">
+            <TextBlock Text="{Binding $parent[Window].Title}"
+                       FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+                       FontSize="28"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Foreground="White"/>
+          </Panel>
+
+          <!-- Close / Minimize buttons -->
+          <local:TerrariaButton x:Name="closeButton"
+                                Padding="0" Margin="0,12,12,0"
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Width="20" Height="20">
+            <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/CloseButton.png"
+                   Width="8" Height="8"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </local:TerrariaButton>
+
+          <local:TerrariaButton x:Name="minimizeButton"
+                                Padding="0" Margin="0,12,36,0"
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Width="20" Height="20">
+            <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/MinimizeButton.png"
+                   Width="8" Height="8"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </local:TerrariaButton>
+
+          <!-- Resize grips -->
+          <Border x:Name="leftSizeGrip"   Width="7" HorizontalAlignment="Left"  Cursor="SizeWestEast"         Background="Transparent"/>
+          <Border x:Name="rightSizeGrip"  Width="7" HorizontalAlignment="Right" Cursor="SizeWestEast"         Background="Transparent"/>
+          <Border x:Name="topSizeGrip"    Height="7" VerticalAlignment="Top"    Cursor="SizeNorthSouth"       Background="Transparent"/>
+          <Border x:Name="bottomSizeGrip" Height="7" VerticalAlignment="Bottom" Cursor="SizeNorthSouth"       Background="Transparent"/>
+          <Border x:Name="topLeftSizeGrip"     Width="7" Height="7" HorizontalAlignment="Left"  VerticalAlignment="Top"    Cursor="TopLeftCorner"    Background="Transparent"/>
+          <Border x:Name="bottomRightSizeGrip" Width="7" Height="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="BottomRightCorner" Background="Transparent"/>
+          <Border x:Name="topRightSizeGrip"    Width="7" Height="7" HorizontalAlignment="Right" VerticalAlignment="Top"    Cursor="TopRightCorner"   Background="Transparent"/>
+          <Border x:Name="bottomLeftSizeGrip"  Width="7" Height="7" HorizontalAlignment="Left"  VerticalAlignment="Bottom" Cursor="BottomLeftCorner"  Background="Transparent"/>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+</Styles>

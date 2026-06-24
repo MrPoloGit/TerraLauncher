@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TerraLauncher.Controls.Terraria.TerrariaTooltip"
+             x:Name="Root">
+  <Border Background="#33000000" CornerRadius="4" BoxShadow="0 0 8 0 #88000000">
+    <TextBlock Text="{Binding #Root.Text}"
+               FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+               Foreground="White"
+               FontSize="22"
+               Margin="8,4"/>
+  </Border>
+</UserControl>

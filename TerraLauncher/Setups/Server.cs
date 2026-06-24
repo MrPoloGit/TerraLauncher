@@ -1,129 +1,95 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Xml;
 using TerraLauncher.Windows;
 
-namespace TerraLauncher.Setups {
-	public class Server : Setup {
-		//========== PROPERTIES ==========
-		#region Properties
+namespace TerraLauncher.Setups;
 
-		public override string Arguments { get; set; } = "";
-		public string WorldDirectory { get; set; } = "Default";
-		public bool IsTMod { get; set; } = false;
-		protected override string TypeName {
-			get { return "Server"; }
+public class Server : Setup {
+	public override string Arguments { get; set; } = "";
+	public string WorldDirectory { get; set; } = "Default";
+	public bool IsTMod { get; set; } = false;
+
+	protected override string TypeName => "Server";
+	protected override string DefaultIcon => "Server";
+
+	public override SetupOption[] Options {
+		get {
+			var opts = new List<SetupOption> {
+				new("Launch Server", "Launch", Launch),
+				new("Open Worlds Folder", "Folder", OpenWorldsFolder),
+				new("Open Server Folder", "Home", OpenExeFolder),
+				new("Edit Server Setup", "Gear", EditServer)
+			};
+			return opts.ToArray();
 		}
-		protected override string DefaultIcon {
-			get { return "Server"; }
+	}
+
+	public Server() {
+		Name = "New Server";
+		Icon = "Server";
+	}
+
+	public override ISetup Clone() {
+		var s = new Server();
+		CloneBase(s);
+		s.Arguments = Arguments;
+		s.WorldDirectory = WorldDirectory;
+		s.IsTMod = IsTMod;
+		return s;
+	}
+
+	protected override void ReadSetup(XmlElement setup) {
+		var node = setup.SelectSingleNode("Arguments");
+		if (node != null) Arguments = node.InnerText;
+
+		node = setup.SelectSingleNode("WorldDirectory");
+		if (node != null) WorldDirectory = node.InnerText;
+		if (WorldDirectory == "") WorldDirectory = "Default";
+
+		node = setup.SelectSingleNode("IsTMod");
+		if (node != null && bool.TryParse(node.InnerText, out bool b))
+			IsTMod = b;
+	}
+
+	protected override void WriteSetup(XmlElement setup, XmlDocument doc) {
+		void AppendText(string name, string value) {
+			var el = doc.CreateElement(name);
+			el.AppendChild(doc.CreateTextNode(value));
+			setup.AppendChild(el);
 		}
-		public override SetupOption[] Options {
-			get {
-				List<SetupOption> options = new List<SetupOption>();
-				options.Add(new SetupOption("Launch Server", "Launch", Launch));
-				options.Add(new SetupOption("Open Worlds Folder", "Folder", OpenWorldsFolder));
-				options.Add(new SetupOption("Open Server Folder", "Home", OpenExeFolder));
-				options.Add(new SetupOption("Edit Server Setup", "Gear", EditServer));
-				return options.ToArray();
+		if (!string.IsNullOrWhiteSpace(Arguments)) AppendText("Arguments", Arguments);
+		if (!string.IsNullOrWhiteSpace(WorldDirectory)) AppendText("WorldDirectory", WorldDirectory);
+		AppendText("IsTMod", IsTMod.ToString());
+	}
+
+	public void OpenWorldsFolder() {
+		Sounds.PlayOpen();
+		try {
+			string path;
+			if (WorldDirectory == "Default") {
+				path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
+				if (IsTMod) path = Path.Combine(path, "ModLoader");
+				path = Path.Combine(path, "Worlds");
 			}
-		}
-
-		#endregion
-		//========= CONSTRUCTORS =========
-		#region Constructors
-
-		public Server() {
-			Name = "New Server";
-			Icon = "Server";
-		}
-		public override ISetup Clone() {
-			Server server = new Server();
-			CloneBase(server);
-			server.Arguments = server.Arguments;
-			server.WorldDirectory = WorldDirectory;
-			server.IsTMod = IsTMod;
-			return server;
-		}
-
-		#endregion
-		//=========== LOADING ============
-		#region Loading
-
-		protected override void ReadSetup(XmlElement setup) {
-			XmlNode node;
-			XmlAttribute attribute;
-
-			bool boolValue;
-
-			node = setup.SelectSingleNode("Arguments");
-			if (node != null)
-				Arguments = node.InnerText;
-
-			node = setup.SelectSingleNode("WorldDirectory");
-			if (node != null)
-				WorldDirectory = node.InnerText;
-			if (WorldDirectory == "")
-				WorldDirectory = "Default";
-
-			node = setup.SelectSingleNode("IsTMod");
-			if (node != null && bool.TryParse(node.InnerText, out boolValue))
-				IsTMod = boolValue;
-		}
-		protected override void WriteSetup(XmlElement setup, XmlDocument doc) {
-			XmlElement element;
-			
-			if (!string.IsNullOrWhiteSpace(Arguments)) {
-				element = doc.CreateElement("Arguments");
-				element.AppendChild(doc.CreateTextNode(Arguments));
-				setup.AppendChild(element);
+			else {
+				path = WorldDirectory;
 			}
-
-			if (!string.IsNullOrWhiteSpace(WorldDirectory)) {
-				element = doc.CreateElement("WorldDirectory");
-				element.AppendChild(doc.CreateTextNode(WorldDirectory));
-				setup.AppendChild(element);
-			}
-
-			element = doc.CreateElement("IsTMod");
-			element.AppendChild(doc.CreateTextNode(IsTMod.ToString()));
-			setup.AppendChild(element);
+			if (Directory.Exists(path))
+				OpenFolder(path);
 		}
+		catch { }
+	}
 
-		#endregion
-		//=========== OPTIONS ============
-		#region Options
-		
-		public void OpenWorldsFolder() {
-			Sounds.PlayOpen();
-			try {
-				if (WorldDirectory == "Default") {
-					string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
-					if (IsTMod)
-						path = Path.Combine(path, "ModLoader");
-					path = Path.Combine(path, "Worlds");
-					Process.Start(path);
-				}
-				else if (Directory.Exists(WorldDirectory)) {
-					Process.Start(WorldDirectory);
-				}
-			}
-			catch { }
-		}
-		public void EditServer() {
-			if (EditServerWindow.ShowDialog(Config.MainWindow, this)) {
+	public void EditServer() {
+		if (Config.MainWindow == null) return;
+		Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+			if (await EditServerWindow.ShowDialogAsync(Config.MainWindow, this)) {
 				Entry?.Update();
 				Config.Modified = true;
 				Config.SaveConfig();
 			}
-		}
-
-		#endregion
+		});
 	}
 }

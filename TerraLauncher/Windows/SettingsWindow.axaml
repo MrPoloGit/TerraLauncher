@@ -1,0 +1,117 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        xmlns:local="clr-namespace:TerraLauncher.Controls"
+        x:Class="TerraLauncher.Windows.SettingsWindow"
+        Title="Settings"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="460" Height="520"
+        MinWidth="380" MinHeight="460"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+
+  <controls:TerrariaWindow>
+    <Grid>
+
+      <!-- Content area: below title bar, above tab strip -->
+      <Border Margin="8,40,8,49" Background="#323381" BorderThickness="2" BorderBrush="#14143A">
+        <Grid>
+          <local:SetupTreeView x:Name="treeViewGames"   IsVisible="True"/>
+          <local:SetupTreeView x:Name="treeViewServers" IsVisible="False"/>
+          <local:SetupTreeView x:Name="treeViewTools"   IsVisible="False"/>
+
+          <!-- Settings panel -->
+          <ScrollViewer x:Name="panelSettings" IsVisible="False">
+            <StackPanel Spacing="8" Margin="14,12,14,12">
+
+              <TextBlock Text="Launch Behavior" FontSize="22" Foreground="White" Margin="0,0,0,2"/>
+              <CheckBox x:Name="checkBoxCloseGame"   Content="Close when launching Games"   Foreground="White"/>
+              <CheckBox x:Name="checkBoxCloseServer" Content="Close when launching Servers" Foreground="White"/>
+              <CheckBox x:Name="checkBoxCloseTool"   Content="Close when launching Tools"   Foreground="White"/>
+              <TextBlock Text="Hold Shift while launching to keep open" FontSize="11" Opacity="0.6" Foreground="White"/>
+              <TextBlock Text="Hold Ctrl while launching to close"      FontSize="11" Opacity="0.6" Foreground="White"/>
+
+              <Border Height="2" Background="#14143A" Margin="0,6,0,2"/>
+
+              <TextBlock Text="Display" FontSize="22" Foreground="White" Margin="0,0,0,2"/>
+              <CheckBox x:Name="checkBoxDisableTransitions" Content="Disable Transitions" Foreground="White"/>
+              <CheckBox x:Name="checkBoxMuted"              Content="Mute Menu Sounds"    Foreground="White"/>
+              <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,2,0,0">
+                <TextBlock Text="Scroll Speed" VerticalAlignment="Center" Foreground="White"/>
+                <local:IntSpinner x:Name="spinnerScrollSpeed" Maximum="300" Minimum="10"/>
+              </StackPanel>
+
+              <Border Height="2" Background="#14143A" Margin="0,6,0,2"/>
+
+              <TextBlock Text="Integration" FontSize="22" Foreground="White" Margin="0,0,0,2"/>
+              <CheckBox x:Name="checkBoxIntegration" Content="Integrate with Other Trigger Tools" Foreground="White"/>
+
+              <Border Height="2" Background="#14143A" Margin="0,6,0,2"/>
+
+              <TextBlock Text="Help" FontSize="22" Foreground="White" Margin="0,0,0,4"/>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <controls:TerrariaButton Click="OnAbout">
+                  <TextBlock Text="About"   Foreground="White" FontSize="18" Margin="10,3"/>
+                </controls:TerrariaButton>
+                <controls:TerrariaButton Click="OnCredits">
+                  <TextBlock Text="Credits" Foreground="White" FontSize="18" Margin="10,3"/>
+                </controls:TerrariaButton>
+                <controls:TerrariaButton Click="OnViewOnGitHub">
+                  <TextBlock Text="GitHub"  Foreground="White" FontSize="18" Margin="10,3"/>
+                </controls:TerrariaButton>
+              </StackPanel>
+
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <!-- Bottom tab strip -->
+      <controls:TerrariaButton x:Name="buttonGames"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8,0,0,0"
+                               Click="OnGamesTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Games"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/GameTab.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <controls:TerrariaButton x:Name="buttonServers"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="57,0,0,0"
+                               Click="OnServersTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Servers"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/ServerTab.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <controls:TerrariaButton x:Name="buttonTools"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="106,0,0,0"
+                               Click="OnToolsTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Tools"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/ToolTab.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <controls:TerrariaButton x:Name="buttonSettingsTab"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="155,0,0,0"
+                               Click="OnSettingsTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Settings"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/SettingsButton.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <TextBlock x:Name="labelTab"
+                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                 Margin="210,0,0,0" Height="44"
+                 FontSize="24" Foreground="White" Padding="5,8,5,0"/>
+
+      <!-- Save (OK) button at bottom right -->
+      <controls:TerrariaButton x:Name="buttonSave"
+                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                               Margin="0,0,8,8"
+                               Click="OnSaveClicked">
+        <TextBlock Text="Save" Foreground="White" FontSize="22" Margin="12,3"/>
+      </controls:TerrariaButton>
+
+    </Grid>
+  </controls:TerrariaWindow>
+</Window>

@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TerraLauncher.Controls.Terraria"
+             x:Class="TerraLauncher.Controls.Terraria.TerrariaSetupOptionButton"
+             Width="36" Height="36" Margin="0,0,5,0">
+  <local:TerrariaButton x:Name="button" Padding="4" Click="OnButton">
+    <ToolTip.Tip>
+      <local:TerrariaTooltip x:Name="tooltip"/>
+    </ToolTip.Tip>
+    <Image x:Name="image" Width="28" Height="28"
+           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+  </local:TerrariaButton>
+</UserControl>

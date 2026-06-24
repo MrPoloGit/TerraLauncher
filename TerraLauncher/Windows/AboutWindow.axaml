@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TerraLauncher.Windows.AboutWindow"
+        Title="About Terra Launcher"
+        Width="384"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        SizeToContent="Height">
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+      <Image Source="avares://TerraLauncher/Resources/Logo112.png" Width="112" Height="112"/>
+      <Border BorderBrush="#A9B1B6" BorderThickness="1" Padding="8" MinWidth="200">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Terra Launcher" FontWeight="Bold" Foreground="#1C644A" Margin="0,0,8,4"/>
+          <TextBlock Grid.Row="1" Grid.Column="0" Text="Version:"    Margin="0,0,8,2"/>
+          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="labelVersion" Margin="0,0,0,2"/>
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Build Date:" Margin="0,0,8,2"/>
+          <TextBlock Grid.Row="2" Grid.Column="1" x:Name="labelBuildDate" Margin="0,0,0,2"/>
+          <TextBlock Grid.Row="3" Grid.Column="0" Text="Created By:" Margin="0,0,8,2"/>
+          <TextBlock Grid.Row="3" Grid.Column="1" Text="trigger_death" Margin="0,0,0,2"/>
+        </Grid>
+      </Border>
+    </StackPanel>
+
+    <Border Grid.Row="1" BorderBrush="#A9B1B6" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+      <TextBlock TextWrapping="Wrap"
+                 Text="Terra Launcher is a hub for everything Terraria-related stored on your computer. From Game versions, to servers, to tools."
+                 Margin="4"/>
+    </Border>
+
+    <Button Grid.Row="2" Content="Close" HorizontalAlignment="Right" Width="80" IsDefault="True" IsCancel="True"/>
+  </Grid>
+</Window>

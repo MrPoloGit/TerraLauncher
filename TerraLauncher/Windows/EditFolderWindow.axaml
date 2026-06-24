@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TerraLauncher.Windows.EditFolderWindow"
+        Title="Edit Folder"
+        Width="340"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        SizeToContent="Height"
+        Background="#F9F9F9">
+  <Grid Margin="14,14,14,10" RowDefinitions="Auto,8,Auto,8,Auto,12,Auto">
+
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+      <Grid Width="72" Height="72">
+        <Rectangle Margin="2" Fill="#6675CC"/>
+        <Image x:Name="imageIcon" Width="68" Height="68"/>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconFrame.png" IsHitTestVisible="False"/>
+      </Grid>
+      <Grid RowDefinitions="Auto,6,Auto" ColumnDefinitions="Auto,8,*" VerticalAlignment="Center">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" VerticalAlignment="Center"/>
+        <TextBox   Grid.Row="0" Grid.Column="2" x:Name="textBoxName" Height="23"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Icon" VerticalAlignment="Center"/>
+        <Grid Grid.Row="2" Grid.Column="2" ColumnDefinitions="*,4,24">
+          <ComboBox x:Name="comboBoxIcon" Grid.Column="0" Height="23" SelectionChanged="OnIconSelectionChanged"/>
+          <TextBox  x:Name="textBoxCustomIcon" Grid.Column="0" Height="23" IsVisible="False" LostFocus="OnCustomIconLostFocus"/>
+          <Button   x:Name="buttonBrowseCustomIcon" Grid.Column="2" Width="24" Height="23" IsVisible="False"
+                    Padding="0" Click="OnBrowseCustomIcon" IsTabStop="False">
+            <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
+          </Button>
+        </Grid>
+      </Grid>
+    </StackPanel>
+
+    <Separator Grid.Row="2"/>
+
+    <CheckBox x:Name="checkBoxCustomIcon" Grid.Row="4" Content="Custom Icon" Click="OnCustomIconChecked"/>
+
+    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Content="OK"     MinWidth="75" IsDefault="True" Click="OnOKClicked"/>
+      <Button Content="Cancel" MinWidth="75" IsCancel="True"/>
+    </StackPanel>
+  </Grid>
+</Window>

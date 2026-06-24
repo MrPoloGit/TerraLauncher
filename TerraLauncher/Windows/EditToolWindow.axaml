@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="TerraLauncher.Windows.EditToolWindow"
+        Title="Edit Tool Setup"
+        Width="380"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        SizeToContent="Height"
+        Background="#F9F9F9">
+  <Grid Margin="14,14,14,10" RowDefinitions="Auto,8,Auto,8,Auto,8,Auto,8,Auto,12,Auto">
+
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+      <Grid Width="72" Height="72">
+        <Rectangle Margin="2" Fill="#6675CC"/>
+        <Image x:Name="imageIcon" Width="68" Height="68"/>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconFrame.png" IsHitTestVisible="False"/>
+      </Grid>
+      <Grid RowDefinitions="Auto,6,Auto,6,Auto" ColumnDefinitions="Auto,8,*" VerticalAlignment="Center">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"    VerticalAlignment="Center"/>
+        <TextBox   Grid.Row="0" Grid.Column="2" x:Name="textBoxName" Height="23"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Details" VerticalAlignment="Center"/>
+        <TextBox   Grid.Row="2" Grid.Column="2" x:Name="textBoxDetails" Height="23"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Icon"    VerticalAlignment="Center"/>
+        <Grid Grid.Row="4" Grid.Column="2" ColumnDefinitions="*,4,24">
+          <ComboBox x:Name="comboBoxIcon" Grid.Column="0" Height="23" SelectionChanged="OnIconSelectionChanged"/>
+          <TextBox  x:Name="textBoxCustomIcon" Grid.Column="0" Height="23" IsVisible="False" LostFocus="OnCustomIconLostFocus"/>
+          <Button   x:Name="buttonBrowseCustomIcon" Grid.Column="2" Width="24" Height="23" IsVisible="False"
+                    Padding="0" Click="OnBrowseCustomIcon" IsTabStop="False">
+            <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
+          </Button>
+        </Grid>
+      </Grid>
+    </StackPanel>
+
+    <Separator Grid.Row="2"/>
+
+    <Grid Grid.Row="4" RowDefinitions="Auto,6,Auto,6,Auto" ColumnDefinitions="80,8,*,4,24">
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="Executable"  VerticalAlignment="Center" HorizontalAlignment="Right"/>
+      <TextBox   Grid.Row="0" Grid.Column="2" x:Name="textBoxExe" Height="23"/>
+      <Button    Grid.Row="0" Grid.Column="4" Width="24" Height="23" Padding="0" Click="OnBrowseExe" IsTabStop="False">
+        <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
+      </Button>
+      <TextBlock Grid.Row="2" Grid.Column="0" Text="Arguments"   VerticalAlignment="Center" HorizontalAlignment="Right"/>
+      <TextBox   Grid.Row="2" Grid.Column="2" x:Name="textBoxArguments" Height="23" Grid.ColumnSpan="3"/>
+      <TextBlock Grid.Row="4" Grid.Column="0" Text="Project File" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+      <TextBox   Grid.Row="4" Grid.Column="2" x:Name="textBoxProject" Height="23"/>
+      <Button    Grid.Row="4" Grid.Column="4" Width="24" Height="23" Padding="0" Click="OnBrowseProject" IsTabStop="False">
+        <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
+      </Button>
+    </Grid>
+
+    <Separator Grid.Row="6"/>
+
+    <StackPanel Grid.Row="8" Orientation="Horizontal" Spacing="12">
+      <CheckBox x:Name="checkBoxCustomIcon"  Content="Custom Icon"  Click="OnCustomIconChecked"/>
+      <CheckBox x:Name="checkBoxDeveloper"   Content="Developer"    Click="OnDeveloperChecked"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button Content="OK"     MinWidth="75" IsDefault="True" Click="OnOKClicked"/>
+      <Button Content="Cancel" MinWidth="75" IsCancel="True"/>
+    </StackPanel>
+  </Grid>
+</Window>

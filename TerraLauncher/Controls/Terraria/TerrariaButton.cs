@@ -1,76 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Media;
 
-namespace TerraLauncher.Controls.Terraria {
-	public class TerrariaButton : ContentControl {
-		static TerrariaButton() {
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(TerrariaButton),
-					   new FrameworkPropertyMetadata(typeof(TerrariaButton)));
-		}
+namespace TerraLauncher.Controls.Terraria;
 
+public class TerrariaButton : Button {
+	public override void Render(DrawingContext context) {
+		CroppedFrames.EnsureInitialized();
+		var frame = IsPressed ? CroppedFrames.ButtonFrameDark
+			: IsPointerOver ? CroppedFrames.ButtonFrameLight
+			: CroppedFrames.ButtonFrame;
+		DrawCropped.DrawFrame(context, frame, Bounds.Width, Bounds.Height);
+	}
 
-		/*static BitmapSource light;
-		static BitmapSource dark;
-		static BitmapSource normal;*/
+	protected override void OnPointerEntered(PointerEventArgs e) {
+		base.OnPointerEntered(e);
+		Sounds.PlayTick();
+		InvalidateVisual();
+	}
 
-		bool inside = false;
-		bool down = false;
+	protected override void OnPointerExited(PointerEventArgs e) {
+		base.OnPointerExited(e);
+		InvalidateVisual();
+	}
 
+	protected override void OnPointerPressed(PointerPressedEventArgs e) {
+		base.OnPointerPressed(e);
+		InvalidateVisual();
+	}
 
-		public TerrariaButton() {
-
-		}
-
-		protected override void OnRender(DrawingContext d) {
-			CroppedFrame frame = CroppedFrames.ButtonFrame;
-			if (down)
-				frame = CroppedFrames.ButtonFrameDark;
-			else if (inside)
-				frame = CroppedFrames.ButtonFrameLight;
-			
-			DrawCropped.DrawFrame(d, frame, ActualWidth, ActualHeight);
-			base.OnRender(d);
-		}
-
-		private void OnMouseEnter(object sender, MouseEventArgs e) {
-			inside = true;
-			Sounds.PlayTick();
-			InvalidateVisual();
-		}
-
-		private void OnMouseLeave(object sender, MouseEventArgs e) {
-			inside = false;
-			if (!down)
-				InvalidateVisual();
-		}
-
-		private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-			down = true;
-			this.CaptureMouse();
-			InvalidateVisual();
-		}
-
-		private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-			down = false;
-			this.ReleaseMouseCapture();
-			InvalidateVisual();
-		}
-		public override void OnApplyTemplate() {
-			this.PreviewMouseLeftButtonDown += OnMouseLeftButtonDown;
-			this.PreviewMouseLeftButtonUp += OnMouseLeftButtonUp;
-			this.MouseEnter += OnMouseEnter;
-			this.MouseLeave += OnMouseLeave;
-		}
+	protected override void OnPointerReleased(PointerReleasedEventArgs e) {
+		base.OnPointerReleased(e);
+		InvalidateVisual();
 	}
 }

@@ -1,103 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
-namespace TerraLauncher.Util {
-	/**<summary>Finds the Terraria Content folder.</summary>*/
-	public static class TerrariaLocator {
-		//=========== MEMBERS ============
-		#region Members
+namespace TerraLauncher.Util;
 
-		/**<summary>The located or empty Terraria executable path.</summary>*/
-		public static readonly string TerrariaPath;
+public static class TerrariaLocator {
+	public static readonly string TerrariaPath;
 
-		#endregion
-		//========= CONSTRUCTORS =========
-		#region Constructors
+	static TerrariaLocator() {
+		TerrariaPath = FindTerrariaPath() ?? "";
+	}
 
-		/**<summary>Start looking for the Terraria executable.</summary>*/
-		static TerrariaLocator() {
-			TerrariaPath = FindTerrariaPath();
-		}
+	private static string? FindTerrariaPath() {
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			return FindOnWindows();
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			return FindOnMac();
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			return FindOnLinux();
+		return null;
+	}
 
-		#endregion
-		//=========== LOCATORS ===========
-		#region Locators
-
-		/**<summary>Starts looking for the Terraria executable.</summary>*/
-		private static string FindTerrariaPath() {
-			try {
-				// Check the windows registry for steam installation path
-				string steamPath = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
-				string result = SeekDirectory(steamPath);
-				if (result != null) {
-					return result;
-				}
+	[SupportedOSPlatform("windows")]
+	private static string? FindOnWindows() {
+		try {
+			// Try registry
+			using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam");
+			if (key?.GetValue("SteamPath") is string steamPath) {
+				var r = SeekDirectory(steamPath, "Terraria.exe");
+				if (r != null) return r;
 			}
-			catch { }
-			try {
-				// Try to find relevant environment variables
-				foreach (KeyValuePair<string, string> envVar in Environment.GetEnvironmentVariables()) {
-					string result = null;
-					if (envVar.Key.ToLower().Contains("terraria") ||
-							envVar.Key.ToLower().Contains("tapi")) {
-						result = SeekDirectory(envVar.Value);
-					}
-					else if (envVar.Key.ToLower().Contains("steam")) {
-						result = SeekDirectory(envVar.Value);
-					}
-					if (result != null) {
-						return result;
-					}
-				}
-			}
-			catch { }
-
-			// If nothing other works, then prompt the user
-			return null;
 		}
-
-		/**<summary>Seeks a directory for the Terraria executable.</summary>*/
-		private static string SeekDirectory(string steamDirectory) {
-			if (steamDirectory == null || !Directory.Exists(steamDirectory)) {
-				return null;
-			}
-
-			string path = Path.Combine(steamDirectory, "SteamApps", "Common", "Terraria", "Terraria.exe");
-			if (File.Exists(path)) {
-				path = GetProperFilePathCapitalization(path);
-				if (path.Length >= 2 && path[1] == ':') {
-					path = char.ToUpper(path[0]) + path.Substring(1);
-					return path;
-				}
-			}
-			return null;
+		catch { }
+		// Common Windows Steam paths
+		foreach (var drive in new[] { "C", "D", "E" }) {
+			var path = SeekDirectory($@"{drive}:\Program Files (x86)\Steam", "Terraria.exe");
+			if (path != null) return path;
 		}
+		return null;
+	}
 
-		#endregion
-		//=========== HELPERS ============
-		#region Helpers
+	private static string? FindOnMac() {
+		string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+		var candidates = new[] {
+			Path.Combine(home, "Library", "Application Support", "Steam", "steamapps", "common", "Terraria", "Terraria.app"),
+			"/Applications/Terraria.app"
+		};
+		foreach (var c in candidates)
+			if (Directory.Exists(c)) return c;
+		return null;
+	}
 
-		/**<summary>Gets the proper capitalization of a path so it looks nice.</summary>*/
-		private static string GetProperDirectoryCapitalization(DirectoryInfo dirInfo) {
-			DirectoryInfo parentDirInfo = dirInfo.Parent;
-			if (null == parentDirInfo)
-				return dirInfo.Name;
-			return Path.Combine(GetProperDirectoryCapitalization(parentDirInfo),
-								parentDirInfo.GetDirectories(dirInfo.Name)[0].Name);
-		}
-		/**<summary>Recursively gets the proper capitalization of a path so it looks nice.</summary>*/
-		private static string GetProperFilePathCapitalization(string filename) {
-			FileInfo fileInfo = new FileInfo(filename);
-			DirectoryInfo dirInfo = fileInfo.Directory;
-			return Path.Combine(GetProperDirectoryCapitalization(dirInfo),
-								dirInfo.GetFiles(fileInfo.Name)[0].Name);
-		}
+	private static string? FindOnLinux() {
+		string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+		var candidates = new[] {
+			Path.Combine(home, ".steam", "steam", "steamapps", "common", "Terraria", "Terraria"),
+			Path.Combine(home, ".local", "share", "Steam", "steamapps", "common", "Terraria", "Terraria"),
+			"/usr/games/Terraria"
+		};
+		foreach (var c in candidates)
+			if (File.Exists(c)) return c;
+		return null;
+	}
 
-		#endregion
+	private static string? SeekDirectory(string steamDir, string exeName) {
+		if (!Directory.Exists(steamDir)) return null;
+		var path = Path.Combine(steamDir, "SteamApps", "Common", "Terraria", exeName);
+		if (File.Exists(path)) return path;
+		path = Path.Combine(steamDir, "steamapps", "common", "Terraria", exeName);
+		if (File.Exists(path)) return path;
+		return null;
 	}
 }

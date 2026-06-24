@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        x:Class="TerraLauncher.MainWindow"
+        Title="Terra Launcher"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Height="460" Width="600"
+        MinWidth="560" MinHeight="420"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+  <controls:TerrariaWindow>
+    <Grid>
+      <!-- Main content area with tabs -->
+      <Border Margin="8,40,8,49" Background="#323381" BorderThickness="2" BorderBrush="#14143A">
+        <Grid>
+          <Grid x:Name="gridGames"   IsVisible="True"/>
+          <Grid x:Name="gridServers" IsVisible="False"/>
+          <Grid x:Name="gridTools"   IsVisible="False"/>
+        </Grid>
+      </Border>
+
+      <!-- Tab buttons (bottom left) -->
+      <controls:TerrariaButton x:Name="buttonGames"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8,0,0,0"
+                               Click="OnGamesTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Games Tab"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/GameTab.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <controls:TerrariaButton x:Name="buttonServers"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="57,0,0,0"
+                               Click="OnServersTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Servers Tab"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/ServerTab.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <controls:TerrariaButton x:Name="buttonTools"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="106,0,0,0"
+                               Click="OnToolsTab">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Tools Tab"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/ToolTab.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+
+      <!-- Tab label -->
+      <TextBlock x:Name="labelListType"
+                 Text="Game List"
+                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                 Margin="160,0,0,0"
+                 Height="44"
+                 FontSize="28" Foreground="White"
+                 Padding="5,5,5,0"/>
+
+      <!-- Settings button (bottom right) -->
+      <controls:TerrariaButton x:Name="buttonSettings"
+                               HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0"
+                               Click="OnEditSetups">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Change Settings"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/SettingsButton.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
+    </Grid>
+  </controls:TerrariaWindow>
+</Window>

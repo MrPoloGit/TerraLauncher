@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TerraLauncher.Controls.Terraria.TerrariaSetupEntry"
+             Height="96" Margin="0,0,26,10">
+  <Grid>
+    <Grid Margin="12,8,8,8">
+      <Grid Width="72" Height="72" HorizontalAlignment="Left">
+        <Rectangle Margin="2" Fill="#FF6675CC"/>
+        <Image x:Name="imageIcon"
+               Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTree.png"/>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconFrame.png"
+               IsHitTestVisible="False"/>
+      </Grid>
+
+      <TextBlock x:Name="labelName"
+                 Text="Setup Name"
+                 HorizontalAlignment="Left" VerticalAlignment="Top"
+                 Margin="76,3,0,0"
+                 Foreground="White" FontSize="24"
+                 FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"/>
+
+      <TextBlock x:Name="labelDetails"
+                 Text=""
+                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                 Margin="96,0,0,0"
+                 Foreground="White" FontSize="22"
+                 FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"/>
+
+      <StackPanel x:Name="stackPanelOptions"
+                  HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                  Orientation="Horizontal"
+                  FlowDirection="RightToLeft"/>
+    </Grid>
+  </Grid>
+</UserControl>

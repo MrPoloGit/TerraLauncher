@@ -1,124 +1,95 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Xml;
-using TerraLauncher.Controls.Terraria;
+using Avalonia.Media.Imaging;
 using TerraLauncher.Windows;
 
-namespace TerraLauncher.Setups {
-	public class Game : Setup {
-		//========== PROPERTIES ==========
-		#region Properties
+namespace TerraLauncher.Setups;
 
-		public string SaveDirectory { get; set; } = "Default";
-		public bool IsTMod { get; set; } = false;
-		public override string Arguments {
-			get {
-				if (SaveDirectory != "Default")
-					return "-savedirectory \"" + SaveDirectory + "\"";
-				return "";
+public class Game : Setup {
+	public string SaveDirectory { get; set; } = "Default";
+	public bool IsTMod { get; set; } = false;
+
+	public override string Arguments {
+		get => SaveDirectory != "Default" ? $"-savedirectory \"{SaveDirectory}\"" : "";
+		set { }
+	}
+	protected override string TypeName => "Game";
+	protected override string DefaultIcon => "Tree";
+
+	public override SetupOption[] Options {
+		get {
+			var opts = new List<SetupOption> {
+				new("Launch Game", "Launch", Launch),
+				new("Open Save Folder", "Folder", OpenSaveFolder),
+				new("Open Executable Folder", "Home", OpenExeFolder),
+				new("Edit Game Setup", "Gear", EditGame)
+			};
+			return opts.ToArray();
+		}
+	}
+
+	public Game() {
+		Name = "New Game";
+		Icon = "Tree";
+	}
+
+	public override ISetup Clone() {
+		var g = new Game();
+		CloneBase(g);
+		g.SaveDirectory = SaveDirectory;
+		g.IsTMod = IsTMod;
+		return g;
+	}
+
+	protected override void ReadSetup(XmlElement setup) {
+		var node = setup.SelectSingleNode("SaveDirectory");
+		if (node != null) SaveDirectory = node.InnerText;
+		if (SaveDirectory == "") SaveDirectory = "Default";
+
+		node = setup.SelectSingleNode("IsTMod");
+		if (node != null && bool.TryParse(node.InnerText, out bool b))
+			IsTMod = b;
+	}
+
+	protected override void WriteSetup(XmlElement setup, XmlDocument doc) {
+		void AppendText(string name, string value) {
+			var el = doc.CreateElement(name);
+			el.AppendChild(doc.CreateTextNode(value));
+			setup.AppendChild(el);
+		}
+		AppendText("SaveDirectory", SaveDirectory);
+		AppendText("IsTMod", IsTMod.ToString());
+	}
+
+	public void OpenSaveFolder() {
+		Sounds.PlayOpen();
+		try {
+			string path;
+			if (SaveDirectory == "Default") {
+				path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
+				if (IsTMod) path = Path.Combine(path, "ModLoader");
 			}
-			set { }
-		}
-		protected override string TypeName {
-			get { return "Game"; }
-		}
-		protected override string DefaultIcon {
-			get { return "Tree"; }
-		}
-		public override SetupOption[] Options {
-			get {
-				List<SetupOption> options = new List<SetupOption>();
-				options.Add(new SetupOption("Launch Game", "Launch", Launch));
-				options.Add(new SetupOption("Open Save Folder", "Folder", OpenSaveFolder));
-				options.Add(new SetupOption("Open Executable Folder", "Home", OpenExeFolder));
-				options.Add(new SetupOption("Edit Game Setup", "Gear", EditGame));
-				return options.ToArray();
+			else {
+				path = SaveDirectory;
 			}
+			if (Directory.Exists(path))
+				OpenFolder(path);
 		}
+		catch { }
+	}
 
-		#endregion
-		//========= CONSTRUCTORS =========
-		#region Constructors
-
-		public Game() {
-			Name = "New Game";
-			Icon = "Tree";
-		}
-		public override ISetup Clone() {
-			Game game = new Game();
-			CloneBase(game);
-			game.SaveDirectory = SaveDirectory;
-			game.IsTMod = IsTMod;
-			return game;
-		}
-
-		#endregion
-		//=========== LOADING ============
-		#region Loading
-
-		protected override void ReadSetup(XmlElement setup) {
-			XmlNode node;
-			XmlAttribute attribute;
-
-			bool boolValue;
-				
-			node = setup.SelectSingleNode("SaveDirectory");
-			if (node != null) {
-				SaveDirectory = node.InnerText;
-			}
-			if (SaveDirectory == "")
-				SaveDirectory = "Default";
-			
-			node = setup.SelectSingleNode("IsTMod");
-			if (node != null && bool.TryParse(node.InnerText, out boolValue))
-				IsTMod = boolValue;
-		}
-		protected override void WriteSetup(XmlElement setup, XmlDocument doc) {
-			XmlElement element;
-			
-			element = doc.CreateElement("SaveDirectory");
-			element.AppendChild(doc.CreateTextNode(SaveDirectory));
-			setup.AppendChild(element);
-
-			element = doc.CreateElement("IsTMod");
-			element.AppendChild(doc.CreateTextNode(IsTMod.ToString()));
-			setup.AppendChild(element);
-		}
-
-		#endregion
-		//=========== OPTIONS ============
-		#region Options
-
-		public void OpenSaveFolder() {
-			Sounds.PlayOpen();
-			try {
-				if (SaveDirectory == "Default") {
-					string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
-					if (IsTMod)
-						path = Path.Combine(path, "ModLoader");
-					Process.Start(path);
-				}
-				else if (Directory.Exists(SaveDirectory)) {
-					Process.Start(SaveDirectory);
-				}
-			}
-			catch { }
-		}
-		public void EditGame() {
-			if (EditGameWindow.ShowDialog(Config.MainWindow, this)) {
+	public void EditGame() {
+		if (Config.MainWindow == null) return;
+		// Must be called from UI thread; uses async dispatch
+		Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+			if (await EditGameWindow.ShowDialogAsync(Config.MainWindow, this)) {
 				Entry?.Update();
 				Config.Modified = true;
 				Config.SaveConfig();
 			}
-		}
-
-		#endregion
+		});
 	}
 }

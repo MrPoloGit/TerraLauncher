@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TerraLauncher.Controls.SetupTreeView"
+             Background="#F9F9F9">
+  <Grid>
+    <StackPanel Height="20" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                Orientation="Horizontal">
+      <Button x:Name="buttonEdit"    Width="20" Height="20" ToolTip.Tip="Edit Setup"    Click="OnEdit"      Padding="0" Margin="1,0" IsTabStop="False">
+        <Image Source="avares://TerraLauncher/Resources/Icons/SetupEdit.png" Width="16" Height="16"/>
+      </Button>
+      <Separator/>
+      <Button x:Name="buttonAddFolder"  Width="20" Height="20" ToolTip.Tip="Add Folder"  Click="OnAddFolder" Padding="0" Margin="1,0" IsTabStop="False">
+        <Image Source="avares://TerraLauncher/Resources/Icons/FolderAdd.png" Width="16" Height="16"/>
+      </Button>
+      <Button x:Name="buttonAddSetup"   Width="20" Height="20" ToolTip.Tip="Add Setup"   Click="OnAddSetup"  Padding="0" Margin="1,0" IsTabStop="False">
+        <Image x:Name="imageAddSetup" Source="avares://TerraLauncher/Resources/Icons/GameAdd.png" Width="16" Height="16"/>
+      </Button>
+      <Separator/>
+      <Button x:Name="buttonRemove"  Width="20" Height="20" ToolTip.Tip="Remove"      Click="OnRemove"    Padding="0" Margin="1,0" IsTabStop="False">
+        <Image x:Name="imageRemove" Source="avares://TerraLauncher/Resources/Icons/Remove.png" Width="16" Height="16"/>
+      </Button>
+      <Separator/>
+      <Button x:Name="buttonMoveUp"   Width="20" Height="20" ToolTip.Tip="Move Up"   Click="OnMoveUp"   Padding="0" Margin="1,0" IsTabStop="False">
+        <Image Source="avares://TerraLauncher/Resources/Icons/MoveUp.png" Width="16" Height="16"/>
+      </Button>
+      <Button x:Name="buttonMoveDown" Width="20" Height="20" ToolTip.Tip="Move Down" Click="OnMoveDown" Padding="0" Margin="1,0" IsTabStop="False">
+        <Image Source="avares://TerraLauncher/Resources/Icons/MoveDown.png" Width="16" Height="16"/>
+      </Button>
+    </StackPanel>
+    <TreeView x:Name="treeView" Margin="0,24,0,0"
+              SelectionChanged="OnTreeViewSelectionChanged"/>
+  </Grid>
+</UserControl>
