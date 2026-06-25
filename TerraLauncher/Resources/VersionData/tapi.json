@@ -1,0 +1,22 @@
+[
+  {
+    "name": "tAPI r14",
+    "version": "r14",
+    "description": "Final stable release of tAPI",
+    "date": "2014-03-01",
+    "author": "SelesGames",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/tapi-r14.zip",
+    "requiresTerrariaVersion": "1.2.4.1"
+  },
+  {
+    "name": "tAPI r13",
+    "version": "r13",
+    "description": "Previous release of tAPI",
+    "date": "2014-01-15",
+    "author": "SelesGames",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/tapi-r13.zip",
+    "requiresTerrariaVersion": "1.2.4.1"
+  }
+]

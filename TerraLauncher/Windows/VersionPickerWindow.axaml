@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        x:Class="TerraLauncher.Windows.VersionPickerWindow"
+        Title="Select Version"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="500" Height="520"
+        MinWidth="420" MinHeight="400"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+
+  <controls:TerrariaWindow>
+    <Grid RowDefinitions="Auto,*,Auto">
+
+      <!-- Background content area spanning all rows -->
+      <Border Grid.Row="0" Grid.RowSpan="3" Margin="8,40,8,8"
+              Background="#323381" BorderThickness="2" BorderBrush="#14143A"/>
+
+      <!-- Header -->
+      <StackPanel Grid.Row="0" Margin="16,48,16,0" Spacing="6">
+        <TextBlock x:Name="labelCategory" FontSize="22" Foreground="White"/>
+        <Border Height="2" Background="#14143A" Margin="0,4,0,0"/>
+      </StackPanel>
+
+      <!-- Version list -->
+      <ScrollViewer Grid.Row="1" Margin="14,8,14,0" VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="versionList" Spacing="6"/>
+      </ScrollViewer>
+
+      <!-- Status bar + refresh button -->
+      <StackPanel Grid.Row="2" Margin="14,8,14,12" Orientation="Horizontal" Spacing="10">
+        <TextBlock x:Name="labelStatus" Foreground="White" FontSize="13"
+                   VerticalAlignment="Center" Opacity="0.7"/>
+        <controls:TerrariaButton x:Name="buttonRefresh" Click="OnRefresh">
+          <TextBlock Text="Refresh" Foreground="White" FontSize="15" Margin="10,3"/>
+        </controls:TerrariaButton>
+      </StackPanel>
+
+    </Grid>
+  </controls:TerrariaWindow>
+</Window>

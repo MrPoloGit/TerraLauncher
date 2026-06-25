@@ -215,8 +215,7 @@ public partial class SetupTreeView : UserControl {
 	private void MoveSelected(int delta) {
 		var item = SelectedItem;
 		if (item?.Parent is not TreeViewItem parent) return;
-		int idx, newIdx;
-		var newParent = FindMoveLocation(item, delta, out idx);
+		var newParent = FindMoveLocation(item, delta, out int idx);
 		if (newParent == null) return;
 		parent.Items.Remove(item);
 		newParent.Items.Insert(idx, item);

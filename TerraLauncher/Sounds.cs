@@ -30,13 +30,11 @@ public static class Sounds {
 
 	private static void Play(byte[]? data) {
 		if (Config.Muted || data == null) return;
+		// Audio via external process (afplay/aplay) causes system-wide stutter on macOS/Linux.
+		// Restrict to Windows until a cross-platform managed audio library is added.
+		if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
 		try {
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				PlayWindows(data);
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-				PlayViaTempFile(data, "afplay", null);
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-				PlayLinux(data);
+			PlayWindows(data);
 		}
 		catch { }
 	}

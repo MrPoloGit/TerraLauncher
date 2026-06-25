@@ -45,6 +45,9 @@ public static class Config {
 
 	public static bool Modified { get; set; } = false;
 
+	// Instances
+	public static string TerrariaExePath { get; set; } = "";
+
 	public static SetupFolder Games { get; set; } = new SetupFolder("Game List");
 	public static SetupFolder Servers { get; set; } = new SetupFolder("Server List");
 	public static SetupFolder Tools { get; set; } = new SetupFolder("Tool List");
@@ -147,6 +150,10 @@ public static class Config {
 			if (node != null && int.TryParse(node.InnerText, out intValue) && intValue >= 410)
 				SettingsHeight = intValue;
 
+			node = doc.SelectSingleNode("TerraLauncher/TerrariaExePath");
+			if (node != null && !string.IsNullOrEmpty(node.InnerText))
+				TerrariaExePath = node.InnerText;
+
 			#endregion
 
 			XmlElement? gameFolder = doc.SelectSingleNode("TerraLauncher/Games") as XmlElement;
@@ -198,6 +205,7 @@ public static class Config {
 			AppendText("CurrentTab", CurrentTab);
 			AppendText("SettingsWidth", SettingsWidth.ToString());
 			AppendText("SettingsHeight", SettingsHeight.ToString());
+			AppendText("TerrariaExePath", TerrariaExePath);
 
 			var gamesEl = doc.CreateElement("Games");
 			Games.Write<Game>(gamesEl, doc);

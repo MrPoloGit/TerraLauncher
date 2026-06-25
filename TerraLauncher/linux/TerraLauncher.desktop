@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=TerraLauncher
+Comment=Launch and manage Terraria installations
+Exec=TerraLauncher %U
+Icon=TerraLauncher
+Categories=Game;
+StartupNotify=true
+Terminal=false

@@ -26,6 +26,7 @@ public class Tool : Setup {
 				opts.Add(new("Open Project Folder", "Folder", OpenProjectFolder));
 			}
 			opts.Add(new("Edit Tool Setup", "Gear", EditTool));
+			opts.Add(new("Remove Entry", "ToolRemove", Delete));
 			return opts.ToArray();
 		}
 	}

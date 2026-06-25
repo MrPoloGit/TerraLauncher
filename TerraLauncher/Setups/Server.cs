@@ -20,7 +20,8 @@ public class Server : Setup {
 				new("Launch Server", "Launch", Launch),
 				new("Open Worlds Folder", "Folder", OpenWorldsFolder),
 				new("Open Server Folder", "Home", OpenExeFolder),
-				new("Edit Server Setup", "Gear", EditServer)
+				new("Edit Server Setup", "Gear", EditServer),
+				new("Remove Entry", "ServerRemove", Delete)
 			};
 			return opts.ToArray();
 		}

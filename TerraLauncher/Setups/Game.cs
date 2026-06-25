@@ -25,7 +25,8 @@ public class Game : Setup {
 				new("Launch Game", "Launch", Launch),
 				new("Open Save Folder", "Folder", OpenSaveFolder),
 				new("Open Executable Folder", "Home", OpenExeFolder),
-				new("Edit Game Setup", "Gear", EditGame)
+				new("Edit Game Setup", "Gear", EditGame),
+				new("Remove Entry", "GameRemove", Delete)
 			};
 			return opts.ToArray();
 		}
@@ -69,7 +70,11 @@ public class Game : Setup {
 		try {
 			string path;
 			if (SaveDirectory == "Default") {
-				path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
+				if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX)) {
+					path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Terraria");
+				} else {
+					path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
+				}
 				if (IsTMod) path = Path.Combine(path, "ModLoader");
 			}
 			else {

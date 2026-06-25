@@ -18,19 +18,82 @@ A Terraria-styled hub for everything Terraria-related stored on your computer. K
 ## About
 
 * **Created By:** Robert Jordan
-* **Version:** 1.0.0.1
-* **Language:** C#, WPF
+* **Version:** 1.0.0
+* **Language:** C#, [Avalonia UI](https://avaloniaui.net/) (cross-platform)
+* **Framework:** .NET 10
 
 ## Requirements for Running
-* .NET Framework 4.5.2 | [Offline Installer](https://www.microsoft.com/en-us/download/details.aspx?id=42642) | [Web Installer](https://www.microsoft.com/en-us/download/details.aspx?id=42643)
-* Windows 7 or later
 
-## Requirements for Source Code
-* Extended.Wpf.Toolkit | [NuGet Package](https://www.nuget.org/packages/Extended.Wpf.Toolkit/)
+| Platform | Requirement |
+|----------|-------------|
+| **Windows** | Windows 10 or later (x64 or arm64) |
+| **macOS** | macOS 11 (Big Sur) or later (Apple Silicon) |
+| **Linux** | Any modern x64 or arm64 distribution |
+
+Releases are self-contained — no separate .NET runtime installation required.
 
 ## Features
-* Keep a collection of links to different Terraria executables, servers, and tools.
-* Change Terraria save directory for linked games.
-* Sort customize previews for entries with icons and details.
-* Sort entries into folders for better organization.
-* Built with Terraria style and sounds to feel more like the game.
+
+* Keep a collection of links to different Terraria executables, servers, and tools
+* Auto-detects Steam-installed Terraria on first launch
+* Supports Terraria, tModLoader, tAPI, tConfig, and StandAlone instances
+* Change Terraria save directory for individual game entries
+* Sort entries into folders for better organization
+* Open save folder or executable folder directly from the launcher
+* Add and remove instances with confirmation dialogs
+* Built with Terraria style and sounds to feel more like the game
+* Cross-platform: runs on Windows, macOS, and Linux
+
+## Building from Source
+
+### Requirements
+
+* [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+
+### Run (development)
+
+```sh
+dotnet run --project TerraLauncher/TerraLauncher.csproj
+```
+
+### Publish
+
+Each publish command produces a self-contained, ready-to-distribute build.
+
+**macOS (Apple Silicon)**
+```sh
+dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r osx-arm64 --self-contained -o ./publish/osx-arm64
+open ./publish/TerraLauncher.app
+```
+
+**Linux (x64)**
+```sh
+dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r linux-x64 --self-contained -o ./publish/linux-x64
+# Produces: ./publish/linux-x64/ with binary, TerraLauncher.desktop, TerraLauncher.png, install-linux.sh
+```
+
+**Linux (arm64)**
+```sh
+dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r linux-arm64 --self-contained -o ./publish/linux-arm64
+```
+
+**Windows (x64)**
+```sh
+dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-x64 --self-contained -o ./publish/win-x64
+```
+
+**Windows (arm64)**
+```sh
+dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-arm64 --self-contained -o ./publish/win-arm64
+```
+
+### Linux installation
+
+After publishing for Linux, run the included install script to register the app in your desktop environment:
+
+```sh
+cd ./publish/linux-x64
+./install-linux.sh
+```
+
+This installs TerraLauncher to `~/.local/share/TerraLauncher/`, creates a launcher symlink at `~/.local/bin/TerraLauncher`, and registers the `.desktop` entry so it appears in your applications menu.

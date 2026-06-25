@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using TerraLauncher.Setups;
 
@@ -13,16 +14,9 @@ namespace TerraLauncher.Windows;
 
 public partial class SettingsWindow : Window {
 	private bool _closing;
-	private SetupTypes _currentTab;
 
-	public SettingsWindow(SetupTypes startupTab) {
+	public SettingsWindow(SetupTypes startupTab = SetupTypes.Game) {
 		InitializeComponent();
-
-		_currentTab = startupTab;
-
-		treeViewGames.Populate(Config.Games, SetupTypes.Game);
-		treeViewServers.Populate(Config.Servers, SetupTypes.Server);
-		treeViewTools.Populate(Config.Tools, SetupTypes.Tool);
 
 		if (Config.SettingsWidth >= MinWidth)   Width  = Config.SettingsWidth;
 		if (Config.SettingsHeight >= MinHeight) Height = Config.SettingsHeight;
@@ -34,39 +28,10 @@ public partial class SettingsWindow : Window {
 		checkBoxMuted.IsChecked              = Config.Muted;
 		checkBoxIntegration.IsChecked        = Config.Integration;
 		spinnerScrollSpeed.Value             = (int)(Config.ScrollSpeed * 100);
-
-		UpdateTab();
+		textBoxTerrariaPath.Text             = Config.TerrariaExePath;
 
 		Opened  += async (_, _) => { Sounds.PlayOpen(); await FadeAsync(0, 1, 0.3); };
 		Closing += OnWindowClosing;
-	}
-
-	// ── Tab switching ──────────────────────────────────────────────────
-
-	private void OnGamesTab(object? sender, RoutedEventArgs e) {
-		_currentTab = SetupTypes.Game;
-		UpdateTab();
-	}
-	private void OnServersTab(object? sender, RoutedEventArgs e) {
-		_currentTab = SetupTypes.Server;
-		UpdateTab();
-	}
-	private void OnToolsTab(object? sender, RoutedEventArgs e) {
-		_currentTab = SetupTypes.Tool;
-		UpdateTab();
-	}
-	private void OnSettingsTab(object? sender, RoutedEventArgs e) {
-		_currentTab = (SetupTypes)(-1);
-		UpdateTab();
-	}
-
-	private void UpdateTab() {
-		bool isSettings = (int)_currentTab < 0;
-		treeViewGames.IsVisible   = _currentTab == SetupTypes.Game;
-		treeViewServers.IsVisible = _currentTab == SetupTypes.Server;
-		treeViewTools.IsVisible   = _currentTab == SetupTypes.Tool;
-		panelSettings.IsVisible   = isSettings;
-		labelTab.Text = isSettings ? "Settings" : _currentTab + " List";
 	}
 
 	// ── Close / Save ───────────────────────────────────────────────────
@@ -108,6 +73,15 @@ public partial class SettingsWindow : Window {
 		Opacity = to;
 	}
 
+	private async void OnBrowseTerrariaPath(object? sender, RoutedEventArgs e) {
+		var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
+			Title = "Select Terraria Executable",
+			AllowMultiple = false,
+		});
+		if (files.Count > 0)
+			textBoxTerrariaPath.Text = files[0].TryGetLocalPath() ?? "";
+	}
+
 	// ── Help links ─────────────────────────────────────────────────────
 
 	private void OnAbout(object? sender, RoutedEventArgs e)        => AboutWindow.Show(this);
@@ -117,7 +91,7 @@ public partial class SettingsWindow : Window {
 
 	// ── ShowDialog helper ──────────────────────────────────────────────
 
-	public static async Task<bool> ShowDialogAsync(Window owner, SetupTypes startupTab) {
+	public static async Task<bool> ShowDialogAsync(Window owner, SetupTypes startupTab = SetupTypes.Game) {
 		var w = new SettingsWindow(startupTab);
 		var ok = await w.ShowDialog<bool>(owner);
 
@@ -125,15 +99,13 @@ public partial class SettingsWindow : Window {
 		Config.SettingsHeight = (int)w.Height;
 
 		if (ok) {
-			if (w.treeViewGames.Modified)   { Config.Games   = w.treeViewGames.GenerateHierarchy();   Config.Modified = true; }
-			if (w.treeViewServers.Modified) { Config.Servers = w.treeViewServers.GenerateHierarchy(); Config.Modified = true; }
-			if (w.treeViewTools.Modified)   { Config.Tools   = w.treeViewTools.GenerateHierarchy();   Config.Modified = true; }
-			Config.CloseOnGameLaunch   = w.checkBoxCloseGame.IsChecked   == true;
-			Config.CloseOnServerLaunch = w.checkBoxCloseServer.IsChecked == true;
-			Config.CloseOnToolLaunch   = w.checkBoxCloseTool.IsChecked   == true;
+			Config.TerrariaExePath     = w.textBoxTerrariaPath.Text?.Trim()       ?? "";
+			Config.CloseOnGameLaunch   = w.checkBoxCloseGame.IsChecked          == true;
+			Config.CloseOnServerLaunch = w.checkBoxCloseServer.IsChecked        == true;
+			Config.CloseOnToolLaunch   = w.checkBoxCloseTool.IsChecked          == true;
 			Config.DisableTransitions  = w.checkBoxDisableTransitions.IsChecked == true;
-			Config.Muted               = w.checkBoxMuted.IsChecked       == true;
-			Config.Integration         = w.checkBoxIntegration.IsChecked == true;
+			Config.Muted               = w.checkBoxMuted.IsChecked              == true;
+			Config.Integration         = w.checkBoxIntegration.IsChecked        == true;
 			Config.ScrollSpeed         = w.spinnerScrollSpeed.Value / 100.0;
 			Config.SaveConfig();
 		}

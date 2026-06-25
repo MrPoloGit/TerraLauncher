@@ -3,9 +3,11 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- NU1903: Tmds.DBus.Protocol 0.20.0 vulnerability is in Linux-only D-Bus code,
+         unreachable on macOS/Windows. Fixed in Avalonia 12.x (upgrades to 0.92.0). -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
     <AssemblyName>TerraLauncher</AssemblyName>
     <RootNamespace>TerraLauncher</RootNamespace>
     <AssemblyTitle>Terra Launcher</AssemblyTitle>
@@ -14,6 +16,11 @@
     <Company>Trigger's Tools &amp; Games</Company>
     <Copyright>Copyright © Robert Jordan 2017</Copyright>
   </PropertyGroup>
+  <!-- Windows-only settings -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
@@ -23,11 +30,19 @@
   <ItemGroup>
     <!-- All images, fonts, and other assets accessible via avares://TerraLauncher/... -->
     <AvaloniaResource Include="Resources\**\*" Exclude="Resources\Terraria\Sounds\*.wav" />
+    <!-- Platform bundle/packaging files are build-time artifacts, not runtime Avalonia assets -->
+    <None Include="macOS\**\*" />
+    <None Include="linux\**\*" />
     <AvaloniaResource Include="App.ico" />
     <!-- Sounds embedded so they can be loaded into a MemoryStream for SoundPlayer -->
     <EmbeddedResource Include="Resources\Terraria\Sounds\MenuClose.wav" />
     <EmbeddedResource Include="Resources\Terraria\Sounds\MenuOpen.wav" />
     <EmbeddedResource Include="Resources\Terraria\Sounds\MenuTick.wav" />
+    <!-- Version data JSONs for instance manager -->
+    <EmbeddedResource Include="Resources\VersionData\terraria-versions.json" />
+    <EmbeddedResource Include="Resources\VersionData\tapi.json" />
+    <EmbeddedResource Include="Resources\VersionData\tconfig.json" />
+    <EmbeddedResource Include="Resources\VersionData\standalone.json" />
   </ItemGroup>
   <!-- Exclude old WPF files and Windows-only IconPack from compilation -->
   <ItemGroup>
@@ -84,4 +99,35 @@
     <None Remove="Windows\SettingsWindow.xaml" />
     <None Remove="Windows\TriggerMessageBox.xaml" />
   </ItemGroup>
+
+  <!-- ── macOS .app bundle (run after dotnet publish -r osx-*) ────────── -->
+  <Target Name="CreateMacBundle" AfterTargets="Publish"
+          Condition="$(RuntimeIdentifier.StartsWith('osx'))">
+    <PropertyGroup>
+      <_BundleRoot>$(PublishDir)..\TerraLauncher.app</_BundleRoot>
+    </PropertyGroup>
+    <RemoveDir Directories="$(_BundleRoot)" />
+    <MakeDir   Directories="$(_BundleRoot)/Contents/MacOS" />
+    <MakeDir   Directories="$(_BundleRoot)/Contents/Resources" />
+    <Exec Command="cp -r &quot;$(PublishDir).&quot; &quot;$(_BundleRoot)/Contents/MacOS/&quot;" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/macOS/Info.plist"
+          DestinationFiles="$(_BundleRoot)/Contents/Info.plist" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/macOS/TerraLauncher.icns"
+          DestinationFiles="$(_BundleRoot)/Contents/Resources/TerraLauncher.icns" />
+    <Exec Command="chmod +x &quot;$(_BundleRoot)/Contents/MacOS/TerraLauncher&quot;" />
+    <Message Text="&#x2713; macOS bundle: $(_BundleRoot)" Importance="High" />
+  </Target>
+
+  <!-- ── Linux: icon + .desktop + install script ───────────────────────── -->
+  <Target Name="CopyLinuxAssets" AfterTargets="Publish"
+          Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/linux/TerraLauncher.png"
+          DestinationFiles="$(PublishDir)TerraLauncher.png" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/linux/TerraLauncher.desktop"
+          DestinationFiles="$(PublishDir)TerraLauncher.desktop" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/linux/install-linux.sh"
+          DestinationFiles="$(PublishDir)install-linux.sh" />
+    <Exec Command="chmod +x &quot;$(PublishDir)TerraLauncher&quot; &quot;$(PublishDir)install-linux.sh&quot;" />
+    <Message Text="&#x2713; Linux assets copied to $(PublishDir)" Importance="High" />
+  </Target>
 </Project>

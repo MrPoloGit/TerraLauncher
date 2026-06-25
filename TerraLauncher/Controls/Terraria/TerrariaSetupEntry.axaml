@@ -12,19 +12,17 @@
                IsHitTestVisible="False"/>
       </Grid>
 
-      <TextBlock x:Name="labelName"
-                 Text="Setup Name"
-                 HorizontalAlignment="Left" VerticalAlignment="Top"
-                 Margin="76,3,0,0"
-                 Foreground="White" FontSize="24"
-                 FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"/>
-
-      <TextBlock x:Name="labelDetails"
-                 Text=""
-                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                 Margin="96,0,0,0"
-                 Foreground="White" FontSize="22"
-                 FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"/>
+      <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center"
+                  Margin="84,0,0,0" Spacing="2">
+        <TextBlock x:Name="labelName"
+                   Text="Setup Name"
+                   Foreground="White" FontSize="24"
+                   FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"/>
+        <TextBlock x:Name="labelDetails"
+                   Text=""
+                   Foreground="White" FontSize="22"
+                   FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"/>
+      </StackPanel>
 
       <StackPanel x:Name="stackPanelOptions"
                   HorizontalAlignment="Right" VerticalAlignment="Bottom"

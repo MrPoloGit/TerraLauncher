@@ -1,0 +1,12 @@
+[
+  {
+    "name": "tConfig v0.38",
+    "version": "v0.38",
+    "description": "Last tConfig release",
+    "date": "2012-11-01",
+    "author": "Surfpup",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/tconfig-v038.zip",
+    "requiresTerrariaVersion": "1.1.2"
+  }
+]

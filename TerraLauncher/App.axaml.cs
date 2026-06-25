@@ -15,10 +15,12 @@ public partial class App : Application {
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
 			var mainWindow = new MainWindow();
 			desktop.MainWindow = mainWindow;
-			desktop.ShutdownRequested += (s, e) => {
+			desktop.ShutdownRequested += (_, _) => {
 				Config.SaveConfig();
+				ProcessTracker.KillAll();
 			};
 		}
+		AppDomain.CurrentDomain.ProcessExit += (_, _) => ProcessTracker.KillAll();
 		base.OnFrameworkInitializationCompleted();
 	}
 }

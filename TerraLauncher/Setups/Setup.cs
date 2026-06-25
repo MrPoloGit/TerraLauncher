@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Xml;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using TerraLauncher.Controls.Terraria;
+using TerraLauncher.Instances;
+using TerraLauncher.Windows;
 
 namespace TerraLauncher.Setups;
 
@@ -76,6 +79,10 @@ public abstract class Setup : ISetup {
 		AddOptionIcon("Gear");
 		AddOptionIcon("FolderEnter");
 		AddOptionIcon("FolderLeave");
+		AddRemoveIcon("Game");
+		AddRemoveIcon("Server");
+		AddRemoveIcon("Tool");
+		AddIconFromPath("TMod", "avares://TerraLauncher/Resources/Icons/TreeView/TreeViewGameTMod.png");
 	}
 
 	public abstract ISetup Clone();
@@ -95,6 +102,16 @@ public abstract class Setup : ISetup {
 	private static void AddOptionIcon(string name) {
 		var bmp = LoadAvaloniaAsset("avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOption" + name + ".png");
 		if (bmp != null) SetupOptions[name] = bmp;
+	}
+
+	private static void AddRemoveIcon(string name) {
+		var bmp = LoadAvaloniaAsset($"avares://TerraLauncher/Resources/Icons/{name}Remove.png");
+		if (bmp != null) SetupOptions[name + "Remove"] = bmp;
+	}
+
+	private static void AddIconFromPath(string key, string uri) {
+		var bmp = LoadAvaloniaAsset(uri);
+		if (bmp != null) SetupIcons[key] = bmp;
 	}
 
 	public static Bitmap? LoadAvaloniaAsset(string uri) {
@@ -139,29 +156,107 @@ public abstract class Setup : ISetup {
 	public void Launch() {
 		Sounds.PlayOpen();
 		try {
-			if (File.Exists(ExePath)) {
-				var start = new ProcessStartInfo {
-					FileName = ExePath,
-					Arguments = Arguments,
-					WindowStyle = ProcessWindowStyle.Normal,
-					CreateNoWindow = true,
-					UseShellExecute = true,
-					WorkingDirectory = ExeDirectory
-				};
-				var proc = Process.Start(start);
-				bool close = TypeName switch {
-					"Game" => Config.CloseOnGameLaunch,
-					"Server" => Config.CloseOnServerLaunch,
-					"Tool" => Config.CloseOnToolLaunch,
-					_ => false
-				};
-				bool ctrl = false, shift = false;
+			bool isMacBundle = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+				&& ExePath.EndsWith(".app", StringComparison.OrdinalIgnoreCase)
+				&& Directory.Exists(ExePath);
 
-				if (proc != null && (close || ctrl) && !shift)
-					Config.MainWindow?.Close();
+			// Validate path before attempting launch
+			if (!isMacBundle && !File.Exists(ExePath)) {
+				Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+					if (Config.MainWindow == null) return;
+					string msg = string.IsNullOrEmpty(ExePath)
+						? "No executable path is set for this entry.\n\nUse Edit to set the path."
+						: $"Could not find:\n\n{ExePath}\n\nThe path may have moved or been deleted. Use Edit to update it.";
+					await TriggerMessageBox.ShowAsync(Config.MainWindow, MessageIcon.Error,
+						msg, "Cannot Launch", MsgBoxButton.OK);
+				});
+				return;
 			}
+
+			ProcessStartInfo start;
+			if (isMacBundle) {
+				// Use ArgumentList so paths with spaces (e.g. "Application Support") are not split
+				start = new ProcessStartInfo { FileName = "open", UseShellExecute = false };
+				start.ArgumentList.Add(ExePath);
+				if (!string.IsNullOrEmpty(Arguments)) {
+					start.ArgumentList.Add("--args");
+					foreach (var arg in SplitArgs(Arguments))
+						start.ArgumentList.Add(arg);
+				}
+			}
+			else {
+				start = new ProcessStartInfo {
+					FileName         = ExePath,
+					Arguments        = Arguments,
+					WindowStyle      = ProcessWindowStyle.Normal,
+					CreateNoWindow   = true,
+					UseShellExecute  = true,
+					WorkingDirectory = ExeDirectory,
+				};
+			}
+
+			var proc = Process.Start(start);
+			if (proc != null) ProcessTracker.Track(proc);
+			bool close = TypeName switch {
+				"Game"   => Config.CloseOnGameLaunch,
+				"Server" => Config.CloseOnServerLaunch,
+				"Tool"   => Config.CloseOnToolLaunch,
+				_ => false
+			};
+			if (close) Config.MainWindow?.Close();
 		}
 		catch { }
+	}
+
+	// Splits a command-line string into tokens, respecting "quoted segments"
+	private static List<string> SplitArgs(string args) {
+		var result = new List<string>();
+		int i = 0;
+		while (i < args.Length) {
+			while (i < args.Length && args[i] == ' ') i++;
+			if (i >= args.Length) break;
+			if (args[i] == '"') {
+				i++;
+				int s = i;
+				while (i < args.Length && args[i] != '"') i++;
+				result.Add(args[s..i]);
+				if (i < args.Length) i++;
+			}
+			else {
+				int s = i;
+				while (i < args.Length && args[i] != ' ') i++;
+				result.Add(args[s..i]);
+			}
+		}
+		return result;
+	}
+
+	public void Delete() {
+		if (Config.MainWindow == null) return;
+		Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+			var result = await TriggerMessageBox.ShowAsync(
+				Config.MainWindow,
+				MessageIcon.Warning,
+				$"Remove \"{Name}\" from the list?\n\nFiles on disk will not be deleted.",
+				"Remove Entry",
+				MsgBoxButton.YesNo);
+			if (result != MsgBoxResult.Yes) return;
+
+			Sounds.PlayClose();
+			static bool RemoveFrom(SetupFolder folder, Setup target) {
+				if (folder.Entries.Remove(target)) return true;
+				foreach (var e in folder.Entries)
+					if (e is SetupFolder sub && RemoveFrom(sub, target)) return true;
+				return false;
+			}
+			RemoveFrom(Config.Games, this);
+			RemoveFrom(Config.Servers, this);
+			RemoveFrom(Config.Tools, this);
+			InstanceManager.RemoveByExePath(ExePath);
+			Config.Modified = true;
+			Config.SaveConfig();
+			Config.MainWindow?.ReloadSetups();
+		});
 	}
 
 	public void OpenExeFolder() {

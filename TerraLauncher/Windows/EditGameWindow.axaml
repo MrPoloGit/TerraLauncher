@@ -1,70 +1,110 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
         x:Class="TerraLauncher.Windows.EditGameWindow"
         Title="Edit Game Setup"
-        Width="380"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="420"
+        SizeToContent="Height"
+        MinWidth="360"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False"
-        SizeToContent="Height"
-        Background="#F9F9F9">
-  <Grid Margin="14,14,14,10" RowDefinitions="Auto,8,Auto,8,Auto,8,Auto,8,Auto,8,Auto,12,Auto">
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
 
-    <!-- Icon preview row -->
-    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
-      <Grid Width="72" Height="72">
-        <Rectangle Margin="2" Fill="#6675CC"/>
-        <Image x:Name="imageIcon" Width="68" Height="68"/>
-        <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconFrame.png" IsHitTestVisible="False"/>
-      </Grid>
-      <Grid RowDefinitions="Auto,6,Auto,6,Auto" ColumnDefinitions="Auto,8,*" VerticalAlignment="Center">
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"    VerticalAlignment="Center"/>
-        <TextBox   Grid.Row="0" Grid.Column="2" x:Name="textBoxName" Height="23"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Details" VerticalAlignment="Center"/>
-        <TextBox   Grid.Row="2" Grid.Column="2" x:Name="textBoxDetails" Height="23"/>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Icon"    VerticalAlignment="Center"/>
-        <Grid Grid.Row="4" Grid.Column="2" ColumnDefinitions="*,4,24">
-          <ComboBox x:Name="comboBoxIcon" Grid.Column="0" Height="23" SelectionChanged="OnIconSelectionChanged"/>
-          <TextBox  x:Name="textBoxCustomIcon" Grid.Column="0" Height="23" IsVisible="False" LostFocus="OnCustomIconLostFocus"/>
-          <Button   x:Name="buttonBrowseCustomIcon" Grid.Column="2" Width="24" Height="23" IsVisible="False"
-                    Padding="0" Click="OnBrowseCustomIcon" IsTabStop="False">
-            <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
-          </Button>
+  <controls:TerrariaWindow>
+    <Border Margin="8,40,8,10" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
+            Padding="12,12,12,12">
+      <StackPanel Spacing="10">
+
+        <!-- Icon preview + Name/Details/Icon fields -->
+        <Grid ColumnDefinitions="84,12,*">
+          <Grid Width="72" Height="72" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Rectangle Margin="2" Fill="#6675CC"/>
+            <Image x:Name="imageIcon" Width="68" Height="68"/>
+            <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconFrame.png"
+                   IsHitTestVisible="False"/>
+          </Grid>
+
+          <Grid Grid.Column="2" RowDefinitions="Auto,6,Auto,6,Auto" ColumnDefinitions="Auto,8,*,4,28">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name"    Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+            <TextBox   Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="3" x:Name="textBoxName"
+                       Background="#14143A" Foreground="White" BorderBrush="#4A4AAA" BorderThickness="1"
+                       CaretBrush="White" Padding="6,3"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Details" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+            <TextBox   Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" x:Name="textBoxDetails"
+                       Background="#14143A" Foreground="White" BorderBrush="#4A4AAA" BorderThickness="1"
+                       CaretBrush="White" Padding="6,3"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Icon"    Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+            <ComboBox  Grid.Row="4" Grid.Column="2" x:Name="comboBoxIcon"
+                       Background="#14143A" Foreground="White" BorderBrush="#4A4AAA"
+                       SelectionChanged="OnIconSelectionChanged"/>
+            <TextBox   Grid.Row="4" Grid.Column="2" x:Name="textBoxCustomIcon"
+                       Background="#14143A" Foreground="White" BorderBrush="#4A4AAA" BorderThickness="1"
+                       IsVisible="False" LostFocus="OnCustomIconLostFocus" CaretBrush="White" Padding="6,3"/>
+            <controls:TerrariaButton Grid.Row="4" Grid.Column="4" x:Name="buttonBrowseCustomIcon"
+                                     IsVisible="False" IsTabStop="False" Click="OnBrowseCustomIcon" Padding="0">
+              <TextBlock Text="…" Foreground="White" FontSize="14"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </controls:TerrariaButton>
+          </Grid>
         </Grid>
-      </Grid>
-    </StackPanel>
 
-    <Separator Grid.Row="2"/>
+        <Border Height="1" Background="#14143A"/>
 
-    <!-- Executable + Save Folder -->
-    <Grid Grid.Row="4" RowDefinitions="Auto,6,Auto" ColumnDefinitions="80,8,*,4,24">
-      <TextBlock Grid.Row="0" Grid.Column="0" Text="Executable"  VerticalAlignment="Center" HorizontalAlignment="Right"/>
-      <TextBox   Grid.Row="0" Grid.Column="2" x:Name="textBoxExe" Height="23"/>
-      <Button    Grid.Row="0" Grid.Column="4" Width="24" Height="23" Padding="0" Click="OnBrowseExe" IsTabStop="False">
-        <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
-      </Button>
-      <TextBlock Grid.Row="2" Grid.Column="0" Text="Save Folder" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-      <TextBox   Grid.Row="2" Grid.Column="2" x:Name="textBoxSaveFolder" Height="23"/>
-      <Button    Grid.Row="2" Grid.Column="4" Width="24" Height="23" Padding="0" Click="OnBrowseSaveFolder" IsTabStop="False">
-        <Image Source="avares://TerraLauncher/Resources/Icons/Browse.png" Width="14" Height="14"/>
-      </Button>
-    </Grid>
+        <!-- Executable + Save Folder -->
+        <Grid RowDefinitions="Auto,6,Auto" ColumnDefinitions="86,8,*,6,28">
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Executable"  Foreground="White" FontSize="14"
+                     VerticalAlignment="Center" HorizontalAlignment="Right"/>
+          <TextBox   Grid.Row="0" Grid.Column="2" x:Name="textBoxExe"
+                     Background="#14143A" Foreground="White" BorderBrush="#4A4AAA" BorderThickness="1"
+                     CaretBrush="White" Padding="6,3"/>
+          <controls:TerrariaButton Grid.Row="0" Grid.Column="4" Padding="0" Click="OnBrowseExe" IsTabStop="False">
+            <TextBlock Text="…" Foreground="White" FontSize="14"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </controls:TerrariaButton>
 
-    <Separator Grid.Row="6"/>
+          <TextBlock Grid.Row="2" Grid.Column="0" Text="Save Folder" Foreground="White" FontSize="14"
+                     VerticalAlignment="Center" HorizontalAlignment="Right"/>
+          <TextBox   Grid.Row="2" Grid.Column="2" x:Name="textBoxSaveFolder"
+                     Background="#14143A" Foreground="White" BorderBrush="#4A4AAA" BorderThickness="1"
+                     CaretBrush="White" Padding="6,3"/>
+          <controls:TerrariaButton Grid.Row="2" Grid.Column="4" Padding="0" Click="OnBrowseSaveFolder" IsTabStop="False">
+            <TextBlock Text="…" Foreground="White" FontSize="14"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </controls:TerrariaButton>
+        </Grid>
 
-    <!-- Options row -->
-    <StackPanel Grid.Row="8" Orientation="Horizontal" Spacing="12">
-      <CheckBox x:Name="checkBoxDefaultSaveFolder" Content="Default Save Folder" Click="OnDefaultSaveFolderChecked"/>
-      <CheckBox x:Name="checkBoxCustomIcon"        Content="Custom Icon"         Click="OnCustomIconChecked"/>
-      <CheckBox x:Name="checkBoxTMod"              Content="tModLoader"/>
-    </StackPanel>
+        <Border Height="1" Background="#14143A"/>
 
-    <Separator Grid.Row="10"/>
+        <!-- Options checkboxes -->
+        <StackPanel Orientation="Horizontal" Spacing="16">
+          <CheckBox x:Name="checkBoxDefaultSaveFolder" Content="Default Save Folder"
+                    Foreground="White" Click="OnDefaultSaveFolderChecked"/>
+          <CheckBox x:Name="checkBoxCustomIcon"        Content="Custom Icon"
+                    Foreground="White" Click="OnCustomIconChecked"/>
+          <CheckBox x:Name="checkBoxTMod"              Content="tModLoader"
+                    Foreground="White"/>
+        </StackPanel>
 
-    <!-- OK / Cancel -->
-    <StackPanel Grid.Row="12" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-      <Button Content="OK"     MinWidth="75" IsDefault="True" Click="OnOKClicked"/>
-      <Button Content="Cancel" MinWidth="75" IsCancel="True"/>
-    </StackPanel>
-  </Grid>
+        <Border Height="1" Background="#14143A"/>
+
+        <!-- OK / Cancel -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+          <controls:TerrariaButton Click="OnOKClicked">
+            <TextBlock Text="OK" Foreground="White" FontSize="18" Margin="20,3"/>
+          </controls:TerrariaButton>
+          <controls:TerrariaButton Click="OnCancelClicked">
+            <TextBlock Text="Cancel" Foreground="White" FontSize="18" Margin="12,3"/>
+          </controls:TerrariaButton>
+        </StackPanel>
+
+      </StackPanel>
+    </Border>
+  </controls:TerrariaWindow>
 </Window>

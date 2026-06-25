@@ -1,0 +1,95 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        x:Class="TerraLauncher.Windows.AddInstanceWindow"
+        Title="Add Instance"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="400" Height="440"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+
+  <controls:TerrariaWindow>
+    <Grid>
+      <Border Margin="8,40,8,8" Background="#323381" BorderThickness="2" BorderBrush="#14143A">
+        <Grid RowDefinitions="Auto,*" Margin="10">
+
+          <TextBlock Grid.Row="0"
+                     Text="Select a Category"
+                     FontSize="20" Foreground="White"
+                     HorizontalAlignment="Center"
+                     Margin="0,6,0,12"/>
+
+          <!-- 2×3 tile grid -->
+          <UniformGrid Grid.Row="1" Rows="3" Columns="2" Margin="4">
+
+            <!-- Terraria Versions -->
+            <controls:TerrariaButton Margin="4" Click="OnTerraria">
+              <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
+                <Image Source="avares://TerraLauncher/Resources/Icons/TerrariaIcon.png"
+                       Width="36" Height="36" HorizontalAlignment="Center"/>
+                <TextBlock Text="Terraria Versions" Foreground="White" FontSize="15"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
+              </StackPanel>
+            </controls:TerrariaButton>
+
+            <!-- tModLoader -->
+            <controls:TerrariaButton Margin="4" Click="OnTModLoader">
+              <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
+                <Image Source="avares://TerraLauncher/Resources/Icons/TreeView/TreeViewGameTMod.png"
+                       Width="36" Height="36" HorizontalAlignment="Center"/>
+                <TextBlock Text="tModLoader" Foreground="White" FontSize="15"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
+              </StackPanel>
+            </controls:TerrariaButton>
+
+            <!-- tAPI -->
+            <controls:TerrariaButton Margin="4" Click="OnTAPI">
+              <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
+                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionHammer.png"
+                       Width="36" Height="36" HorizontalAlignment="Center"/>
+                <TextBlock Text="tAPI" Foreground="White" FontSize="15"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
+              </StackPanel>
+            </controls:TerrariaButton>
+
+            <!-- tConfig -->
+            <controls:TerrariaButton Margin="4" Click="OnTConfig">
+              <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
+                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionGear.png"
+                       Width="36" Height="36" HorizontalAlignment="Center"/>
+                <TextBlock Text="tConfig" Foreground="White" FontSize="15"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
+              </StackPanel>
+            </controls:TerrariaButton>
+
+            <!-- StandAlone -->
+            <controls:TerrariaButton Margin="4" Click="OnStandAlone">
+              <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
+                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTShock.png"
+                       Width="36" Height="36" HorizontalAlignment="Center"/>
+                <TextBlock Text="StandAlone" Foreground="White" FontSize="15"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
+              </StackPanel>
+            </controls:TerrariaButton>
+
+            <!-- Other (disabled) -->
+            <controls:TerrariaButton Margin="4" IsEnabled="False" Opacity="0.35">
+              <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
+                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTool.png"
+                       Width="36" Height="36" HorizontalAlignment="Center"/>
+                <TextBlock Text="Other (Tools)" Foreground="White" FontSize="15"
+                           HorizontalAlignment="Center" TextAlignment="Center"/>
+              </StackPanel>
+            </controls:TerrariaButton>
+
+          </UniformGrid>
+        </Grid>
+      </Border>
+    </Grid>
+  </controls:TerrariaWindow>
+</Window>

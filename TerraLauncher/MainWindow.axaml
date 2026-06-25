@@ -10,6 +10,7 @@
         MinWidth="560" MinHeight="420"
         WindowStartupLocation="CenterScreen"
         FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Icon="avares://TerraLauncher/Resources/Icons/TerrariaIcon.png"
         Opacity="0">
   <controls:TerrariaWindow>
     <Grid>
@@ -52,6 +53,18 @@
                  Height="44"
                  FontSize="28" Foreground="White"
                  Padding="5,5,5,0"/>
+
+      <!-- Add Instance button (left of Settings) -->
+      <controls:TerrariaButton x:Name="buttonAddInstance"
+                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                               Margin="0,0,56,0"
+                               Click="OnAddInstance">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Add Instance"/></ToolTip.Tip>
+        <TextBlock Text="+" Foreground="White" FontSize="30" FontWeight="Bold"
+                   Width="32" Height="32"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   TextAlignment="Center" Padding="0,0,0,4"/>
+      </controls:TerrariaButton>
 
       <!-- Settings button (bottom right) -->
       <controls:TerrariaButton x:Name="buttonSettings"

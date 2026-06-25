@@ -1,33 +1,56 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
         x:Class="TerraLauncher.Windows.TriggerMessageBox"
         Title="Message"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="380"
+        SizeToContent="Height"
+        MinWidth="300"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
         ShowInTaskbar="False"
-        SizeToContent="WidthAndHeight"
-        MinWidth="280">
-  <Grid x:Name="clientArea" Width="400" MinHeight="110">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
 
-    <TextBlock x:Name="textBlockMessage"
-               Grid.Row="0"
-               Text="Message"
-               TextWrapping="Wrap"
-               Margin="18,27,18,8"/>
+  <controls:TerrariaWindow>
+    <Border Margin="8,40,8,10" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
+            Padding="16,14,16,14">
+      <StackPanel Spacing="16">
 
-    <Border Grid.Row="1" Background="#F0F0F0" Padding="10,12">
-      <StackPanel x:Name="stackPanelButtons"
-                  HorizontalAlignment="Right"
-                  Orientation="Horizontal"
-                  Spacing="10">
-        <Button x:Name="button1" Content="Yes"    MinWidth="75" Padding="5,1" Click="OnButtonClicked"/>
-        <Button x:Name="button2" Content="No"     MinWidth="75" Padding="5,1" Click="OnButtonClicked"/>
-        <Button x:Name="button3" Content="Cancel" MinWidth="75" Padding="5,1" Click="OnButtonClicked"/>
+        <!-- Icon + Message -->
+        <StackPanel Orientation="Horizontal" Spacing="14">
+          <TextBlock x:Name="textBlockIcon"
+                     Text="⚠"
+                     FontSize="26"
+                     VerticalAlignment="Top"
+                     Margin="0,2,0,0"/>
+          <TextBlock x:Name="textBlockMessage"
+                     Text="Message"
+                     TextWrapping="Wrap"
+                     Foreground="White"
+                     FontSize="17"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel x:Name="stackPanelButtons"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Spacing="8">
+          <controls:TerrariaButton x:Name="button1" Click="OnButtonClicked">
+            <TextBlock x:Name="label1" Text="Yes" Foreground="White" FontSize="18" Margin="14,3"/>
+          </controls:TerrariaButton>
+          <controls:TerrariaButton x:Name="button2" Click="OnButtonClicked">
+            <TextBlock x:Name="label2" Text="No" Foreground="White" FontSize="18" Margin="14,3"/>
+          </controls:TerrariaButton>
+          <controls:TerrariaButton x:Name="button3" Click="OnButtonClicked">
+            <TextBlock x:Name="label3" Text="Cancel" Foreground="White" FontSize="18" Margin="14,3"/>
+          </controls:TerrariaButton>
+        </StackPanel>
+
       </StackPanel>
     </Border>
-  </Grid>
+  </controls:TerrariaWindow>
 </Window>

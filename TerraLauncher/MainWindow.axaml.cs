@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -10,13 +12,14 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using TerraLauncher.Controls.Terraria;
+using TerraLauncher.Instances;
 using TerraLauncher.Setups;
+using TerraLauncher.Util;
 using TerraLauncher.Windows;
 
 namespace TerraLauncher;
 
 public partial class MainWindow : Window {
-	private bool _loaded;
 	private bool _closing;
 	private readonly Stack<TerrariaSetupList> _gameStack = new();
 	private readonly Stack<TerrariaSetupList> _serverStack = new();
@@ -43,11 +46,11 @@ public partial class MainWindow : Window {
 		InitializeComponent();
 		Config.MainWindow = this;
 		LoadSettings();
+		InstanceManager.Load();
 
 		Opened += async (_, _) => {
 			Sounds.PlayOpen();
 			await FadeAsync(0, 1, 0.4);
-			_loaded = true;
 		};
 
 		Closing += OnWindowClosing;
@@ -56,6 +59,7 @@ public partial class MainWindow : Window {
 
 	private void LoadSettings() {
 		Config.LoadConfig(this);
+		EnsureSteamTerrariaEntry();
 		LoadSetups();
 
 		if (Config.WindowWidth >= MinWidth) Width = Config.WindowWidth;
@@ -75,6 +79,47 @@ public partial class MainWindow : Window {
 		Config.SaveConfig();
 	}
 
+	private static void EnsureSteamTerrariaEntry() {
+		string path = Config.TerrariaExePath;
+		if (string.IsNullOrEmpty(path))
+			path = TerrariaLocator.TerrariaPath;
+		if (string.IsNullOrEmpty(path)) return;
+		if (FolderContainsExe(Config.Games, path)) return;
+
+		string details = TryReadTerrariaVersion(path) ?? "";
+		Config.Games.Entries.Insert(0, new Game {
+			Name    = "Terraria",
+			ExePath = path,
+			Icon    = "Tree",
+			Details = details,
+		});
+		Config.Modified = true;
+		Config.SaveConfig();
+	}
+
+	private static bool FolderContainsExe(SetupFolder folder, string path) {
+		foreach (var e in folder.Entries) {
+			if (e is Game g && string.Equals(g.ExePath, path, StringComparison.OrdinalIgnoreCase)) return true;
+			if (e is SetupFolder sub && FolderContainsExe(sub, path)) return true;
+		}
+		return false;
+	}
+
+	private static string? TryReadTerrariaVersion(string terrariaPath) {
+		try {
+			string plist = Path.Combine(terrariaPath, "Contents", "Info.plist");
+			if (File.Exists(plist)) {
+				string text = File.ReadAllText(plist);
+				var m = Regex.Match(text, @"<key>CFBundleShortVersionString</key>\s*<string>([^<]+)</string>");
+				if (m.Success) return m.Groups[1].Value;
+				m = Regex.Match(text, @"<key>CFBundleVersion</key>\s*<string>([^<]+)</string>");
+				if (m.Success) return m.Groups[1].Value;
+			}
+		}
+		catch { }
+		return null;
+	}
+
 	private void LoadSetups() {
 		AddTabList(gridGames, _gameStack, Config.Games);
 		AddTabList(gridServers, _serverStack, Config.Servers);
@@ -88,7 +133,7 @@ public partial class MainWindow : Window {
 		grid.Children.Add(list);
 	}
 
-	private void ReloadSetups() {
+	public void ReloadSetups() {
 		ClearTab(gridGames, _gameStack);
 		ClearTab(gridServers, _serverStack);
 		ClearTab(gridTools, _toolStack);
@@ -181,6 +226,11 @@ public partial class MainWindow : Window {
 		if (CurrentStack.Count > 1)
 			label += " " + new string('>', CurrentStack.Count - 1) + " " + CurrentStack.Peek().Folder?.Name;
 		labelListType.Text = label;
+	}
+
+	private async void OnAddInstance(object? sender, RoutedEventArgs e) {
+		await AddInstanceWindow.ShowDialogAsync(this);
+		ReloadSetups();
 	}
 
 	private async void OnEditSetups(object? sender, RoutedEventArgs e) {

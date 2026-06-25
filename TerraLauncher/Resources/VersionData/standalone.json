@@ -1,0 +1,11 @@
+[
+  {
+    "name": "TerrariaServer 1.4.4.9",
+    "version": "1.4.4.9",
+    "description": "Dedicated server standalone",
+    "date": "2023-09-28",
+    "author": "Re-Logic",
+    "platforms": ["windows", "linux"],
+    "url": "TODO_HOSTED_URL/TerrariaServer-1449.zip"
+  }
+]
