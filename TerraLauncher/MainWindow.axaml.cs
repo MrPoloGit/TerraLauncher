@@ -228,6 +228,17 @@ public partial class MainWindow : Window {
 		labelListType.Text = label;
 	}
 
+	private void OnOpenInstancesFolder(object? sender, RoutedEventArgs e) {
+		Sounds.PlayOpen();
+		try {
+			string path = InstanceManager.InstancesRoot;
+			if (!Directory.Exists(path))
+				Directory.CreateDirectory(path);
+			System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path) { UseShellExecute = true });
+		}
+		catch { }
+	}
+
 	private async void OnAddInstance(object? sender, RoutedEventArgs e) {
 		await AddInstanceWindow.ShowDialogAsync(this);
 		ReloadSetups();

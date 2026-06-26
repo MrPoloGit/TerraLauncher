@@ -116,6 +116,15 @@ public static class InstanceManager {
 			Save();
 	}
 
+	public static void DeleteInstanceFiles(InstanceRecord record) {
+		if (string.IsNullOrEmpty(record.InstallPath)) return;
+		try {
+			if (Directory.Exists(record.InstallPath))
+				Directory.Delete(record.InstallPath, recursive: true);
+		}
+		catch { }
+	}
+
 	public static InstanceRecord? FindTerrariaVersion(string version) =>
 		_instances.Find(i => i.Category == InstanceCategory.Terraria && i.Version == version);
 }

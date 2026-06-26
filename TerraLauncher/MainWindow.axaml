@@ -15,7 +15,8 @@
   <controls:TerrariaWindow>
     <Grid>
       <!-- Main content area with tabs -->
-      <Border Margin="8,40,8,49" Background="#323381" BorderThickness="2" BorderBrush="#14143A">
+      <Border Margin="8,40,8,49" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
+              ClipToBounds="True">
         <Grid>
           <Grid x:Name="gridGames"   IsVisible="True"/>
           <Grid x:Name="gridServers" IsVisible="False"/>
@@ -53,6 +54,15 @@
                  Height="44"
                  FontSize="28" Foreground="White"
                  Padding="5,5,5,0"/>
+
+      <!-- Open Instances Folder button -->
+      <controls:TerrariaButton x:Name="buttonOpenFolder"
+                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                               Margin="0,0,104,0"
+                               Click="OnOpenInstancesFolder">
+        <ToolTip.Tip><controls:TerrariaTooltip Text="Open Instances Folder"/></ToolTip.Tip>
+        <Image Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionHome.png" Width="32" Height="32"/>
+      </controls:TerrariaButton>
 
       <!-- Add Instance button (left of Settings) -->
       <controls:TerrariaButton x:Name="buttonAddInstance"

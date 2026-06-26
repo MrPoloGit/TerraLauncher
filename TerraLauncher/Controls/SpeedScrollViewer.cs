@@ -14,10 +14,14 @@ public class SpeedScrollViewer : ScrollViewer {
 	}
 
 	protected override void OnPointerWheelChanged(PointerWheelEventArgs e) {
-		double delta = e.Delta.Y * ScrollSpeed * 50;
-		double newOffset = Offset.Y - delta;
-		newOffset = System.Math.Clamp(newOffset, 0, ScrollBarMaximum.Y);
-		Offset = new Vector(Offset.X, newOffset);
-		e.Handled = true;
+		// Delegate to Avalonia's native handler first — it correctly handles macOS trackpad momentum.
+		// Then nudge the offset further when ScrollSpeed != 1 to apply the multiplier.
+		var before = Offset.Y;
+		base.OnPointerWheelChanged(e);
+		if (System.Math.Abs(ScrollSpeed - 1.0) > 0.01) {
+			double extra = (Offset.Y - before) * (ScrollSpeed - 1.0);
+			double newOffset = System.Math.Clamp(Offset.Y + extra, 0, ScrollBarMaximum.Y);
+			Offset = new Vector(Offset.X, newOffset);
+		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Xml;
 using Avalonia;
@@ -234,15 +235,51 @@ public abstract class Setup : ISetup {
 	public void Delete() {
 		if (Config.MainWindow == null) return;
 		Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+			var window = Config.MainWindow!;
+
+			// Find this entry's instance record
+			var record = InstanceManager.Instances.FirstOrDefault(r => r.ExePath == ExePath);
+
+			// Find instances that depend on this Terraria version
+			var dependents = new List<InstanceRecord>();
+			if (record?.Category == InstanceCategory.Terraria) {
+				dependents = InstanceManager.Instances
+					.Where(r => r.LinkedTerrariaInstanceId == record.Id)
+					.ToList();
+			}
+
+			// Confirm removal
 			var result = await TriggerMessageBox.ShowAsync(
-				Config.MainWindow,
-				MessageIcon.Warning,
-				$"Remove \"{Name}\" from the list?\n\nFiles on disk will not be deleted.",
-				"Remove Entry",
-				MsgBoxButton.YesNo);
+				window, MessageIcon.Warning,
+				$"Remove \"{Name}\" from the list?",
+				"Remove Entry", MsgBoxButton.YesNo);
 			if (result != MsgBoxResult.Yes) return;
 
+			// Ask about deleting files
+			bool deleteFiles = false;
+			if (record != null && !string.IsNullOrEmpty(record.InstallPath)
+				&& Directory.Exists(record.InstallPath)) {
+				var delResult = await TriggerMessageBox.ShowAsync(
+					window, MessageIcon.Warning,
+					$"Also delete files from disk?\n\n{record.InstallPath}",
+					"Delete Files", MsgBoxButton.YesNo);
+				deleteFiles = delResult == MsgBoxResult.Yes;
+			}
+
+			// Ask about dependent instances
+			bool deleteDependents = false;
+			if (dependents.Count > 0) {
+				string depList = string.Join("\n", dependents.Select(d => $"• {d.Name} ({d.Version})"));
+				var depResult = await TriggerMessageBox.ShowAsync(
+					window, MessageIcon.Warning,
+					$"The following instances depend on this Terraria version:\n\n{depList}\n\nDelete them too?",
+					"Delete Dependents", MsgBoxButton.YesNo);
+				deleteDependents = depResult == MsgBoxResult.Yes;
+			}
+
 			Sounds.PlayClose();
+
+			// Remove this entry
 			static bool RemoveFrom(SetupFolder folder, Setup target) {
 				if (folder.Entries.Remove(target)) return true;
 				foreach (var e in folder.Entries)
@@ -253,10 +290,36 @@ public abstract class Setup : ISetup {
 			RemoveFrom(Config.Servers, this);
 			RemoveFrom(Config.Tools, this);
 			InstanceManager.RemoveByExePath(ExePath);
+			if (deleteFiles && record != null)
+				InstanceManager.DeleteInstanceFiles(record);
+
+			// Remove dependent entries
+			if (deleteDependents) {
+				foreach (var dep in dependents) {
+					RemoveSetupByExePath(dep.ExePath);
+					InstanceManager.RemoveByExePath(dep.ExePath);
+					InstanceManager.DeleteInstanceFiles(dep);
+				}
+			}
+
 			Config.Modified = true;
 			Config.SaveConfig();
-			Config.MainWindow?.ReloadSetups();
+			window.ReloadSetups();
 		});
+	}
+
+	private static void RemoveSetupByExePath(string exePath) {
+		static bool Remove(SetupFolder folder, string path) {
+			var match = folder.Entries.OfType<Setup>()
+				.FirstOrDefault(s => s.ExePath == path);
+			if (match != null) { folder.Entries.Remove(match); return true; }
+			foreach (var e in folder.Entries)
+				if (e is SetupFolder sub && Remove(sub, path)) return true;
+			return false;
+		}
+		Remove(Config.Games, exePath);
+		Remove(Config.Servers, exePath);
+		Remove(Config.Tools, exePath);
 	}
 
 	public void OpenExeFolder() {
