@@ -5,6 +5,11 @@ using Avalonia.Input;
 namespace TerraLauncher.Controls;
 
 public class SpeedScrollViewer : ScrollViewer {
+	// Without this, theme lookup uses typeof(SpeedScrollViewer) and finds no
+	// ControlTheme, so the control renders without a ScrollContentPresenter
+	// and Extent/Viewport stay 0 (no scrolling at all).
+	protected override System.Type StyleKeyOverride => typeof(ScrollViewer);
+
 	public static readonly StyledProperty<double> ScrollSpeedProperty =
 		AvaloniaProperty.Register<SpeedScrollViewer, double>(nameof(ScrollSpeed), 1.0);
 
