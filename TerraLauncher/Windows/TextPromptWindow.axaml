@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        x:Class="TerraLauncher.Windows.TextPromptWindow"
+        Title="Input"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="400"
+        SizeToContent="Height"
+        MinWidth="320"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+
+  <controls:TerrariaWindow>
+    <Border Margin="8,40,8,10" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
+            Padding="16,14,16,14">
+      <StackPanel Spacing="12">
+
+        <TextBlock x:Name="textBlockMessage"
+                   Text="Message"
+                   TextWrapping="Wrap"
+                   Foreground="White"
+                   FontSize="17"/>
+
+        <StackPanel x:Name="panelField1" Spacing="4">
+          <TextBlock x:Name="labelField1" Text="Field 1" Foreground="White" FontSize="15" Opacity="0.8"/>
+          <TextBox x:Name="textBox1" FontSize="15"/>
+        </StackPanel>
+
+        <StackPanel x:Name="panelField2" Spacing="4">
+          <TextBlock x:Name="labelField2" Text="Field 2" Foreground="White" FontSize="15" Opacity="0.8"/>
+          <TextBox x:Name="textBox2" FontSize="15" PasswordChar="●"/>
+        </StackPanel>
+
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+          <controls:TerrariaButton x:Name="buttonOK" Click="OnOK">
+            <TextBlock Text="OK" Foreground="White" FontSize="18" Margin="14,3"/>
+          </controls:TerrariaButton>
+          <controls:TerrariaButton x:Name="buttonCancel" Click="OnCancel">
+            <TextBlock Text="Cancel" Foreground="White" FontSize="18" Margin="14,3"/>
+          </controls:TerrariaButton>
+        </StackPanel>
+
+      </StackPanel>
+    </Border>
+  </controls:TerrariaWindow>
+</Window>

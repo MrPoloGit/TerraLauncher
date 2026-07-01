@@ -6,8 +6,10 @@
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- NU1903: Tmds.DBus.Protocol 0.20.0 vulnerability is in Linux-only D-Bus code,
-         unreachable on macOS/Windows. Fixed in Avalonia 12.x (upgrades to 0.92.0). -->
-    <NoWarn>$(NoWarn);NU1903</NoWarn>
+         unreachable on macOS/Windows. Fixed in Avalonia 12.x (upgrades to 0.92.0).
+         AVLN3001: windows/controls with parameterized constructors are constructed
+         from code, never via the runtime XAML loader — the warning doesn't apply. -->
+    <NoWarn>$(NoWarn);NU1903;AVLN3001</NoWarn>
     <AssemblyName>TerraLauncher</AssemblyName>
     <RootNamespace>TerraLauncher</RootNamespace>
     <AssemblyTitle>Terra Launcher</AssemblyTitle>

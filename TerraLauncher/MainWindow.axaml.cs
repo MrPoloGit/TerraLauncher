@@ -80,6 +80,7 @@ public partial class MainWindow : Window {
 	}
 
 	private static void EnsureSteamTerrariaEntry() {
+		if (Config.HideSteamTerraria) return;
 		string path = Config.TerrariaExePath;
 		if (string.IsNullOrEmpty(path))
 			path = TerrariaLocator.TerrariaPath;

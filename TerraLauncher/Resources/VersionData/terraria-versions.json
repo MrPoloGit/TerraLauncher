@@ -1,15 +1,37 @@
 [
   {
-    "name": "Terraria 1.4.4.9",
-    "version": "1.4.4.9",
-    "description": "Latest release",
-    "date": "2023-09-28",
+    "name": "Terraria (Latest)",
+    "version": "latest",
+    "description": "Current version on Steam — no manifest needed",
+    "date": "",
     "platforms": ["windows", "mac", "linux"],
     "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
+    "manifestIds": null
+  },
+  {
+    "name": "Terraria 1.4.5.6",
+    "version": "1.4.5.6",
+    "description": "Latest release",
+    "date": "2026",
+    "platforms": ["windows"],
+    "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
     "manifestIds": {
-      "windows": "TODO_MANIFEST_WIN_1449",
-      "mac":     "TODO_MANIFEST_MAC_1449",
-      "linux":   "TODO_MANIFEST_LIN_1449"
+      "windows": "5751495116255795831",
+      "mac":     null,
+      "linux":   null
+    }
+  },
+  {
+    "name": "Terraria 1.4.4.9",
+    "version": "1.4.4.9",
+    "description": "Last 1.4.4 release",
+    "date": "2023-09-28",
+    "platforms": ["windows"],
+    "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
+    "manifestIds": {
+      "windows": "8046724853517638985",
+      "mac":     null,
+      "linux":   null
     }
   },
   {
@@ -17,12 +39,12 @@
     "version": "1.4.3.6",
     "description": "Pre-1.4.4 stable",
     "date": "2022-09-26",
-    "platforms": ["windows", "mac", "linux"],
+    "platforms": ["windows"],
     "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
     "manifestIds": {
-      "windows": "TODO_MANIFEST_WIN_1436",
-      "mac":     "TODO_MANIFEST_MAC_1436",
-      "linux":   "TODO_MANIFEST_LIN_1436"
+      "windows": "8029804717360255491",
+      "mac":     null,
+      "linux":   null
     }
   },
   {
@@ -30,12 +52,12 @@
     "version": "1.3.5.3",
     "description": "Required by tModLoader 1.3",
     "date": "2017-05-20",
-    "platforms": ["windows", "mac", "linux"],
+    "platforms": ["windows"],
     "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
     "manifestIds": {
-      "windows": "TODO_MANIFEST_WIN_1353",
-      "mac":     "TODO_MANIFEST_MAC_1353",
-      "linux":   "TODO_MANIFEST_LIN_1353"
+      "windows": "8115792227484220109",
+      "mac":     null,
+      "linux":   null
     }
   },
   {
@@ -46,7 +68,7 @@
     "platforms": ["windows"],
     "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
     "manifestIds": {
-      "windows": "TODO_MANIFEST_WIN_1241",
+      "windows": "1270558334791485575",
       "mac":     null,
       "linux":   null
     }
@@ -59,7 +81,7 @@
     "platforms": ["windows"],
     "depotIds": { "windows": 105601, "mac": 105602, "linux": 105603 },
     "manifestIds": {
-      "windows": "TODO_MANIFEST_WIN_112",
+      "windows": "5797236311978194792",
       "mac":     null,
       "linux":   null
     }

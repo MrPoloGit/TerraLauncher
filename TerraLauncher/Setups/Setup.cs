@@ -293,6 +293,14 @@ public abstract class Setup : ISetup {
 			if (deleteFiles && record != null)
 				InstanceManager.DeleteInstanceFiles(record);
 
+			// Deleting the auto-detected Steam Terraria entry must stick across
+			// launches, otherwise EnsureSteamTerrariaEntry re-adds it.
+			string steamPath = !string.IsNullOrEmpty(Config.TerrariaExePath)
+				? Config.TerrariaExePath : Util.TerrariaLocator.TerrariaPath;
+			if (!string.IsNullOrEmpty(steamPath)
+				&& string.Equals(ExePath, steamPath, StringComparison.OrdinalIgnoreCase))
+				Config.HideSteamTerraria = true;
+
 			// Remove dependent entries
 			if (deleteDependents) {
 				foreach (var dep in dependents) {

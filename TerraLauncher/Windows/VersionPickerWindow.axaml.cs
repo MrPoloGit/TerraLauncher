@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -110,8 +110,21 @@ public partial class VersionPickerWindow : Window {
 		grid.Children.Add(info);
 
 		var btn = new TerrariaButton { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
-		btn.Content = new TextBlock { Text = "Download", Foreground = Brushes.White, FontSize = 16, Margin = new Thickness(10, 4) };
-		btn.Click += async (_, _) => await OnDownload(entry);
+		bool installed = InstanceManager.Instances.Any(
+			r => r.Category == _category && r.Version == entry.Version);
+		if (installed) {
+			btn.Content = new TextBlock {
+				Text = "Installed", Foreground = new SolidColorBrush(Color.Parse("#888899")),
+				FontSize = 16, Margin = new Thickness(10, 4)
+			};
+			btn.IsEnabled = false;
+			btn.Opacity = 0.55;
+			btn.Cursor = Avalonia.Input.Cursor.Default;
+		}
+		else {
+			btn.Content = new TextBlock { Text = "Download", Foreground = Brushes.White, FontSize = 16, Margin = new Thickness(10, 4) };
+			btn.Click += async (_, _) => await OnDownload(entry);
+		}
 		Grid.SetColumn(btn, 1);
 		grid.Children.Add(btn);
 
@@ -120,25 +133,30 @@ public partial class VersionPickerWindow : Window {
 	}
 
 	private async Task OnDownload(VersionEntry entry) {
+		// Resolve the Terraria dependency first (PLAN Feature 5)
+		string? linkedTerrariaId = null;
 		if (!string.IsNullOrEmpty(entry.RequiresTerrariaVersion)) {
-			var existing = InstanceManager.FindTerrariaVersion(entry.RequiresTerrariaVersion);
+			string required = entry.RequiresTerrariaVersion;
+			var existing = InstanceManager.FindTerrariaVersion(required);
 			if (existing == null) {
 				var result = await TriggerMessageBox.ShowAsync(
 					this,
 					MessageIcon.Question,
-					$"{entry.Name} requires Terraria {entry.RequiresTerrariaVersion} which is not installed.\n\nDownload it automatically?",
+					$"{entry.Name} requires Terraria {required} which is not installed.\n\nDownload it automatically? (Requires Steam login)",
 					"Dependency Required",
 					MsgBoxButton.YesNo);
 				if (result != MsgBoxResult.Yes) return;
 
-				await StubDownloadAsync(new VersionEntry {
-					Name    = $"Terraria {entry.RequiresTerrariaVersion}",
-					Version = entry.RequiresTerrariaVersion,
-				}, InstanceCategory.Terraria);
+				var terrariaVersions = await VersionSource.GetVersionsAsync(InstanceCategory.Terraria);
+				var dep = terrariaVersions.FirstOrDefault(v => v.Version == required)
+					?? new VersionEntry { Name = $"Terraria {required}", Version = required };
+				if (!await DownloadAsync(dep, InstanceCategory.Terraria, null)) return;
+				existing = InstanceManager.FindTerrariaVersion(required);
 			}
+			linkedTerrariaId = existing?.Id;
 		}
 
-		await StubDownloadAsync(entry, _category);
+		if (!await DownloadAsync(entry, _category, linkedTerrariaId)) return;
 
 		_closing = true;
 		Closing -= OnWindowClosing;
@@ -147,25 +165,51 @@ public partial class VersionPickerWindow : Window {
 		Close(true);
 	}
 
-	private static Task StubDownloadAsync(VersionEntry entry, InstanceCategory category) {
-		// Stub: creates directory + marker file. Real download implemented in steps 6–9.
+	private async Task<bool> DownloadAsync(VersionEntry entry, InstanceCategory category, string? linkedTerrariaId) {
+		if (InstanceManager.Instances.Any(r => r.Category == category && r.Version == entry.Version)) {
+			await TriggerMessageBox.ShowAsync(this, MessageIcon.Info,
+				$"{entry.Name} is already installed.", "Already Installed");
+			return false;
+		}
+
+		string user = "", pass = "";
+		if (category == InstanceCategory.Terraria) {
+			var login = await TextPromptWindow.ShowLoginAsync(this, "Steam Login",
+				"Steam credentials are required to download Terraria.\n" +
+				"They are passed directly to DepotDownloader and never saved.",
+				"Steam Username", "Steam Password");
+			if (login == null || string.IsNullOrWhiteSpace(login.Value.User)) return false;
+			(user, pass) = login.Value;
+		}
+		else if (string.IsNullOrEmpty(entry.Url) || entry.Url.Contains("TODO")) {
+			await TriggerMessageBox.ShowAsync(this, MessageIcon.Error,
+				$"No download is available for {entry.Name} yet.", "Not Available");
+			return false;
+		}
+
 		string safeName = (category.ToString() + "-" + entry.Version)
 			.Replace(" ", "-").Replace("/", "-");
 		string installDir = InstanceManager.GetInstallDir(category, safeName);
-		Directory.CreateDirectory(installDir);
 
-		string stubExe = Path.Combine(installDir,
-			OperatingSystem.IsWindows() ? "stub.exe" : "stub");
-		File.WriteAllText(stubExe, $"Stub for {entry.Name} — real download not yet implemented.");
+		string? exePath = null;
+		bool ok = await DownloadProgressWindow.RunAsync(this, $"Downloading {entry.Name}…",
+			async (ui, ct) => {
+				exePath = category == InstanceCategory.Terraria
+					? await DepotDownloaderService.DownloadTerrariaAsync(ui, entry, installDir, user, pass, ct)
+					: await Downloader.InstallFromUrlAsync(ui, entry, category, installDir, ct);
+				return exePath != null;
+			});
+		if (!ok || exePath == null) return false;
 
 		InstanceManager.AddInstance(new InstanceRecord {
 			Name        = entry.Name,
 			Version     = entry.Version,
 			Category    = category,
 			InstallPath = installDir,
-			ExePath     = stubExe,
+			ExePath     = exePath,
+			LinkedTerrariaInstanceId = linkedTerrariaId,
 		});
-		return Task.CompletedTask;
+		return true;
 	}
 
 	private async void OnRefresh(object? sender, RoutedEventArgs e) => await LoadVersionsAsync();

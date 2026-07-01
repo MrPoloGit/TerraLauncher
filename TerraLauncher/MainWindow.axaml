@@ -10,7 +10,7 @@
         MinWidth="560" MinHeight="420"
         WindowStartupLocation="CenterScreen"
         FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
-        Icon="avares://TerraLauncher/Resources/Icons/TerrariaIcon.png"
+        Icon="avares://TerraLauncher/Resources/Icons/AppIcon.png"
         Opacity="0">
   <controls:TerrariaWindow>
     <Grid>

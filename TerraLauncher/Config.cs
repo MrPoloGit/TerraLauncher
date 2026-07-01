@@ -48,6 +48,10 @@ public static class Config {
 	// Instances
 	public static string TerrariaExePath { get; set; } = "";
 
+	// Set when the user deletes the auto-detected Steam Terraria entry, so it
+	// isn't re-added on the next launch.
+	public static bool HideSteamTerraria { get; set; } = false;
+
 	public static SetupFolder Games { get; set; } = new SetupFolder("Game List");
 	public static SetupFolder Servers { get; set; } = new SetupFolder("Server List");
 	public static SetupFolder Tools { get; set; } = new SetupFolder("Tool List");
@@ -154,6 +158,10 @@ public static class Config {
 			if (node != null && !string.IsNullOrEmpty(node.InnerText))
 				TerrariaExePath = node.InnerText;
 
+			node = doc.SelectSingleNode("TerraLauncher/HideSteamTerraria");
+			if (node != null && bool.TryParse(node.InnerText, out boolValue))
+				HideSteamTerraria = boolValue;
+
 			#endregion
 
 			XmlElement? gameFolder = doc.SelectSingleNode("TerraLauncher/Games") as XmlElement;
@@ -206,6 +214,7 @@ public static class Config {
 			AppendText("SettingsWidth", SettingsWidth.ToString());
 			AppendText("SettingsHeight", SettingsHeight.ToString());
 			AppendText("TerrariaExePath", TerrariaExePath);
+			AppendText("HideSteamTerraria", HideSteamTerraria.ToString());
 
 			var gamesEl = doc.CreateElement("Games");
 			Games.Write<Game>(gamesEl, doc);

@@ -94,11 +94,7 @@ public static class VersionSource {
 					Author      = "tModLoader Team",
 					Description = TrimBody(r.Body),
 				};
-				var asset = r.Assets.Find(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)
-				                            && !a.Name.Contains("mac", StringComparison.OrdinalIgnoreCase)
-				                            && !a.Name.Contains("linux", StringComparison.OrdinalIgnoreCase))
-				         ?? r.Assets.Find(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase));
-				entry.Url = asset?.BrowserDownloadUrl;
+				entry.Url = PickAssetForCurrentOS(r.Assets);
 				if (System.Version.TryParse(ver, out var v) && v.Major == 0)
 					entry.RequiresTerrariaVersion = "1.3.5.3";
 				entries.Add(entry);
@@ -108,6 +104,25 @@ public static class VersionSource {
 		return entries;
 	}
 
+	// Legacy tModLoader (0.11) ships one archive per OS; modern releases ship a
+	// single universal tModLoader.zip. Prefer the archive for the running OS.
+	private static string? PickAssetForCurrentOS(List<GitHubAsset> assets) {
+		string os = OperatingSystem.IsWindows() ? "windows"
+			: OperatingSystem.IsMacOS() ? "mac" : "linux";
+		bool IsArchive(string n) =>
+			n.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)
+			|| n.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase);
+
+		var asset = assets.Find(a => IsArchive(a.Name) && a.Name.Contains(os, StringComparison.OrdinalIgnoreCase))
+			?? assets.Find(a => string.Equals(a.Name, "tModLoader.zip", StringComparison.OrdinalIgnoreCase))
+			?? assets.Find(a => IsArchive(a.Name)
+				&& !a.Name.Contains("example", StringComparison.OrdinalIgnoreCase)
+				&& !a.Name.Contains("windows", StringComparison.OrdinalIgnoreCase)
+				&& !a.Name.Contains("mac", StringComparison.OrdinalIgnoreCase)
+				&& !a.Name.Contains("linux", StringComparison.OrdinalIgnoreCase));
+		return asset?.BrowserDownloadUrl;
+	}
+
 	private static string TrimBody(string body) {
 		if (string.IsNullOrWhiteSpace(body)) return "";
 		var line = body.Split('\n')[0].Trim().TrimStart('#').Trim();
@@ -115,7 +130,7 @@ public static class VersionSource {
 	}
 }
 
-file class GitHubRelease {
+internal class GitHubRelease {
 	[JsonPropertyName("tag_name")]     public string TagName     { get; set; } = "";
 	[JsonPropertyName("name")]         public string Name        { get; set; } = "";
 	[JsonPropertyName("published_at")] public string PublishedAt { get; set; } = "";
@@ -124,7 +139,7 @@ file class GitHubRelease {
 	[JsonPropertyName("assets")]       public List<GitHubAsset> Assets { get; set; } = new();
 }
 
-file class GitHubAsset {
+internal class GitHubAsset {
 	[JsonPropertyName("name")]                 public string Name               { get; set; } = "";
 	[JsonPropertyName("browser_download_url")] public string BrowserDownloadUrl { get; set; } = "";
 }

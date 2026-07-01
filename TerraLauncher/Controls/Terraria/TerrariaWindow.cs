@@ -7,6 +7,8 @@ using Avalonia.Media;
 namespace TerraLauncher.Controls.Terraria;
 
 public class TerrariaWindow : ContentControl {
+	private TerrariaButton? _minimizeButton;
+
 	public override void Render(DrawingContext context) {
 		CroppedFrames.EnsureInitialized();
 		DrawCropped.DrawFrame(context, CroppedFrames.WindowFrame, Bounds.Width, Bounds.Height);
@@ -17,7 +19,7 @@ public class TerrariaWindow : ContentControl {
 		base.OnApplyTemplate(e);
 
 		var closeButton = e.NameScope.Find<TerrariaButton>("closeButton");
-		var minimizeButton = e.NameScope.Find<TerrariaButton>("minimizeButton");
+		_minimizeButton = e.NameScope.Find<TerrariaButton>("minimizeButton");
 		var titleBar = e.NameScope.Find<Panel>("titleBar");
 
 		if (closeButton != null)
@@ -25,8 +27,8 @@ public class TerrariaWindow : ContentControl {
 				Sounds.PlayClose();
 				(TopLevel.GetTopLevel(this) as Window)?.Close();
 			};
-		if (minimizeButton != null)
-			minimizeButton.Click += (_, _) => {
+		if (_minimizeButton != null)
+			_minimizeButton.Click += (_, _) => {
 				Sounds.PlayClose();
 				if (TopLevel.GetTopLevel(this) is Window w)
 					w.WindowState = WindowState.Minimized;
@@ -42,6 +44,19 @@ public class TerrariaWindow : ContentControl {
 		AttachResizeGrip(e, "topRightSizeGrip", WindowEdge.NorthEast);
 		AttachResizeGrip(e, "bottomLeftSizeGrip", WindowEdge.SouthWest);
 		AttachResizeGrip(e, "bottomRightSizeGrip", WindowEdge.SouthEast);
+
+		UpdateMinimizeVisibility();
+	}
+
+	protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) {
+		base.OnAttachedToVisualTree(e);
+		UpdateMinimizeVisibility();
+	}
+
+	// Dialogs/popups shouldn't offer minimize — only the main window keeps it.
+	private void UpdateMinimizeVisibility() {
+		if (_minimizeButton != null)
+			_minimizeButton.IsVisible = TopLevel.GetTopLevel(this) is TerraLauncher.MainWindow;
 	}
 
 	private void AttachResizeGrip(TemplateAppliedEventArgs e, string name, WindowEdge edge) {

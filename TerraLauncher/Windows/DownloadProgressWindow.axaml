@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        x:Class="TerraLauncher.Windows.DownloadProgressWindow"
+        Title="Downloading"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="520" Height="360"
+        MinWidth="420" MinHeight="280"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+
+  <controls:TerrariaWindow>
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="8,40,8,10">
+      <Border Grid.Row="0" Grid.RowSpan="4" Margin="0"
+              Background="#323381" BorderThickness="2" BorderBrush="#14143A"/>
+
+      <!-- Title -->
+      <TextBlock x:Name="labelTitle" Grid.Row="0"
+                 Text="Downloading…"
+                 Margin="16,12,16,0"
+                 FontSize="20" Foreground="White"
+                 TextWrapping="Wrap"/>
+
+      <!-- Progress bar -->
+      <Border x:Name="progressTrack" Grid.Row="1"
+              Margin="16,10,16,0" Height="18"
+              Background="#14143A" BorderBrush="#0D0D2B" BorderThickness="1"
+              CornerRadius="3" ClipToBounds="True">
+        <Border x:Name="progressFill"
+                Background="#C8A852" CornerRadius="2"
+                HorizontalAlignment="Left" Width="0"/>
+      </Border>
+
+      <!-- Log output -->
+      <Border Grid.Row="2" Margin="16,10,16,0"
+              Background="#14143A" BorderBrush="#0D0D2B" BorderThickness="1"
+              CornerRadius="3">
+        <ScrollViewer x:Name="logScroll" Margin="6"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+          <SelectableTextBlock x:Name="logText"
+                               Text=""
+                               FontFamily="Menlo,Consolas,monospace"
+                               FontSize="11"
+                               Foreground="#CCCCEE"
+                               TextWrapping="Wrap"/>
+        </ScrollViewer>
+      </Border>
+
+      <!-- Cancel -->
+      <controls:TerrariaButton x:Name="buttonCancel" Grid.Row="3"
+                               HorizontalAlignment="Right" Margin="0,8,14,8"
+                               Click="OnCancel">
+        <TextBlock x:Name="labelCancel" Text="Cancel" Foreground="White" FontSize="18" Margin="14,3"/>
+      </controls:TerrariaButton>
+    </Grid>
+  </controls:TerrariaWindow>
+</Window>

@@ -68,6 +68,20 @@ public static class InstanceManager {
 	}
 
 	private static void SyncToConfig(InstanceRecord record) {
+		// Standalone dedicated servers belong on the Servers tab
+		if (record.Category == InstanceCategory.StandAlone
+			&& record.Name.Contains("server", StringComparison.OrdinalIgnoreCase)) {
+			var server = new Server {
+				Name    = record.Name,
+				ExePath = record.ExePath,
+				Icon    = "ServerTree",
+				Details = record.Version
+			};
+			Config.Servers.Entries.Add(server);
+			Config.Modified = true;
+			return;
+		}
+
 		switch (record.Category) {
 			case InstanceCategory.Terraria:
 			case InstanceCategory.TModLoader:
@@ -78,7 +92,8 @@ public static class InstanceManager {
 					Name    = record.Name,
 					ExePath = record.ExePath,
 					Icon    = record.Category == InstanceCategory.TModLoader ? "TMod" : "Tree",
-					Details = record.Version
+					Details = record.Version,
+					IsTMod  = record.Category == InstanceCategory.TModLoader
 				};
 				Config.Games.Entries.Add(game);
 				Config.Modified = true;
