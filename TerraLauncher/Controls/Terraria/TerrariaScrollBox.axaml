@@ -6,11 +6,13 @@
        ScrollContent, which would otherwise capture this control's own layout -->
   <UserControl.Content>
   <Grid ColumnDefinitions="*,Auto">
-    <local:SpeedScrollViewer x:Name="scrollViewer" Grid.Column="0" Margin="0,0,2,0"
+    <local:SpeedScrollViewer x:Name="scrollViewer" Grid.Column="0"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Hidden"/>
-    <!-- Plain Border scrollbar: avoids Fluent ControlTheme opacity animations entirely -->
-    <Border x:Name="scrollTrack" Grid.Column="1" Width="14"
+    <!-- Plain Border scrollbar: avoids Fluent ControlTheme opacity animations entirely.
+         Left margin = gap between content and track; when the track is hidden the
+         column collapses so left/right padding stay symmetric. -->
+    <Border x:Name="scrollTrack" Grid.Column="1" Width="14" Margin="8,0,0,0"
             Background="#0D0D2B" BorderBrush="#1E1E50" BorderThickness="1"
             CornerRadius="7"
             IsVisible="False" ClipToBounds="True">

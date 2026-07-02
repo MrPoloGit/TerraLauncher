@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,29 +23,18 @@ namespace TerraLauncher;
 public partial class MainWindow : Window {
 	private bool _closing;
 	private readonly Stack<TerrariaSetupList> _gameStack = new();
-	private readonly Stack<TerrariaSetupList> _serverStack = new();
-	private readonly Stack<TerrariaSetupList> _toolStack = new();
-	private SetupTypes _currentTab = SetupTypes.Game;
 
-	private Stack<TerrariaSetupList> CurrentStack => _currentTab switch {
-		SetupTypes.Game => _gameStack,
-		SetupTypes.Server => _serverStack,
-		_ => _toolStack
-	};
-	private SetupFolder CurrentFolder => _currentTab switch {
-		SetupTypes.Game => Config.Games,
-		SetupTypes.Server => Config.Servers,
-		_ => Config.Tools
-	};
-	private Grid CurrentGrid => _currentTab switch {
-		SetupTypes.Game => gridGames,
-		SetupTypes.Server => gridServers,
-		_ => gridTools
-	};
+	private static readonly string[] FilterNames =
+		{ "All Instances", "Terraria", "tModLoader", "tAPI", "tConfig", "StandAlone" };
+	private static readonly InstanceCategory?[] FilterCategories =
+		{ null, InstanceCategory.Terraria, InstanceCategory.TModLoader,
+		  InstanceCategory.TAPI, InstanceCategory.TConfig, InstanceCategory.StandAlone };
 
 	public MainWindow() {
 		InitializeComponent();
 		Config.MainWindow = this;
+		comboFilter.ItemsSource = FilterNames;
+		comboFilter.SelectedIndex = 0;
 		LoadSettings();
 		InstanceManager.Load();
 
@@ -64,18 +54,12 @@ public partial class MainWindow : Window {
 
 		if (Config.WindowWidth >= MinWidth) Width = Config.WindowWidth;
 		if (Config.WindowHeight >= MinHeight) Height = Config.WindowHeight;
-
-		if (Enum.TryParse<SetupTypes>(Config.CurrentTab, out var tab))
-			_currentTab = tab;
-		UpdateTab();
-		UpdateFolder();
 	}
 
 	private void SaveSettings() {
 		if (Config.Modified) Config.SaveConfig();
 		Config.WindowWidth = (int)Width;
 		Config.WindowHeight = (int)Height;
-		Config.CurrentTab = _currentTab.ToString();
 		Config.SaveConfig();
 	}
 
@@ -122,112 +106,97 @@ public partial class MainWindow : Window {
 	}
 
 	private void LoadSetups() {
-		AddTabList(gridGames, _gameStack, Config.Games);
-		AddTabList(gridServers, _serverStack, Config.Servers);
-		AddTabList(gridTools, _toolStack, Config.Tools);
-	}
-
-	private void AddTabList(Grid grid, Stack<TerrariaSetupList> stack, SetupFolder folder) {
 		var list = new TerrariaSetupList();
-		list.PopulateList(folder, sub => NavigateForward(grid, stack, sub));
-		stack.Push(list);
-		grid.Children.Add(list);
+		list.PopulateList(Config.Games, sub => NavigateForward(sub));
+		_gameStack.Push(list);
+		gridGames.Children.Add(list);
 	}
 
 	public void ReloadSetups() {
-		ClearTab(gridGames, _gameStack);
-		ClearTab(gridServers, _serverStack);
-		ClearTab(gridTools, _toolStack);
+		gridGames.Children.Clear();
+		_gameStack.Clear();
 		LoadSetups();
+		ApplyFilter();
 	}
 
-	private static void ClearTab(Grid grid, Stack<TerrariaSetupList> stack) {
-		grid.Children.Clear();
-		stack.Clear();
-	}
-
-	private void NavigateForward(Grid grid, Stack<TerrariaSetupList> stack, SetupFolder folder) {
+	private void NavigateForward(SetupFolder folder) {
 		var list = new TerrariaSetupList();
-		list.PopulateList(folder, sub => NavigateForward(grid, stack, sub), () => NavigateBack(grid, stack));
-		var last = stack.Peek();
-		stack.Push(list);
-		grid.Children.Add(list);
+		list.PopulateList(folder, NavigateForward, NavigateBack);
+		var last = _gameStack.Peek();
+		_gameStack.Push(list);
+		gridGames.Children.Add(list);
 		if (!Config.DisableTransitions) {
-			last.LeaveFolder(false, grid.Bounds.Width);
-			list.EnterFolder(false, grid.Bounds.Width);
+			last.LeaveFolder(false, gridGames.Bounds.Width);
+			list.EnterFolder(false, gridGames.Bounds.Width);
 		}
 		else {
 			last.IsVisible = false;
 		}
-		UpdateFolder();
 	}
 
-	private void NavigateBack(Grid grid, Stack<TerrariaSetupList> stack) {
-		var last = stack.Pop();
-		var prev = stack.Peek();
+	private void NavigateBack() {
+		var last = _gameStack.Pop();
+		var prev = _gameStack.Peek();
 		if (!Config.DisableTransitions) {
-			last.LeaveFolder(true, grid.Bounds.Width);
-			prev.EnterFolder(true, grid.Bounds.Width);
+			last.LeaveFolder(true, gridGames.Bounds.Width);
+			prev.EnterFolder(true, gridGames.Bounds.Width);
 		}
 		else {
-			grid.Children.Remove(last);
+			gridGames.Children.Remove(last);
 			prev.IsVisible = true;
 		}
-		UpdateFolder();
 	}
 
-	private void OnGamesTab(object? sender, RoutedEventArgs e) {
-		if (_currentTab == SetupTypes.Game) return;
-		if (!Config.DisableTransitions) {
-			double w = CurrentGrid.Bounds.Width;
-			CurrentStack.Peek().LeaveTab(true, w, false, UpdateTab);
-			_gameStack.Peek().EnterTab(true, w, false);
-			gridGames.IsVisible = true;
+	// ── Search + instance filter ───────────────────────────────────────
+
+	private void OnSearchChanged(object? sender, TextChangedEventArgs e) => ApplyFilter();
+	private void OnFilterChanged(object? sender, SelectionChangedEventArgs e) => ApplyFilter();
+
+	private void ApplyFilter() {
+		if (_gameStack.Count == 0) return;
+		var list = _gameStack.Peek();
+
+		string query = textBoxSearch.Text?.Trim() ?? "";
+		int idx = Math.Max(0, comboFilter.SelectedIndex);
+		InstanceCategory? category = FilterCategories[Math.Min(idx, FilterCategories.Length - 1)];
+
+		if (query.Length == 0 && category == null) {
+			list.PopulateList(list.Folder ?? Config.Games, NavigateForward, NavigateBack);
+			return;
 		}
-		_currentTab = SetupTypes.Game;
-		UpdateFolder();
-		if (Config.DisableTransitions) UpdateTab();
-	}
 
-	private void OnServersTab(object? sender, RoutedEventArgs e) {
-		if (_currentTab == SetupTypes.Server) return;
-		if (!Config.DisableTransitions) {
-			double w = CurrentGrid.Bounds.Width;
-			bool back = _currentTab == SetupTypes.Tool;
-			CurrentStack.Peek().LeaveTab(back, w, false, UpdateTab);
-			_serverStack.Peek().EnterTab(back, w, false);
-			gridServers.IsVisible = true;
+		// Flatten the whole tree so search/filter reaches into folders
+		var matches = new List<Setup>();
+		void Walk(SetupFolder folder) {
+			foreach (var entry in folder.Entries) {
+				if (entry is SetupFolder sub) { Walk(sub); continue; }
+				if (entry is not Setup setup) continue;
+				if (query.Length > 0
+					&& !setup.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+					&& !setup.Details.Contains(query, StringComparison.OrdinalIgnoreCase)) continue;
+				if (category != null && CategoryOf(setup) != category) continue;
+				matches.Add(setup);
+			}
 		}
-		_currentTab = SetupTypes.Server;
-		UpdateFolder();
-		if (Config.DisableTransitions) UpdateTab();
+		Walk(Config.Games);
+
+		string what = category != null ? $"{FilterNames[idx]} instances" : "instances";
+		string emptyMessage = query.Length > 0
+			? $"No {what} match \"{query}\"."
+			: $"No {what} installed.";
+		list.PopulateFlat(matches, emptyMessage);
 	}
 
-	private void OnToolsTab(object? sender, RoutedEventArgs e) {
-		if (_currentTab == SetupTypes.Tool) return;
-		if (!Config.DisableTransitions) {
-			double w = CurrentGrid.Bounds.Width;
-			CurrentStack.Peek().LeaveTab(false, w, false, UpdateTab);
-			_toolStack.Peek().EnterTab(false, w, false);
-			gridTools.IsVisible = true;
-		}
-		_currentTab = SetupTypes.Tool;
-		UpdateFolder();
-		if (Config.DisableTransitions) UpdateTab();
+	private static InstanceCategory? CategoryOf(Setup setup) {
+		var record = InstanceManager.Instances.FirstOrDefault(r => r.ExePath == setup.ExePath);
+		if (record != null) return record.Category;
+		// Entries with no instance record (e.g. the Steam-detected install)
+		if (setup is Game g)
+			return g.IsTMod ? InstanceCategory.TModLoader : InstanceCategory.Terraria;
+		return null;
 	}
 
-	private void UpdateTab() {
-		gridGames.IsVisible = _currentTab == SetupTypes.Game;
-		gridServers.IsVisible = _currentTab == SetupTypes.Server;
-		gridTools.IsVisible = _currentTab == SetupTypes.Tool;
-	}
-
-	private void UpdateFolder() {
-		string label = _currentTab + " List";
-		if (CurrentStack.Count > 1)
-			label += " " + new string('>', CurrentStack.Count - 1) + " " + CurrentStack.Peek().Folder?.Name;
-		labelListType.Text = label;
-	}
+	// ── Bottom bar buttons ─────────────────────────────────────────────
 
 	private void OnOpenInstancesFolder(object? sender, RoutedEventArgs e) {
 		Sounds.PlayOpen();
@@ -246,14 +215,14 @@ public partial class MainWindow : Window {
 	}
 
 	private async void OnEditSetups(object? sender, RoutedEventArgs e) {
-		if (await SettingsWindow.ShowDialogAsync(this, _currentTab))
+		if (await SettingsWindow.ShowDialogAsync(this, SetupTypes.Game))
 			ReloadSetups();
 	}
 
 	private void OnKeyDown(object? sender, KeyEventArgs e) {
-		if (e.Key == Key.Back) {
-			if (CurrentStack.Count > 1)
-				NavigateBack(CurrentGrid, CurrentStack);
+		if (e.Key == Key.Back && !textBoxSearch.IsFocused) {
+			if (_gameStack.Count > 1)
+				NavigateBack();
 		}
 	}
 

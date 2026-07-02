@@ -12,48 +12,82 @@
         FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
         Icon="avares://TerraLauncher/Resources/Icons/AppIcon.png"
         Opacity="0">
+
+  <Window.Styles>
+    <!-- Terraria-themed search box: dark panel, gold accent, no Fluent
+         white-on-focus background swap or blue focus ring -->
+    <Style Selector="TextBox.terraria">
+      <Setter Property="Background" Value="#14143A"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="#1E1E50"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="CaretBrush" Value="#C8A852"/>
+      <Setter Property="SelectionBrush" Value="#C8A852"/>
+      <Setter Property="FocusAdorner" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="TextBox.terraria /template/ TextBlock#PART_Watermark">
+      <Setter Property="Foreground" Value="#8888AA"/>
+    </Style>
+    <Style Selector="TextBox.terraria:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="#14143A"/>
+      <Setter Property="BorderBrush" Value="#4A4AAA"/>
+    </Style>
+    <Style Selector="TextBox.terraria:focus /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="#14143A"/>
+      <Setter Property="BorderBrush" Value="#C8A852"/>
+    </Style>
+    <Style Selector="TextBox.terraria:pointerover">
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+    <Style Selector="TextBox.terraria:focus">
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!-- Terraria-themed filter dropdown -->
+    <Style Selector="ComboBox.terraria">
+      <Setter Property="Background" Value="#14143A"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="BorderBrush" Value="#1E1E50"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="FocusAdorner" Value="{x:Null}"/>
+    </Style>
+    <Style Selector="ComboBox.terraria:pointerover /template/ Border#Background">
+      <Setter Property="Background" Value="#14143A"/>
+      <Setter Property="BorderBrush" Value="#4A4AAA"/>
+    </Style>
+    <Style Selector="ComboBox.terraria:focus /template/ Border#Background">
+      <Setter Property="Background" Value="#14143A"/>
+      <Setter Property="BorderBrush" Value="#C8A852"/>
+    </Style>
+    <Style Selector="ComboBox.terraria /template/ Path#DropDownGlyph">
+      <Setter Property="Fill" Value="#C8A852"/>
+    </Style>
+    <Style Selector="ComboBox.terraria /template/ PathIcon#DropDownGlyph">
+      <Setter Property="Foreground" Value="#C8A852"/>
+    </Style>
+  </Window.Styles>
   <controls:TerrariaWindow>
     <Grid>
-      <!-- Main content area with tabs -->
+      <!-- Main content area -->
       <Border Margin="8,40,8,49" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
               ClipToBounds="True">
-        <Grid>
-          <Grid x:Name="gridGames"   IsVisible="True"/>
-          <Grid x:Name="gridServers" IsVisible="False"/>
-          <Grid x:Name="gridTools"   IsVisible="False"/>
-        </Grid>
+        <Grid x:Name="gridGames"/>
       </Border>
 
-      <!-- Tab buttons (bottom left) -->
-      <controls:TerrariaButton x:Name="buttonGames"
-                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8,0,0,0"
-                               Click="OnGamesTab">
-        <ToolTip.Tip><controls:TerrariaTooltip Text="Games Tab"/></ToolTip.Tip>
-        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/GameTab.png" Width="32" Height="32"/>
-      </controls:TerrariaButton>
+      <!-- Search + instance filter (bottom left) -->
+      <TextBox x:Name="textBoxSearch" Classes="terraria"
+               Watermark="Search…"
+               Width="160" Height="32"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8,0,0,7"
+               CornerRadius="10" Padding="10,5"
+               FontSize="14"
+               TextChanged="OnSearchChanged"/>
 
-      <controls:TerrariaButton x:Name="buttonServers"
-                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="57,0,0,0"
-                               Click="OnServersTab">
-        <ToolTip.Tip><controls:TerrariaTooltip Text="Servers Tab"/></ToolTip.Tip>
-        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/ServerTab.png" Width="32" Height="32"/>
-      </controls:TerrariaButton>
-
-      <controls:TerrariaButton x:Name="buttonTools"
-                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="106,0,0,0"
-                               Click="OnToolsTab">
-        <ToolTip.Tip><controls:TerrariaTooltip Text="Tools Tab"/></ToolTip.Tip>
-        <Image Source="avares://TerraLauncher/Resources/Terraria/Buttons/ToolTab.png" Width="32" Height="32"/>
-      </controls:TerrariaButton>
-
-      <!-- Tab label -->
-      <TextBlock x:Name="labelListType"
-                 Text="Game List"
-                 HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                 Margin="160,0,0,0"
-                 Height="44"
-                 FontSize="28" Foreground="White"
-                 Padding="5,5,5,0"/>
+      <ComboBox x:Name="comboFilter" Classes="terraria"
+                Width="130" Height="32"
+                HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="176,0,0,7"
+                CornerRadius="10" FontSize="14"
+                SelectionChanged="OnFilterChanged"/>
 
       <!-- Open Instances Folder button -->
       <controls:TerrariaButton x:Name="buttonOpenFolder"

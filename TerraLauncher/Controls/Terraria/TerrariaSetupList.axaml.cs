@@ -40,6 +40,29 @@ public partial class TerrariaSetupList : UserControl {
 				list.Children.Add(new TerrariaSetupEntry(setup));
 			}
 		}
+		if (list.Children.Count == 0)
+			ShowEmptyMessage("No instances yet.\nClick + below to add one.");
+	}
+
+	// Flat list of entries only — used by search/filter results
+	public void PopulateFlat(System.Collections.Generic.IEnumerable<Setup> setups, string emptyMessage) {
+		list.Children.Clear();
+		foreach (var setup in setups)
+			list.Children.Add(new TerrariaSetupEntry(setup));
+		if (list.Children.Count == 0)
+			ShowEmptyMessage(emptyMessage);
+	}
+
+	private void ShowEmptyMessage(string message) {
+		list.Children.Add(new TextBlock {
+			Text = message,
+			FontSize = 22,
+			Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#9999BB")),
+			TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+			TextAlignment = Avalonia.Media.TextAlignment.Center,
+			HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+			Margin = new Thickness(20, 60, 20, 0),
+		});
 	}
 
 	public async void EnterFolder(bool back, double width) {

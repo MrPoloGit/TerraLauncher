@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="TerraLauncher.Controls.Terraria.TerrariaSetupFolder"
-             Height="96" Margin="0,0,4,10">
+             Height="96" Margin="0,0,0,10">
   <Grid>
     <Grid Margin="12,8,8,8">
       <Grid Width="72" Height="72" HorizontalAlignment="Left">

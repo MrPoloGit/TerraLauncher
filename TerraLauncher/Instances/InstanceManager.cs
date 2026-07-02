@@ -68,20 +68,6 @@ public static class InstanceManager {
 	}
 
 	private static void SyncToConfig(InstanceRecord record) {
-		// Standalone dedicated servers belong on the Servers tab
-		if (record.Category == InstanceCategory.StandAlone
-			&& record.Name.Contains("server", StringComparison.OrdinalIgnoreCase)) {
-			var server = new Server {
-				Name    = record.Name,
-				ExePath = record.ExePath,
-				Icon    = "ServerTree",
-				Details = record.Version
-			};
-			Config.Servers.Entries.Add(server);
-			Config.Modified = true;
-			return;
-		}
-
 		switch (record.Category) {
 			case InstanceCategory.Terraria:
 			case InstanceCategory.TModLoader:
