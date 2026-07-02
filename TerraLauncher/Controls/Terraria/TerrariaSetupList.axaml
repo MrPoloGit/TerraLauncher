@@ -1,21 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TerraLauncher.Controls"
+             xmlns:terraria="clr-namespace:TerraLauncher.Controls.Terraria"
              x:Class="TerraLauncher.Controls.Terraria.TerrariaSetupList">
-  <Grid ColumnDefinitions="*,Auto">
-    <local:SpeedScrollViewer x:Name="scrollViewer" Margin="6,6,2,6"
-                              Grid.Column="0"
-                              HorizontalScrollBarVisibility="Disabled"
-                              VerticalScrollBarVisibility="Hidden">
-      <StackPanel x:Name="list"/>
-    </local:SpeedScrollViewer>
-    <!-- Plain Border scrollbar: avoids Fluent ControlTheme opacity animations entirely -->
-    <Border x:Name="scrollTrack" Grid.Column="1" Width="14" Margin="0,6,6,6"
-            Background="#0D0D2B" BorderBrush="#1E1E50" BorderThickness="1,0,0,0"
-            IsVisible="False" ClipToBounds="True">
-      <Border x:Name="scrollThumb" Width="10" HorizontalAlignment="Center"
-              Background="#C8A852" CornerRadius="4" Height="20"
-              VerticalAlignment="Top"/>
-    </Border>
-  </Grid>
+  <terraria:TerrariaScrollBox x:Name="scrollBox" Margin="6">
+    <StackPanel x:Name="list"/>
+  </terraria:TerrariaScrollBox>
 </UserControl>

@@ -30,7 +30,7 @@
 
         <TextBlock Text="Cross-Platform Port" FontSize="19" Foreground="#C8A852"/>
         <TextBlock TextWrapping="Wrap" FontSize="16" Foreground="White"
-                   Text="Ported to macOS, Linux, and Windows with Avalonia, plus instance management, by MrPolo."/>
+                   Text="Ported to macOS, Linux, and Windows with Avalonia, plus instance management, by MrPolo. Built and ported with the assistance of AI (Claude)."/>
         <TextBlock FontSize="15" Foreground="#88AAFF" Cursor="Hand" TextWrapping="Wrap"
                    Text="github.com/MrPoloGit/TerraLauncher"
                    Tag="https://github.com/MrPoloGit/TerraLauncher"

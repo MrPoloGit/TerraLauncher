@@ -19,8 +19,8 @@
 
       <!-- Settings content -->
       <Border Margin="8,40,8,50" Background="#323381" BorderThickness="2" BorderBrush="#14143A">
-        <ScrollViewer>
-          <StackPanel Spacing="8" Margin="14,12,14,12">
+        <controls:TerrariaScrollBox Margin="6">
+          <StackPanel Spacing="8" Margin="8,6,8,6">
 
             <TextBlock Text="Terraria Installation" FontSize="22" Foreground="White" Margin="0,0,0,4"/>
             <TextBlock Text="Executable path (leave blank to auto-detect from Steam)" FontSize="11" Opacity="0.6" Foreground="White"/>
@@ -80,7 +80,7 @@
             </StackPanel>
 
           </StackPanel>
-        </ScrollViewer>
+        </controls:TerrariaScrollBox>
       </Border>
 
       <!-- Save button -->
