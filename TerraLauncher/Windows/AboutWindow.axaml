@@ -18,29 +18,25 @@
             Padding="16,14,16,14">
       <StackPanel Spacing="12">
 
-        <StackPanel Orientation="Horizontal" Spacing="14">
-          <Image Source="avares://TerraLauncher/Resources/Icons/AppIcon.png" Width="80" Height="80"
-                 VerticalAlignment="Top"/>
-          <StackPanel Spacing="2">
-            <TextBlock Text="Terra Launcher" FontSize="24" Foreground="White"/>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="Version:" FontSize="16" Foreground="#AAAACC"/>
-              <TextBlock x:Name="labelVersion" FontSize="16" Foreground="White"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="Build Date:" FontSize="16" Foreground="#AAAACC"/>
-              <TextBlock x:Name="labelBuildDate" FontSize="16" Foreground="White"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="Original By:" FontSize="16" Foreground="#AAAACC"/>
-              <TextBlock Text="trigger_death (Robert Jordan)" FontSize="16" Foreground="White"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock Text="Ported By:" FontSize="16" Foreground="#AAAACC"/>
-              <TextBlock Text="MrPolo" FontSize="16" Foreground="White"/>
-            </StackPanel>
-          </StackPanel>
-        </StackPanel>
+        <!-- Grids, not horizontal StackPanels — those measure with infinite
+             width and defeat text wrapping -->
+        <Grid ColumnDefinitions="Auto,*">
+          <Image Grid.Column="0" Source="avares://TerraLauncher/Resources/Icons/AppIcon.png"
+                 Width="80" Height="80" VerticalAlignment="Top" Margin="0,0,14,0"/>
+          <Grid Grid.Column="1" ColumnDefinitions="Auto,*"
+                RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Text="Terra Launcher" FontSize="24" Foreground="White" Margin="0,0,0,2"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Version:" FontSize="16" Foreground="#AAAACC" Margin="0,0,6,2"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="labelVersion" FontSize="16" Foreground="White" TextWrapping="Wrap"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Build Date:" FontSize="16" Foreground="#AAAACC" Margin="0,0,6,2"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="labelBuildDate" FontSize="16" Foreground="White" TextWrapping="Wrap"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Original By:" FontSize="16" Foreground="#AAAACC" Margin="0,0,6,2"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="trigger_death (Robert Jordan)" FontSize="16" Foreground="White" TextWrapping="Wrap"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Ported By:" FontSize="16" Foreground="#AAAACC" Margin="0,0,6,2"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="MrPolo" FontSize="16" Foreground="White" TextWrapping="Wrap"/>
+          </Grid>
+        </Grid>
 
         <Border Height="2" Background="#14143A"/>
 

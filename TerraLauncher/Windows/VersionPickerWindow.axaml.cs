@@ -142,16 +142,20 @@ public partial class VersionPickerWindow : Window {
 				var result = await TriggerMessageBox.ShowAsync(
 					this,
 					MessageIcon.Question,
-					$"{entry.Name} requires Terraria {required} which is not installed.\n\nDownload it automatically? (Requires Steam login)",
+					$"{entry.Name} requires Terraria {required} which is not installed.\n\n" +
+					"Download it now? (Requires Steam login)\n" +
+					$"Choose Skip to install {entry.Name} without it.",
 					"Dependency Required",
-					MsgBoxButton.YesNo);
-				if (result != MsgBoxResult.Yes) return;
+					MsgBoxButton.YesNoCancel, b2: "Skip");
+				if (result == MsgBoxResult.Cancel || result == MsgBoxResult.None) return;
 
-				var terrariaVersions = await VersionSource.GetVersionsAsync(InstanceCategory.Terraria);
-				var dep = terrariaVersions.FirstOrDefault(v => v.Version == required)
-					?? new VersionEntry { Name = $"Terraria {required}", Version = required };
-				if (!await DownloadAsync(dep, InstanceCategory.Terraria, null)) return;
-				existing = InstanceManager.FindTerrariaVersion(required);
+				if (result == MsgBoxResult.Yes) {
+					var terrariaVersions = await VersionSource.GetVersionsAsync(InstanceCategory.Terraria);
+					var dep = terrariaVersions.FirstOrDefault(v => v.Version == required)
+						?? new VersionEntry { Name = $"Terraria {required}", Version = required };
+					if (!await DownloadAsync(dep, InstanceCategory.Terraria, null)) return;
+					existing = InstanceManager.FindTerrariaVersion(required);
+				}
 			}
 			linkedTerrariaId = existing?.Id;
 		}

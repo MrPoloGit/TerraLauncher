@@ -29,6 +29,29 @@ public static class Downloader {
 		}
 
 		Directory.CreateDirectory(installDir);
+
+		// Direct file (e.g. tAPI installer .exe) — no extraction step
+		if (!IsArchiveUrl(entry.Url)) {
+			string fileName = Path.GetFileName(new Uri(entry.Url).LocalPath);
+			if (string.IsNullOrEmpty(fileName)) fileName = "download.bin";
+			string dest = Path.Combine(installDir, fileName);
+			try {
+				ui.AppendLog($"Downloading {entry.Url}");
+				await DownloadFileAsync(entry.Url, dest, ui, ct);
+				ui.AppendLog("Installed: " + dest);
+				return dest;
+			}
+			catch (OperationCanceledException) {
+				TryDelete(dest);
+				throw;
+			}
+			catch (Exception ex) {
+				ui.AppendLog("Download failed: " + ex.Message);
+				TryDelete(dest);
+				return null;
+			}
+		}
+
 		string archivePath = Path.Combine(installDir, "_download" + ArchiveExtension(entry.Url));
 
 		try {
@@ -88,6 +111,11 @@ public static class Downloader {
 		}
 		if (total > 0) ui.AppendLog($"  {total.Value / 1048576.0:F1} MB — done");
 	}
+
+	private static bool IsArchiveUrl(string url) =>
+		url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)
+		|| url.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)
+		|| url.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase);
 
 	private static string ArchiveExtension(string url) {
 		if (url.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)) return ".tar.gz";

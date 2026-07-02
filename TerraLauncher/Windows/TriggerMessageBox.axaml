@@ -19,20 +19,21 @@
             Padding="16,14,16,14">
       <StackPanel Spacing="16">
 
-        <!-- Icon + Message -->
-        <StackPanel Orientation="Horizontal" Spacing="14">
-          <TextBlock x:Name="textBlockIcon"
+        <!-- Icon + Message (Grid, not horizontal StackPanel — the latter
+             measures with infinite width and defeats text wrapping) -->
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock x:Name="textBlockIcon" Grid.Column="0"
                      Text="⚠"
                      FontSize="26"
                      VerticalAlignment="Top"
-                     Margin="0,2,0,0"/>
-          <TextBlock x:Name="textBlockMessage"
+                     Margin="0,2,14,0"/>
+          <TextBlock x:Name="textBlockMessage" Grid.Column="1"
                      Text="Message"
                      TextWrapping="Wrap"
                      Foreground="White"
                      FontSize="17"
                      VerticalAlignment="Center"/>
-        </StackPanel>
+        </Grid>
 
         <!-- Buttons -->
         <StackPanel x:Name="stackPanelButtons"
