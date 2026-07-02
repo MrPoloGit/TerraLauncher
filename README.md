@@ -87,6 +87,27 @@ dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-x64 --self-c
 dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-arm64 --self-contained -o ./publish/win-arm64
 ```
 
+## Building on Windows (Git Bash)
+
+Install the [.NET 10 SDK for Windows](https://dotnet.microsoft.com/download/dotnet/10.0), then from Git Bash:
+
+```sh
+# Build
+dotnet build TerraLauncher/TerraLauncher.csproj
+
+# Run (development)
+dotnet run --project TerraLauncher/TerraLauncher.csproj
+
+# Publish a self-contained Windows build
+dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-x64 --self-contained -o ./publish/win-x64
+
+# Launch the published build
+./publish/win-x64/TerraLauncher.exe
+```
+
+The published `TerraLauncher.exe` carries the app icon (from `App.ico`) for Explorer
+and the taskbar.
+
 ### Linux installation
 
 After publishing for Linux, run the included install script to register the app in your desktop environment:

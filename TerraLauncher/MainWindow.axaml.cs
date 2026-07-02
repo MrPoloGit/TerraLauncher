@@ -50,6 +50,7 @@ public partial class MainWindow : Window {
 	private void LoadSettings() {
 		Config.LoadConfig(this);
 		EnsureSteamTerrariaEntry();
+		EnsureSteamTModLoaderEntry();
 		LoadSetups();
 
 		if (Config.WindowWidth >= MinWidth) Width = Config.WindowWidth;
@@ -77,6 +78,25 @@ public partial class MainWindow : Window {
 			ExePath = path,
 			Icon    = "Tree",
 			Details = details,
+		});
+		Config.Modified = true;
+		Config.SaveConfig();
+	}
+
+	private static void EnsureSteamTModLoaderEntry() {
+		if (Config.HideSteamTModLoader) return;
+		string path = TerrariaLocator.TModLoaderPath;
+		if (string.IsNullOrEmpty(path)) return;
+		if (FolderContainsExe(Config.Games, path)) return;
+
+		// Slot in right after the Steam Terraria entry
+		int index = Math.Min(1, Config.Games.Entries.Count);
+		Config.Games.Entries.Insert(index, new Game {
+			Name    = "tModLoader",
+			ExePath = path,
+			Icon    = "TMod",
+			IsTMod  = true,
+			Details = "Steam",
 		});
 		Config.Modified = true;
 		Config.SaveConfig();

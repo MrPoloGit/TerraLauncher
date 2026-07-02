@@ -185,6 +185,19 @@ public abstract class Setup : ISetup {
 						start.ArgumentList.Add(arg);
 				}
 			}
+			else if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+				&& ExePath.EndsWith(".sh", StringComparison.OrdinalIgnoreCase)) {
+				// Shell scripts (e.g. start-tModLoader.sh) must run through bash —
+				// shell-execute would hand them to a text editor / Terminal window
+				start = new ProcessStartInfo {
+					FileName         = "/bin/bash",
+					UseShellExecute  = false,
+					WorkingDirectory = ExeDirectory,
+				};
+				start.ArgumentList.Add(ExePath);
+				foreach (var arg in SplitArgs(Arguments))
+					start.ArgumentList.Add(arg);
+			}
 			else {
 				start = new ProcessStartInfo {
 					FileName         = ExePath,
@@ -293,13 +306,16 @@ public abstract class Setup : ISetup {
 			if (deleteFiles && record != null)
 				InstanceManager.DeleteInstanceFiles(record);
 
-			// Deleting the auto-detected Steam Terraria entry must stick across
-			// launches, otherwise EnsureSteamTerrariaEntry re-adds it.
+			// Deleting the auto-detected Steam entries must stick across
+			// launches, otherwise the Ensure* methods re-add them.
 			string steamPath = !string.IsNullOrEmpty(Config.TerrariaExePath)
 				? Config.TerrariaExePath : Util.TerrariaLocator.TerrariaPath;
 			if (!string.IsNullOrEmpty(steamPath)
 				&& string.Equals(ExePath, steamPath, StringComparison.OrdinalIgnoreCase))
 				Config.HideSteamTerraria = true;
+			if (!string.IsNullOrEmpty(Util.TerrariaLocator.TModLoaderPath)
+				&& string.Equals(ExePath, Util.TerrariaLocator.TModLoaderPath, StringComparison.OrdinalIgnoreCase))
+				Config.HideSteamTModLoader = true;
 
 			// Remove dependent entries
 			if (deleteDependents) {

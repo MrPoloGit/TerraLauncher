@@ -7,9 +7,48 @@ namespace TerraLauncher.Util;
 
 public static class TerrariaLocator {
 	public static readonly string TerrariaPath;
+	public static readonly string TModLoaderPath;
 
 	static TerrariaLocator() {
 		TerrariaPath = FindTerrariaPath() ?? "";
+		TModLoaderPath = FindTModLoaderPath() ?? "";
+	}
+
+	// Steam installs tModLoader next to Terraria (app 1281930); the launch
+	// entry point is the start script, not a bare executable.
+	private static string? FindTModLoaderPath() {
+		string script = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+			? "start-tModLoader.bat" : "start-tModLoader.sh";
+		foreach (var common in SteamCommonDirs()) {
+			string candidate = Path.Combine(common, "tModLoader", script);
+			if (File.Exists(candidate)) return candidate;
+		}
+		return null;
+	}
+
+	private static string[] SteamCommonDirs() {
+		string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+			return [Path.Combine(home, "Library", "Application Support", "Steam", "steamapps", "common")];
+		}
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+			return [
+				Path.Combine(home, ".steam", "steam", "steamapps", "common"),
+				Path.Combine(home, ".local", "share", "Steam", "steamapps", "common"),
+			];
+		}
+		var dirs = new System.Collections.Generic.List<string>();
+		try {
+			if (OperatingSystem.IsWindows()) {
+				using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam");
+				if (key?.GetValue("SteamPath") is string steamPath)
+					dirs.Add(Path.Combine(steamPath, "steamapps", "common"));
+			}
+		}
+		catch { }
+		foreach (var drive in new[] { "C", "D", "E" })
+			dirs.Add($@"{drive}:\Program Files (x86)\Steam\steamapps\common");
+		return dirs.ToArray();
 	}
 
 	private static string? FindTerrariaPath() {
