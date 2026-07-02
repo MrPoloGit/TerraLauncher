@@ -1,23 +1,52 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
         x:Class="TerraLauncher.Windows.CreditsWindow"
         Title="Credits"
-        Width="400"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="440"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
         ShowInTaskbar="False"
-        SizeToContent="Height">
-  <StackPanel Margin="18" Spacing="8">
-    <TextBlock FontSize="16" FontWeight="Bold" Text="Terra Launcher Credits"/>
-    <TextBlock TextWrapping="Wrap" Text="Created by trigger_death (Robert Jordan)."/>
-    <TextBlock TextWrapping="Wrap">
-      <Run Text="GitHub: "/>
-      <TextBlock Text="https://github.com/trigger-death/TerraLauncher"
-                 Foreground="Blue" Cursor="Hand"
-                 PointerReleased="OnLinkClicked"
-                 Tag="https://github.com/trigger-death/TerraLauncher"/>
-    </TextBlock>
-    <TextBlock TextWrapping="Wrap" Text="Icons from various Terraria assets and custom-made resources."/>
-    <Button Content="Close" HorizontalAlignment="Right" Width="80" IsDefault="True" IsCancel="True" Margin="0,8,0,0"/>
-  </StackPanel>
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
+
+  <controls:TerrariaWindow>
+    <Border Margin="8,40,8,10" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
+            Padding="16,14,16,14">
+      <StackPanel Spacing="10">
+
+        <TextBlock Text="Original Project" FontSize="19" Foreground="#C8A852"/>
+        <TextBlock TextWrapping="Wrap" FontSize="16" Foreground="White"
+                   Text="Terra Launcher was created by trigger_death (Robert Jordan)."/>
+        <TextBlock FontSize="15" Foreground="#88AAFF" Cursor="Hand" TextWrapping="Wrap"
+                   Text="github.com/trigger-death/TerraLauncher"
+                   Tag="https://github.com/trigger-death/TerraLauncher"
+                   PointerReleased="OnLinkClicked"/>
+
+        <Border Height="2" Background="#14143A"/>
+
+        <TextBlock Text="Cross-Platform Port" FontSize="19" Foreground="#C8A852"/>
+        <TextBlock TextWrapping="Wrap" FontSize="16" Foreground="White"
+                   Text="Ported to macOS, Linux, and Windows with Avalonia, plus instance management, by MrPolo."/>
+        <TextBlock FontSize="15" Foreground="#88AAFF" Cursor="Hand" TextWrapping="Wrap"
+                   Text="github.com/MrPoloGit/TerraLauncher"
+                   Tag="https://github.com/MrPoloGit/TerraLauncher"
+                   PointerReleased="OnLinkClicked"/>
+
+        <Border Height="2" Background="#14143A"/>
+
+        <TextBlock Text="Thanks To" FontSize="19" Foreground="#C8A852"/>
+        <TextBlock TextWrapping="Wrap" FontSize="16" Foreground="White"
+                   Text="• Re-Logic — Terraria and its artwork&#x0a;• SteamRE — DepotDownloader&#x0a;• tModLoader team&#x0a;• RussDev7 — TerrariaDepotDownloader manifest list&#x0a;• Avalonia UI"/>
+
+        <controls:TerrariaButton HorizontalAlignment="Right" Click="OnClose">
+          <TextBlock Text="Close" Foreground="White" FontSize="18" Margin="14,3"/>
+        </controls:TerrariaButton>
+
+      </StackPanel>
+    </Border>
+  </controls:TerrariaWindow>
 </Window>

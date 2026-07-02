@@ -87,7 +87,7 @@ public partial class SettingsWindow : Window {
 	private void OnAbout(object? sender, RoutedEventArgs e)        => AboutWindow.Show(this);
 	private void OnCredits(object? sender, RoutedEventArgs e)      => CreditsWindow.Show(this);
 	private void OnViewOnGitHub(object? sender, RoutedEventArgs e) =>
-		Process.Start(new ProcessStartInfo("https://github.com/trigger-death/TerraLauncher") { UseShellExecute = true });
+		Process.Start(new ProcessStartInfo("https://github.com/MrPoloGit/TerraLauncher") { UseShellExecute = true });
 
 	// ── ShowDialog helper ──────────────────────────────────────────────
 

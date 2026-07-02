@@ -1,50 +1,57 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
         x:Class="TerraLauncher.Windows.AboutWindow"
         Title="About Terra Launcher"
-        Width="384"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        SystemDecorations="None"
+        Width="420"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
         ShowInTaskbar="False"
-        SizeToContent="Height">
-  <Grid Margin="10">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
+        FontFamily="avares://TerraLauncher/Resources/Andy.ttf#Andy"
+        Opacity="0">
 
-    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
-      <Image Source="avares://TerraLauncher/Resources/Logo112.png" Width="112" Height="112"/>
-      <Border BorderBrush="#A9B1B6" BorderThickness="1" Padding="8" MinWidth="200">
-        <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-          </Grid.RowDefinitions>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-          <TextBlock Grid.Row="0" Grid.Column="0" Text="Terra Launcher" FontWeight="Bold" Foreground="#1C644A" Margin="0,0,8,4"/>
-          <TextBlock Grid.Row="1" Grid.Column="0" Text="Version:"    Margin="0,0,8,2"/>
-          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="labelVersion" Margin="0,0,0,2"/>
-          <TextBlock Grid.Row="2" Grid.Column="0" Text="Build Date:" Margin="0,0,8,2"/>
-          <TextBlock Grid.Row="2" Grid.Column="1" x:Name="labelBuildDate" Margin="0,0,0,2"/>
-          <TextBlock Grid.Row="3" Grid.Column="0" Text="Created By:" Margin="0,0,8,2"/>
-          <TextBlock Grid.Row="3" Grid.Column="1" Text="trigger_death" Margin="0,0,0,2"/>
-        </Grid>
-      </Border>
-    </StackPanel>
+  <controls:TerrariaWindow>
+    <Border Margin="8,40,8,10" Background="#323381" BorderThickness="2" BorderBrush="#14143A"
+            Padding="16,14,16,14">
+      <StackPanel Spacing="12">
 
-    <Border Grid.Row="1" BorderBrush="#A9B1B6" BorderThickness="1" Padding="8" Margin="0,0,0,8">
-      <TextBlock TextWrapping="Wrap"
-                 Text="Terra Launcher is a hub for everything Terraria-related stored on your computer. From Game versions, to servers, to tools."
-                 Margin="4"/>
+        <StackPanel Orientation="Horizontal" Spacing="14">
+          <Image Source="avares://TerraLauncher/Resources/Icons/AppIcon.png" Width="80" Height="80"
+                 VerticalAlignment="Top"/>
+          <StackPanel Spacing="2">
+            <TextBlock Text="Terra Launcher" FontSize="24" Foreground="White"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Version:" FontSize="16" Foreground="#AAAACC"/>
+              <TextBlock x:Name="labelVersion" FontSize="16" Foreground="White"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Build Date:" FontSize="16" Foreground="#AAAACC"/>
+              <TextBlock x:Name="labelBuildDate" FontSize="16" Foreground="White"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Original By:" FontSize="16" Foreground="#AAAACC"/>
+              <TextBlock Text="trigger_death (Robert Jordan)" FontSize="16" Foreground="White"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Ported By:" FontSize="16" Foreground="#AAAACC"/>
+              <TextBlock Text="MrPolo" FontSize="16" Foreground="White"/>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <Border Height="2" Background="#14143A"/>
+
+        <TextBlock TextWrapping="Wrap" FontSize="16" Foreground="White"
+                   Text="Terra Launcher is a hub for everything Terraria-related stored on your computer — game versions, mod loaders, servers, and tools. This is a cross-platform port of the original Terra Launcher for Windows."/>
+
+        <controls:TerrariaButton HorizontalAlignment="Right" Click="OnClose">
+          <TextBlock Text="Close" Foreground="White" FontSize="18" Margin="14,3"/>
+        </controls:TerrariaButton>
+
+      </StackPanel>
     </Border>
-
-    <Button Grid.Row="2" Content="Close" HorizontalAlignment="Right" Width="80" IsDefault="True" IsCancel="True"/>
-  </Grid>
+  </controls:TerrariaWindow>
 </Window>
