@@ -83,7 +83,20 @@ public abstract class Setup : ISetup {
 		AddRemoveIcon("Game");
 		AddRemoveIcon("Server");
 		AddRemoveIcon("Tool");
-		AddIconFromPath("TMod", "avares://TerraLauncher/Resources/Icons/TreeView/TreeViewGameTMod.png");
+		// Category icons for downloaded/custom instances. User-provided PNGs in
+		// Resources/Icons/AddInstance/ win; otherwise fall back to built-ins.
+		AddCategoryIcon("TMod",       "avares://TerraLauncher/Resources/Icons/TreeView/TreeViewGameTMod.png",
+			"TModLoader");
+		AddCategoryIcon("TAPI",       "avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionHammer.png");
+		AddCategoryIcon("TConfig",    "avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionGear.png");
+		AddCategoryIcon("StandAlone", "avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTShock.png");
+		AddCategoryIcon("Custom",     "avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTool.png");
+	}
+
+	private static void AddCategoryIcon(string key, string fallbackUri, string? fileName = null) {
+		var bmp = LoadAvaloniaAsset($"avares://TerraLauncher/Resources/Icons/AddInstance/{fileName ?? key}.png")
+			?? LoadAvaloniaAsset(fallbackUri);
+		if (bmp != null) SetupIcons[key] = bmp;
 	}
 
 	public abstract ISetup Clone();

@@ -6,5 +6,6 @@ public enum InstanceCategory {
 	TAPI,
 	TConfig,
 	StandAlone,
-	Tool
+	Tool,
+	Custom
 }

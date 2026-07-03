@@ -25,10 +25,11 @@ public partial class MainWindow : Window {
 	private readonly Stack<TerrariaSetupList> _gameStack = new();
 
 	private static readonly string[] FilterNames =
-		{ "All Instances", "Terraria", "tModLoader", "tAPI", "tConfig", "StandAlone" };
+		{ "All Instances", "Terraria", "tModLoader", "tAPI", "tConfig", "StandAlone", "Custom" };
 	private static readonly InstanceCategory?[] FilterCategories =
 		{ null, InstanceCategory.Terraria, InstanceCategory.TModLoader,
-		  InstanceCategory.TAPI, InstanceCategory.TConfig, InstanceCategory.StandAlone };
+		  InstanceCategory.TAPI, InstanceCategory.TConfig, InstanceCategory.StandAlone,
+		  InstanceCategory.Custom };
 
 	public MainWindow() {
 		InitializeComponent();

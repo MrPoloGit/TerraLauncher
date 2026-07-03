@@ -73,11 +73,19 @@ public static class InstanceManager {
 			case InstanceCategory.TModLoader:
 			case InstanceCategory.TAPI:
 			case InstanceCategory.TConfig:
-			case InstanceCategory.StandAlone: {
+			case InstanceCategory.StandAlone:
+			case InstanceCategory.Custom: {
 				var game = new Game {
 					Name    = record.Name,
 					ExePath = record.ExePath,
-					Icon    = record.Category == InstanceCategory.TModLoader ? "TMod" : "Tree",
+					Icon    = record.Category switch {
+						InstanceCategory.TModLoader => "TMod",
+						InstanceCategory.TAPI       => "TAPI",
+						InstanceCategory.TConfig    => "TConfig",
+						InstanceCategory.StandAlone => "StandAlone",
+						InstanceCategory.Custom     => "Custom",
+						_                           => "Tree",
+					},
 					Details = record.Version,
 					IsTMod  = record.Category == InstanceCategory.TModLoader
 				};

@@ -15,8 +15,26 @@ public partial class AddInstanceWindow : Window {
 
 	public AddInstanceWindow() {
 		InitializeComponent();
+		ApplyCustomIcons();
 		Opened  += async (_, _) => { Sounds.PlayOpen(); await FadeAsync(0, 1, 0.3); };
 		Closing += OnWindowClosing;
+	}
+
+	// PNGs dropped into Resources/Icons/AddInstance/ replace the built-in
+	// tile icons; missing files keep the XAML fallbacks.
+	private void ApplyCustomIcons() {
+		TrySwapIcon(imgTerraria,   "Terraria");
+		TrySwapIcon(imgTModLoader, "TModLoader");
+		TrySwapIcon(imgTAPI,       "TAPI");
+		TrySwapIcon(imgTConfig,    "TConfig");
+		TrySwapIcon(imgStandAlone, "StandAlone");
+		TrySwapIcon(imgCustom,     "Custom");
+	}
+
+	private static void TrySwapIcon(Avalonia.Controls.Image image, string name) {
+		var bmp = Setups.Setup.LoadAvaloniaAsset(
+			$"avares://TerraLauncher/Resources/Icons/AddInstance/{name}.png");
+		if (bmp != null) image.Source = bmp;
 	}
 
 	private void OnWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e) {
@@ -54,6 +72,16 @@ public partial class AddInstanceWindow : Window {
 	private async void OnTAPI(object? sender, RoutedEventArgs e)       => await OpenPicker(InstanceCategory.TAPI);
 	private async void OnTConfig(object? sender, RoutedEventArgs e)    => await OpenPicker(InstanceCategory.TConfig);
 	private async void OnStandAlone(object? sender, RoutedEventArgs e) => await OpenPicker(InstanceCategory.StandAlone);
+
+	private async void OnCustom(object? sender, RoutedEventArgs e) {
+		bool added = await CustomInstanceWindow.ShowDialogAsync(this);
+		if (added) {
+			_closing = true;
+			Closing -= OnWindowClosing;
+			await FadeAsync(1, 0, 0.25);
+			Close();
+		}
+	}
 
 	private async Task OpenPicker(InstanceCategory category) {
 		var picker = new VersionPickerWindow(category);

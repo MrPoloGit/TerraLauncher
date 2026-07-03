@@ -24,13 +24,16 @@
                      HorizontalAlignment="Center"
                      Margin="0,6,0,12"/>
 
-          <!-- 2×3 tile grid -->
+          <!-- 2×3 tile grid. Nearest-neighbor scaling keeps pixel art crisp;
+               sources are swapped in code-behind when Resources/Icons/AddInstance
+               contains replacement PNGs. -->
           <UniformGrid Grid.Row="1" Rows="3" Columns="2" Margin="4">
 
             <!-- Terraria Versions -->
             <controls:TerrariaButton Margin="4" Click="OnTerraria">
               <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
-                <Image Source="avares://TerraLauncher/Resources/Icons/TerrariaIcon.png"
+                <Image x:Name="imgTerraria"
+                       Source="avares://TerraLauncher/Resources/Icons/TerrariaIcon.png"
                        Width="36" Height="36" HorizontalAlignment="Center"/>
                 <TextBlock Text="Terraria Versions" Foreground="White" FontSize="15"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
@@ -40,7 +43,9 @@
             <!-- tModLoader -->
             <controls:TerrariaButton Margin="4" Click="OnTModLoader">
               <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
-                <Image Source="avares://TerraLauncher/Resources/Icons/TreeView/TreeViewGameTMod.png"
+                <Image x:Name="imgTModLoader"
+                       Source="avares://TerraLauncher/Resources/Icons/TreeView/TreeViewGameTMod.png"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"
                        Width="36" Height="36" HorizontalAlignment="Center"/>
                 <TextBlock Text="tModLoader" Foreground="White" FontSize="15"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
@@ -50,7 +55,9 @@
             <!-- tAPI -->
             <controls:TerrariaButton Margin="4" Click="OnTAPI">
               <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
-                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionHammer.png"
+                <Image x:Name="imgTAPI"
+                       Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionHammer.png"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"
                        Width="36" Height="36" HorizontalAlignment="Center"/>
                 <TextBlock Text="tAPI" Foreground="White" FontSize="15"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
@@ -60,7 +67,9 @@
             <!-- tConfig -->
             <controls:TerrariaButton Margin="4" Click="OnTConfig">
               <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
-                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionGear.png"
+                <Image x:Name="imgTConfig"
+                       Source="avares://TerraLauncher/Resources/Terraria/SetupOptions/SetupOptionGear.png"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"
                        Width="36" Height="36" HorizontalAlignment="Center"/>
                 <TextBlock Text="tConfig" Foreground="White" FontSize="15"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
@@ -70,19 +79,23 @@
             <!-- StandAlone -->
             <controls:TerrariaButton Margin="4" Click="OnStandAlone">
               <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
-                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTShock.png"
+                <Image x:Name="imgStandAlone"
+                       Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTShock.png"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"
                        Width="36" Height="36" HorizontalAlignment="Center"/>
                 <TextBlock Text="StandAlone" Foreground="White" FontSize="15"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
               </StackPanel>
             </controls:TerrariaButton>
 
-            <!-- Other (disabled) -->
-            <controls:TerrariaButton Margin="4" IsEnabled="False" Opacity="0.35">
+            <!-- Custom: link any executable and pick its category -->
+            <controls:TerrariaButton Margin="4" Click="OnCustom">
               <StackPanel Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,6">
-                <Image Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTool.png"
+                <Image x:Name="imgCustom"
+                       Source="avares://TerraLauncher/Resources/Terraria/SetupIcons/SetupIconTool.png"
+                       RenderOptions.BitmapInterpolationMode="HighQuality"
                        Width="36" Height="36" HorizontalAlignment="Center"/>
-                <TextBlock Text="Other (Tools)" Foreground="White" FontSize="15"
+                <TextBlock Text="Custom" Foreground="White" FontSize="15"
                            HorizontalAlignment="Center" TextAlignment="Center"/>
               </StackPanel>
             </controls:TerrariaButton>

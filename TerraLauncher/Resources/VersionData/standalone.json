@@ -1,11 +1,38 @@
 [
   {
-    "name": "TerrariaServer 1.4.4.9",
-    "version": "1.4.4.9",
-    "description": "Dedicated server standalone",
-    "date": "2023-09-28",
-    "author": "Re-Logic",
-    "platforms": ["windows", "linux"],
-    "url": "TODO_HOSTED_URL/TerrariaServer-1449.zip"
+    "name": "Exxo Avalon",
+    "version": "ExxoAvalon",
+    "description": "Classic standalone content mod",
+    "date": "",
+    "author": "Exxo Team",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/exxo-avalon.zip"
+  },
+  {
+    "name": "Avalon Remastered",
+    "version": "AvalonRemastered",
+    "description": "Remastered release of Avalon",
+    "date": "",
+    "author": "Exxo Team",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/avalon-remastered.zip"
+  },
+  {
+    "name": "N Terraria",
+    "version": "NTerraria",
+    "description": "RPG overhaul mod (classes, leveling, quests)",
+    "date": "",
+    "author": "Nakano15",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/n-terraria.zip"
+  },
+  {
+    "name": "Ulterraria",
+    "version": "Ulterraria",
+    "description": "Standalone content overhaul mod",
+    "date": "",
+    "author": "Ulterraria Team",
+    "platforms": ["windows"],
+    "url": "TODO_HOSTED_URL/ulterraria.zip"
   }
 ]
