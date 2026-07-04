@@ -112,12 +112,12 @@ public static class Downloader {
 		if (total > 0) ui.AppendLog($"  {total.Value / 1048576.0:F1} MB — done");
 	}
 
-	private static bool IsArchiveUrl(string url) =>
+	internal static bool IsArchiveUrl(string url) =>
 		url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)
 		|| url.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)
 		|| url.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase);
 
-	private static string ArchiveExtension(string url) {
+	internal static string ArchiveExtension(string url) {
 		if (url.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)) return ".tar.gz";
 		if (url.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)) return ".tgz";
 		return ".zip";

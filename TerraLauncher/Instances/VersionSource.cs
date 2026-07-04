@@ -78,7 +78,7 @@ public static class VersionSource {
 		return ParseGitHubReleases(json);
 	}
 
-	private static List<VersionEntry> ParseGitHubReleases(string json) {
+	internal static List<VersionEntry> ParseGitHubReleases(string json) {
 		var entries = new List<VersionEntry>();
 		try {
 			var releases = JsonSerializer.Deserialize<List<GitHubRelease>>(json, _json);
@@ -123,7 +123,7 @@ public static class VersionSource {
 		return asset?.BrowserDownloadUrl;
 	}
 
-	private static string TrimBody(string body) {
+	internal static string TrimBody(string body) {
 		if (string.IsNullOrWhiteSpace(body)) return "";
 		var line = body.Split('\n')[0].Trim().TrimStart('#').Trim();
 		return line.Length > 80 ? line[..80] + "…" : line;
