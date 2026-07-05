@@ -26,6 +26,8 @@ public partial class TerrariaScrollBox : UserControl {
 		set => scrollViewer.ScrollSpeed = value;
 	}
 
+	public void ScrollToEnd() => scrollViewer.ScrollToEnd();
+
 	public TerrariaScrollBox() {
 		InitializeComponent();
 		scrollViewer.ScrollSpeed = Config.ScrollSpeed;

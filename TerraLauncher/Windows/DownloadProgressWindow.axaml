@@ -39,16 +39,14 @@
       <Border Grid.Row="2" Margin="16,10,16,0"
               Background="#14143A" BorderBrush="#0D0D2B" BorderThickness="1"
               CornerRadius="3">
-        <ScrollViewer x:Name="logScroll" Margin="6"
-                      HorizontalScrollBarVisibility="Disabled"
-                      VerticalScrollBarVisibility="Auto">
+        <controls:TerrariaScrollBox x:Name="logScroll" Margin="6">
           <SelectableTextBlock x:Name="logText"
                                Text=""
                                FontFamily="Menlo,Consolas,monospace"
                                FontSize="11"
                                Foreground="#CCCCEE"
                                TextWrapping="Wrap"/>
-        </ScrollViewer>
+        </controls:TerrariaScrollBox>
       </Border>
 
       <!-- Cancel -->

@@ -27,9 +27,9 @@
       </StackPanel>
 
       <!-- Version list -->
-      <ScrollViewer Grid.Row="1" Margin="14,8,14,0" VerticalScrollBarVisibility="Auto">
+      <controls:TerrariaScrollBox Grid.Row="1" Margin="14,8,14,0">
         <StackPanel x:Name="versionList" Spacing="6"/>
-      </ScrollViewer>
+      </controls:TerrariaScrollBox>
 
       <!-- Status bar + refresh button -->
       <StackPanel Grid.Row="2" Margin="14,8,14,12" Orientation="Horizontal" Spacing="10">
