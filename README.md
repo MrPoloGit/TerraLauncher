@@ -22,6 +22,10 @@ A Terraria-styled hub for everything Terraria-related stored on your computer. K
 * **Language:** C#, [Avalonia UI](https://avaloniaui.net/) (cross-platform)
 * **Framework:** .NET 10
 
+## Before You Start
+
+**Launch Terraria at least once through Steam before using TerraLauncher.** Steam needs to fully set up Terraria (download assets, create save directories, etc.) before TerraLauncher can detect and launch it correctly.
+
 ## Requirements for Running
 
 | Platform | Requirement |

@@ -211,6 +211,33 @@ public abstract class Setup : ISetup {
 				foreach (var arg in SplitArgs(Arguments))
 					start.ArgumentList.Add(arg);
 			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+				// Launch via /bin/sh so we can:
+				// 1. Redirect game output to /dev/null without a pipe — a pipe would
+				//    fill up and block the game, and closing TerraLauncher would send
+				//    SIGPIPE and kill the game before its window appears.
+				// 2. Set LD_LIBRARY_PATH for the game's bundled native libs.
+				// 'exec' replaces the shell with the game so no zombie is left behind.
+				// $0 = ExePath, "$@" = any game arguments.
+				start = new ProcessStartInfo {
+					FileName         = "/bin/sh",
+					UseShellExecute  = false,
+					WorkingDirectory = ExeDirectory,
+				};
+				string existing = Environment.GetEnvironmentVariable("LD_LIBRARY_PATH") ?? "";
+				var ldParts = new List<string> { ExeDirectory };
+				string lib   = Path.Combine(ExeDirectory, "lib");
+				string lib64 = Path.Combine(ExeDirectory, "lib64");
+				if (Directory.Exists(lib))   ldParts.Add(lib);
+				if (Directory.Exists(lib64)) ldParts.Add(lib64);
+				if (!string.IsNullOrEmpty(existing)) ldParts.Add(existing);
+				start.Environment["LD_LIBRARY_PATH"] = string.Join(":", ldParts);
+				start.ArgumentList.Add("-c");
+				start.ArgumentList.Add("exec \"$0\" \"$@\" >/dev/null 2>&1");
+				start.ArgumentList.Add(ExePath);
+				foreach (var arg in SplitArgs(Arguments))
+					start.ArgumentList.Add(arg);
+			}
 			else {
 				start = new ProcessStartInfo {
 					FileName         = ExePath,
@@ -223,7 +250,18 @@ public abstract class Setup : ISetup {
 			}
 
 			var proc = Process.Start(start);
-			if (proc != null) ProcessTracker.Track(proc);
+			if (proc != null) {
+				// Drain redirected streams so the child never blocks on a full pipe buffer.
+				if (start.RedirectStandardOutput) {
+					proc.OutputDataReceived += (_, _) => { };
+					proc.BeginOutputReadLine();
+				}
+				if (start.RedirectStandardError) {
+					proc.ErrorDataReceived += (_, _) => { };
+					proc.BeginErrorReadLine();
+				}
+				ProcessTracker.Track(proc);
+			}
 			bool close = TypeName switch {
 				"Game"   => Config.CloseOnGameLaunch,
 				"Server" => Config.CloseOnServerLaunch,
