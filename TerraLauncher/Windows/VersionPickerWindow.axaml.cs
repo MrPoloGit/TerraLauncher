@@ -67,7 +67,29 @@ public partial class VersionPickerWindow : Window {
 		labelStatus.Text = $"{versions.Count} version(s)";
 	}
 
+	// Returns true when entry.Platforms contains the current OS (or is unset).
+	private static bool PlatformSupported(VersionEntry entry) {
+		if (entry.Platforms == null || entry.Platforms.Length == 0) return true;
+		string os = OperatingSystem.IsWindows() ? "windows"
+			: OperatingSystem.IsMacOS() ? "mac" : "linux";
+		return Array.Exists(entry.Platforms,
+			p => p.Equals(os, StringComparison.OrdinalIgnoreCase));
+	}
+
+	private static string PlatformNote(VersionEntry entry) {
+		if (entry.Platforms is { Length: 1 })
+			return entry.Platforms[0].ToLowerInvariant() switch {
+				"windows" => "Windows only",
+				"mac"     => "macOS only",
+				"linux"   => "Linux only",
+				_         => "Not available"
+			};
+		return "Not available";
+	}
+
 	private Control BuildRow(VersionEntry entry) {
+		bool supported = PlatformSupported(entry);
+
 		var border = new Border {
 			Background      = new SolidColorBrush(Color.Parse("#1E1E5A")),
 			BorderBrush     = new SolidColorBrush(Color.Parse("#14143A")),
@@ -75,6 +97,7 @@ public partial class VersionPickerWindow : Window {
 			CornerRadius    = new CornerRadius(4),
 			Padding         = new Thickness(10, 8),
 			Margin          = new Thickness(0, 0, 0, 4),
+			Opacity         = supported ? 1.0 : 0.45,
 		};
 
 		var grid = new Grid();
@@ -104,6 +127,8 @@ public partial class VersionPickerWindow : Window {
 			meta.Children.Add(new TextBlock { Text = "by " + entry.Author, FontSize = 11, Foreground = new SolidColorBrush(Color.Parse("#888899")), VerticalAlignment = VerticalAlignment.Center });
 		if (!string.IsNullOrEmpty(entry.RequiresTerrariaVersion))
 			meta.Children.Add(new TextBlock { Text = "⚠ Requires Terraria " + entry.RequiresTerrariaVersion, FontSize = 11, Foreground = new SolidColorBrush(Color.Parse("#FFAA44")), VerticalAlignment = VerticalAlignment.Center, LineHeight = 16 });
+		if (!supported)
+			meta.Children.Add(new TextBlock { Text = "⊘ " + PlatformNote(entry), FontSize = 11, Foreground = new SolidColorBrush(Color.Parse("#FF7777")), VerticalAlignment = VerticalAlignment.Center });
 		info.Children.Add(meta);
 
 		Grid.SetColumn(info, 0);
@@ -112,7 +137,17 @@ public partial class VersionPickerWindow : Window {
 		var btn = new TerrariaButton { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
 		bool installed = InstanceManager.Instances.Any(
 			r => r.Category == _category && r.Version == entry.Version);
-		if (installed) {
+
+		if (!supported) {
+			btn.Content = new TextBlock {
+				Text = PlatformNote(entry), Foreground = new SolidColorBrush(Color.Parse("#888899")),
+				FontSize = 14, Margin = new Thickness(10, 4)
+			};
+			btn.IsEnabled = false;
+			btn.Opacity = 0.55;
+			btn.Cursor = Avalonia.Input.Cursor.Default;
+		}
+		else if (installed) {
 			btn.Content = new TextBlock {
 				Text = "Installed", Foreground = new SolidColorBrush(Color.Parse("#888899")),
 				FontSize = 16, Margin = new Thickness(10, 4)
@@ -133,28 +168,40 @@ public partial class VersionPickerWindow : Window {
 	}
 
 	private async Task OnDownload(VersionEntry entry) {
-		// Resolve the Terraria dependency first (PLAN Feature 5)
 		string? linkedTerrariaId = null;
 		if (!string.IsNullOrEmpty(entry.RequiresTerrariaVersion)) {
 			string required = entry.RequiresTerrariaVersion;
 			var existing = InstanceManager.FindTerrariaVersion(required);
 			if (existing == null) {
-				var result = await TriggerMessageBox.ShowAsync(
-					this,
-					MessageIcon.Question,
-					$"{entry.Name} requires Terraria {required} which is not installed.\n\n" +
-					"Download it now? (Requires Steam login)\n" +
-					$"Choose Skip to install {entry.Name} without it.",
-					"Dependency Required",
-					MsgBoxButton.YesNoCancel, b2: "Skip");
-				if (result == MsgBoxResult.Cancel || result == MsgBoxResult.None) return;
+				var terrariaVersions = await VersionSource.GetVersionsAsync(InstanceCategory.Terraria);
+				var dep = terrariaVersions.FirstOrDefault(v => v.Version == required)
+					?? new VersionEntry { Name = $"Terraria {required}", Version = required, Platforms = ["windows"] };
 
-				if (result == MsgBoxResult.Yes) {
-					var terrariaVersions = await VersionSource.GetVersionsAsync(InstanceCategory.Terraria);
-					var dep = terrariaVersions.FirstOrDefault(v => v.Version == required)
-						?? new VersionEntry { Name = $"Terraria {required}", Version = required };
-					if (!await DownloadAsync(dep, InstanceCategory.Terraria, null)) return;
-					existing = InstanceManager.FindTerrariaVersion(required);
+				if (PlatformSupported(dep)) {
+					var result = await TriggerMessageBox.ShowAsync(
+						this, MessageIcon.Question,
+						$"{entry.Name} requires Terraria {required} which is not installed.\n\n" +
+						"Download it now? (Requires Steam login)\n" +
+						$"Choose Skip to install {entry.Name} without it.",
+						"Dependency Required",
+						MsgBoxButton.YesNoCancel, b2: "Skip");
+					if (result == MsgBoxResult.Cancel || result == MsgBoxResult.None) return;
+					if (result == MsgBoxResult.Yes) {
+						if (!await DownloadAsync(dep, InstanceCategory.Terraria, null)) return;
+						existing = InstanceManager.FindTerrariaVersion(required);
+					}
+				}
+				else {
+					// Dependency exists but has no download for this OS (e.g. Terraria 1.3.5.3 on macOS/Linux)
+					string osName = OperatingSystem.IsMacOS() ? "macOS" : "Linux";
+					var result = await TriggerMessageBox.ShowAsync(
+						this, MessageIcon.Warning,
+						$"{entry.Name} requires Terraria {required}, which cannot be downloaded on {osName}.\n\n" +
+						$"You can still install {entry.Name} without linking to a Terraria copy.",
+						"Dependency Not Available",
+						MsgBoxButton.OKCancel, b1: "Install Anyway");
+					if (result != MsgBoxResult.OK) return;
+					// proceed with no link (existing stays null → linkedTerrariaId = null)
 				}
 			}
 			linkedTerrariaId = existing?.Id;
@@ -178,6 +225,12 @@ public partial class VersionPickerWindow : Window {
 
 		string user = "", pass = "";
 		if (category == InstanceCategory.Terraria) {
+			if (!PlatformSupported(entry)) {
+				await TriggerMessageBox.ShowAsync(this, MessageIcon.Error,
+					$"Terraria {entry.Version} is only available on {PlatformNote(entry)} and cannot be downloaded on this platform.",
+					"Not Available");
+				return false;
+			}
 			var login = await TextPromptWindow.ShowLoginAsync(this, "Steam Login",
 				"Steam credentials are required to download Terraria.\n" +
 				"They are passed directly to DepotDownloader and never saved.",
