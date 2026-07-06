@@ -109,8 +109,25 @@ dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-x64 --self-c
 ./publish/win-x64/TerraLauncher.exe
 ```
 
-The published `TerraLauncher.exe` carries the app icon (from `App.ico`) for Explorer
-and the taskbar.
+The published `TerraLauncher.exe` carries the app icon (from `App.ico`) for Explorer and the taskbar.
+
+### Windows installer (Inno Setup)
+
+To produce a proper Windows installer (`TerraLauncher-Setup-Windows-x64.exe`) that installs to Program Files, creates Start Menu and optional Desktop shortcuts, and registers an uninstaller:
+
+1. **Publish the app** (if you haven't already):
+   ```sh
+   dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-x64 --self-contained -o ./publish/win-x64
+   ```
+
+2. **Install [Inno Setup 6](https://jrsoftware.org/isdl.php)** (free).
+
+3. **Compile the installer** — either open `installer-windows.iss` in the Inno Setup Compiler GUI and click **Build → Compile**, or run from the command line:
+   ```sh
+   "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer-windows.iss
+   ```
+
+The finished installer is written to `installer-output\TerraLauncher-Setup-Windows-x64.exe`.
 
 ### Linux installation
 
