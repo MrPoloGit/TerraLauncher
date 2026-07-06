@@ -167,15 +167,32 @@ public abstract class Setup : ISetup {
 	protected abstract void WriteSetup(XmlElement setup, XmlDocument doc);
 	protected abstract void ReadSetup(XmlElement setup);
 
+	// Append a line to TerraLauncher-launch.log next to the config file.
+	private static void WriteLog(string line) {
+		try {
+			string logPath = Path.Combine(
+				Path.GetDirectoryName(Config.ConfigPath) ?? ".",
+				"TerraLauncher-launch.log");
+			File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {line}" + Environment.NewLine);
+		}
+		catch { }
+	}
+
 	public void Launch() {
 		Sounds.PlayOpen();
+		WriteLog($"=== Launching: {Name} ===");
+		WriteLog($"ExePath: {ExePath}");
 		try {
 			bool isMacBundle = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
 				&& ExePath.EndsWith(".app", StringComparison.OrdinalIgnoreCase)
 				&& Directory.Exists(ExePath);
 
+			bool exists = isMacBundle ? Directory.Exists(ExePath) : File.Exists(ExePath);
+			WriteLog($"Path exists: {exists}  (isMacBundle={isMacBundle})");
+
 			// Validate path before attempting launch
-			if (!isMacBundle && !File.Exists(ExePath)) {
+			if (!exists) {
+				WriteLog("ABORT: path not found");
 				Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
 					if (Config.MainWindow == null) return;
 					string msg = string.IsNullOrEmpty(ExePath)
@@ -248,7 +265,9 @@ public abstract class Setup : ISetup {
 				};
 			}
 
+			WriteLog($"Process.Start: FileName={start.FileName}  UseShellExecute={start.UseShellExecute}  Args={start.Arguments}");
 			var proc = Process.Start(start);
+			WriteLog($"Process.Start returned: {(proc == null ? "null" : $"PID {proc.Id}")}");
 			if (proc != null) {
 				// Drain redirected streams so the child never blocks on a full pipe buffer.
 				if (start.RedirectStandardOutput) {
@@ -267,9 +286,11 @@ public abstract class Setup : ISetup {
 				"Tool"   => Config.CloseOnToolLaunch,
 				_ => false
 			};
+			WriteLog($"CloseOnLaunch={close}");
 			if (close) Config.MainWindow?.Close();
 		}
 		catch (Exception ex) {
+			WriteLog($"EXCEPTION: {ex.GetType().Name}: {ex.Message}");
 			Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
 				if (Config.MainWindow == null) return;
 				await TriggerMessageBox.ShowAsync(Config.MainWindow, MessageIcon.Error,
