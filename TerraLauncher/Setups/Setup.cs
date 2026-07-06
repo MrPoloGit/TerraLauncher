@@ -418,23 +418,20 @@ public abstract class Setup : ISetup {
 					.ToList();
 			}
 
-			// Confirm removal
+			// Build confirmation message — include install path so the user knows
+			// files will be permanently deleted.
+			bool hasManagedFiles = record != null
+				&& !string.IsNullOrEmpty(record.InstallPath)
+				&& Directory.Exists(record.InstallPath);
+
+			string confirmMsg = hasManagedFiles
+				? $"Remove \"{Name}\" from the list and delete its files?\n\n{record!.InstallPath}"
+				: $"Remove \"{Name}\" from the list?";
+
 			var result = await TriggerMessageBox.ShowAsync(
 				window, MessageIcon.Warning,
-				$"Remove \"{Name}\" from the list?",
-				"Remove Entry", MsgBoxButton.YesNo);
+				confirmMsg, "Remove Entry", MsgBoxButton.YesNo);
 			if (result != MsgBoxResult.Yes) return;
-
-			// Ask about deleting files
-			bool deleteFiles = false;
-			if (record != null && !string.IsNullOrEmpty(record.InstallPath)
-				&& Directory.Exists(record.InstallPath)) {
-				var delResult = await TriggerMessageBox.ShowAsync(
-					window, MessageIcon.Warning,
-					$"Also delete files from disk?\n\n{record.InstallPath}",
-					"Delete Files", MsgBoxButton.YesNo);
-				deleteFiles = delResult == MsgBoxResult.Yes;
-			}
 
 			// Ask about dependent instances
 			bool deleteDependents = false;
@@ -449,7 +446,7 @@ public abstract class Setup : ISetup {
 
 			Sounds.PlayClose();
 
-			// Remove this entry
+			// Remove this entry from the UI, instances.json, and its install folder.
 			static bool RemoveFrom(SetupFolder folder, Setup target) {
 				if (folder.Entries.Remove(target)) return true;
 				foreach (var e in folder.Entries)
@@ -460,7 +457,7 @@ public abstract class Setup : ISetup {
 			RemoveFrom(Config.Servers, this);
 			RemoveFrom(Config.Tools, this);
 			InstanceManager.RemoveByExePath(ExePath);
-			if (deleteFiles && record != null)
+			if (record != null)
 				InstanceManager.DeleteInstanceFiles(record);
 
 			// Deleting the auto-detected Steam entries must stick across
