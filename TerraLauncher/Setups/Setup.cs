@@ -288,19 +288,62 @@ public abstract class Setup : ISetup {
 			};
 			WriteLog($"CloseOnLaunch={close}");
 			if (close) {
-				// Wait for the launched process to exit before closing.
-				// Steam games use a stub exe that exits within ~2 s once Steam takes over;
-				// waiting here ensures the real game window is already spawning by the time
-				// the launcher disappears. For non-Steam games we cap the wait at 5 s.
+				// On Windows, poll until the game's window handle appears, then close.
+				// This correctly handles Steam stub exes: Terraria.exe exits in ~2 s after
+				// handing off to Steam; we keep watching for a "Terraria" process with a
+				// visible window. Once found, the game is on-screen and we can close safely.
+				// "start-tModLoader.bat" strips to "tModLoader" so the real process is found.
+				// Safety cap: 60 s (handles slow machines / cases where window never appears).
+				// On macOS/Linux the stub-launch pattern doesn't apply; wait for stub exit (5 s).
 				var procForClose = proc;
+				string rawName = Path.GetFileNameWithoutExtension(ExePath) ?? "";
+				string watchName = rawName.StartsWith("start-", StringComparison.OrdinalIgnoreCase)
+					? rawName["start-".Length..] : rawName;
+
 				_ = System.Threading.Tasks.Task.Run(async () => {
-					if (procForClose != null) {
-						using var cts = new System.Threading.CancellationTokenSource(
-							TimeSpan.FromSeconds(5));
-						try { await procForClose.WaitForExitAsync(cts.Token); }
-						catch { }
+					bool found = false;
+
+					if (OperatingSystem.IsWindows() && !string.IsNullOrEmpty(watchName)) {
+						var deadline = DateTime.UtcNow.AddSeconds(60);
+						while (DateTime.UtcNow < deadline) {
+							await System.Threading.Tasks.Task.Delay(500);
+
+							// Case 1: the original process itself has a window (non-stub game).
+							if (procForClose != null) {
+								try {
+									if (!procForClose.HasExited
+										&& procForClose.MainWindowHandle != IntPtr.Zero) {
+										found = true; break;
+									}
+								}
+								catch { }
+							}
+
+							// Case 2: Steam spawned a new process with the same exe name.
+							try {
+								var procs = Process.GetProcessesByName(watchName);
+								bool hasWindow = procs.Any(p => {
+									try { return p.MainWindowHandle != IntPtr.Zero; }
+									catch { return false; }
+								});
+								foreach (var p in procs) p.Dispose();
+								if (hasWindow) { found = true; break; }
+							}
+							catch { }
+						}
 					}
-					WriteLog("Closing launcher after process handoff");
+					else {
+						// macOS / Linux: the launched process is not a stub — just wait for it
+						// to finish setting up (up to 5 s) then step aside.
+						if (procForClose != null) {
+							using var cts = new System.Threading.CancellationTokenSource(
+								TimeSpan.FromSeconds(5));
+							try { await procForClose.WaitForExitAsync(cts.Token); }
+							catch { }
+						}
+					}
+
+					WriteLog($"Closing launcher (windowDetected={found}, watchName={watchName})");
 					await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(
 						() => Config.MainWindow?.Close());
 				});
