@@ -139,3 +139,21 @@ cd ./publish/linux-x64
 ```
 
 This installs TerraLauncher to `~/.local/share/TerraLauncher/`, creates a launcher symlink at `~/.local/bin/TerraLauncher`, and registers the `.desktop` entry so it appears in your applications menu.
+
+### Notes about storage
+
+- Windows
+- Upon fresh install and first launch of Terraria
+   - Documents/My Games/Terraria
+      - Players
+      - Worlds
+   - Program Files (x86)/Steam/userdata/279170712/105600/remote
+      - ModLoader
+      - players
+      - Worlds
+- Need a way to install and store seperate world/player files
+- Get DepotDownloader fully working
+- Observer the result of downloading TModLoader
+- should maybe use tModLoader first to do it
+- Then tConfig
+- Figure out how to take a
