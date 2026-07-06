@@ -22,8 +22,6 @@ public partial class SettingsWindow : Window {
 		if (Config.SettingsHeight >= MinHeight) Height = Config.SettingsHeight;
 
 		checkBoxCloseGame.IsChecked          = Config.CloseOnGameLaunch;
-		checkBoxCloseServer.IsChecked        = Config.CloseOnServerLaunch;
-		checkBoxCloseTool.IsChecked          = Config.CloseOnToolLaunch;
 		checkBoxDisableTransitions.IsChecked = Config.DisableTransitions;
 		checkBoxMuted.IsChecked              = Config.Muted;
 		checkBoxIntegration.IsChecked        = Config.Integration;
@@ -101,8 +99,6 @@ public partial class SettingsWindow : Window {
 		if (ok) {
 			Config.TerrariaExePath     = w.textBoxTerrariaPath.Text?.Trim()       ?? "";
 			Config.CloseOnGameLaunch   = w.checkBoxCloseGame.IsChecked          == true;
-			Config.CloseOnServerLaunch = w.checkBoxCloseServer.IsChecked        == true;
-			Config.CloseOnToolLaunch   = w.checkBoxCloseTool.IsChecked          == true;
 			Config.DisableTransitions  = w.checkBoxDisableTransitions.IsChecked == true;
 			Config.Muted               = w.checkBoxMuted.IsChecked              == true;
 			Config.Integration         = w.checkBoxIntegration.IsChecked        == true;
