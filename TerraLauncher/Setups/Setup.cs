@@ -287,7 +287,24 @@ public abstract class Setup : ISetup {
 				_ => false
 			};
 			WriteLog($"CloseOnLaunch={close}");
-			if (close) Config.MainWindow?.Close();
+			if (close) {
+				// Wait for the launched process to exit before closing.
+				// Steam games use a stub exe that exits within ~2 s once Steam takes over;
+				// waiting here ensures the real game window is already spawning by the time
+				// the launcher disappears. For non-Steam games we cap the wait at 5 s.
+				var procForClose = proc;
+				_ = System.Threading.Tasks.Task.Run(async () => {
+					if (procForClose != null) {
+						using var cts = new System.Threading.CancellationTokenSource(
+							TimeSpan.FromSeconds(5));
+						try { await procForClose.WaitForExitAsync(cts.Token); }
+						catch { }
+					}
+					WriteLog("Closing launcher after process handoff");
+					await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(
+						() => Config.MainWindow?.Close());
+				});
+			}
 		}
 		catch (Exception ex) {
 			WriteLog($"EXCEPTION: {ex.GetType().Name}: {ex.Message}");
