@@ -243,7 +243,6 @@ public abstract class Setup : ISetup {
 					FileName         = ExePath,
 					Arguments        = Arguments,
 					WindowStyle      = ProcessWindowStyle.Normal,
-					CreateNoWindow   = true,
 					UseShellExecute  = true,
 					WorkingDirectory = ExeDirectory,
 				};
@@ -270,7 +269,14 @@ public abstract class Setup : ISetup {
 			};
 			if (close) Config.MainWindow?.Close();
 		}
-		catch { }
+		catch (Exception ex) {
+			Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () => {
+				if (Config.MainWindow == null) return;
+				await TriggerMessageBox.ShowAsync(Config.MainWindow, MessageIcon.Error,
+					$"Failed to launch {Name}:\n\n{ex.Message}\n\nPath: {ExePath}",
+					"Launch Failed");
+			});
+		}
 	}
 
 	// Splits a command-line string into tokens, respecting "quoted segments"
