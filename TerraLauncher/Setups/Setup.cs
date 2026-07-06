@@ -304,32 +304,51 @@ public abstract class Setup : ISetup {
 					bool found = false;
 
 					if (OperatingSystem.IsWindows() && !string.IsNullOrEmpty(watchName)) {
-						var deadline = DateTime.UtcNow.AddSeconds(60);
+						// Phase 1 — wait for ANY process with that name to have a window
+						// (polls every 500 ms, 120 s cap). Exclude the original stub PID:
+						// the stub hands off to Steam and exits; we want the real game process.
+						int stubPid = procForClose?.Id ?? -1;
+						Process? gameProc = null;
+						var deadline = DateTime.UtcNow.AddSeconds(120);
 						while (DateTime.UtcNow < deadline) {
 							await System.Threading.Tasks.Task.Delay(500);
 
-							// Case 1: the original process itself has a window (non-stub game).
-							if (procForClose != null) {
-								try {
-									if (!procForClose.HasExited
-										&& procForClose.MainWindowHandle != IntPtr.Zero) {
-										found = true; break;
-									}
-								}
-								catch { }
-							}
-
-							// Case 2: Steam spawned a new process with the same exe name.
 							try {
 								var procs = Process.GetProcessesByName(watchName);
-								bool hasWindow = procs.Any(p => {
-									try { return p.MainWindowHandle != IntPtr.Zero; }
-									catch { return false; }
-								});
-								foreach (var p in procs) p.Dispose();
-								if (hasWindow) { found = true; break; }
+								foreach (var p in procs) {
+									try {
+										// Skip the stub unless it never exited (then it IS the game).
+										bool isStub = p.Id == stubPid;
+										if (isStub) {
+											try { if (procForClose!.HasExited) continue; }
+											catch { continue; }
+										}
+										if (p.MainWindowHandle != IntPtr.Zero) {
+											gameProc = p;
+											break;
+										}
+									}
+									catch { }
+								}
+								// Dispose the ones we're not keeping.
+								foreach (var p in procs) {
+									if (!ReferenceEquals(p, gameProc)) p.Dispose();
+								}
 							}
 							catch { }
+
+							if (gameProc != null) break;
+						}
+
+						// Phase 2 — wait until the game's message loop is idle
+						// (i.e., loading is done and it's ready for input).
+						if (gameProc != null) {
+							WriteLog($"Game window found PID={gameProc.Id}, waiting for input-idle");
+							try { gameProc.WaitForInputIdle(60_000); }
+							catch { }
+							WriteLog("WaitForInputIdle returned — closing launcher");
+							gameProc.Dispose();
+							found = true;
 						}
 					}
 					else {
