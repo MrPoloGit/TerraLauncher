@@ -36,10 +36,7 @@
                 <controls:TerrariaButton.ToolTip>
                     <controls:TerrariaTooltip Text="Add Instance"/>
                 </controls:TerrariaButton.ToolTip>
-                <Grid Width="32" Height="32">
-                    <Rectangle Fill="White" Width="24" Height="6" RadiusX="1.5" RadiusY="1.5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Rectangle Fill="White" Width="6" Height="24" RadiusX="1.5" RadiusY="1.5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
+                <Image Source="/Resources/Icons/GameAdd.png" Width="32" Height="32" />
             </controls:TerrariaButton>
 
             <controls:TerrariaButton x:Name="buttonSettings" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" MouseUp="OnEditSetups">

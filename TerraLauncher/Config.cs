@@ -58,13 +58,11 @@ namespace TerraLauncher {
 				}
 
 				XmlNode node;
-				XmlElement element;
 				XmlAttribute attribute;
 				XmlDocument doc = new XmlDocument();
 				doc.Load(ConfigPath);
 
 				int intValue;
-				ushort ushortValue;
 				bool boolValue;
 				double doubleValue;
 

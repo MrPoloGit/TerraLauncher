@@ -35,7 +35,7 @@ namespace TerraLauncher.Util {
 		/**<summary>Extract an embedded resource.</summary>*/
 		public static void Extract(string resourcePath, Stream stream) {
 			byte[] resourceBytes = new byte[stream.Length];
-			stream.Read(resourceBytes, 0, resourceBytes.Length);
+			stream.ReadExactly(resourceBytes, 0, resourceBytes.Length);
 
 			Extract(resourcePath, resourceBytes);
 		}
@@ -43,7 +43,7 @@ namespace TerraLauncher.Util {
 		public static void Extract(string resourcePath, string resourceName) {
 			Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
 			byte[] resourceBytes = new byte[stream.Length];
-			stream.Read(resourceBytes, 0, resourceBytes.Length);
+			stream.ReadExactly(resourceBytes, 0, resourceBytes.Length);
 
 			Extract(resourcePath, resourceBytes);
 		}

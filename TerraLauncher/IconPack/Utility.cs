@@ -22,7 +22,7 @@ namespace TAFactory.Utilities
         {
             int size = Marshal.SizeOf(typeof(T));
             byte[] buffer = new byte[size];
-            inputStream.Read(buffer, 0, size);
+            inputStream.ReadExactly(buffer, 0, size);
             IntPtr ptr = Marshal.AllocHGlobal(size);
             Marshal.Copy(buffer, 0, ptr, size);
             object ret = Marshal.PtrToStructure(ptr, typeof(T));

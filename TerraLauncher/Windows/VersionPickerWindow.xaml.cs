@@ -225,8 +225,7 @@ namespace TerraLauncher.Windows {
 				return false;
 			}
 
-			string safeName = (cat.ToString() + "-" + entry.Version).Replace(" ", "-").Replace("/", "-");
-			string installDir = InstancePaths.GetInstallDir(cat, safeName);
+			string installDir = InstancePaths.GetInstallDirForVersion(cat, entry.Version);
 
 			string exePath = null;
 			bool ok = await DownloadProgressWindow.RunAsync(this, "Downloading " + entry.Name + "...", async (ui, ct) => {

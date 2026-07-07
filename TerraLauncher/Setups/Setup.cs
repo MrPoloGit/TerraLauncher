@@ -93,6 +93,9 @@ namespace TerraLauncher.Setups {
 			AddOptionIcon("Gear");
 			AddOptionIcon("FolderEnter");
 			AddOptionIcon("FolderLeave");
+			// Lives in Resources/Icons/ (old tree-view button art), not the
+			// Resources/Terraria/SetupOptions/ naming convention the others use.
+			AddOptionIconFromPath("GameRemove", "pack://application:,,,/Resources/Icons/GameRemove.png");
 		}
 		public abstract ISetup Clone();
 		protected void CloneBase(Setup setup) {
@@ -111,6 +114,9 @@ namespace TerraLauncher.Setups {
 		}
 		private static void AddOptionIcon(string name) {
 			SetupOptions.Add(name, new BitmapImage(new Uri("pack://application:,,,/Resources/Terraria/SetupOptions/SetupOption" + name + ".png")));
+		}
+		private static void AddOptionIconFromPath(string name, string uri) {
+			SetupOptions.Add(name, new BitmapImage(new Uri(uri)));
 		}
 
 		#endregion

@@ -47,7 +47,7 @@ namespace TerraLauncher {
 					return null;
 
 				byte[] assemblyRawBytes = new byte[stream.Length];
-				stream.Read(assemblyRawBytes, 0, assemblyRawBytes.Length);
+				stream.ReadExactly(assemblyRawBytes, 0, assemblyRawBytes.Length);
 				return Assembly.Load(assemblyRawBytes);
 			}
 		}

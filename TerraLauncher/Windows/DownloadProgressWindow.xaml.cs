@@ -83,7 +83,9 @@ namespace TerraLauncher.Windows {
 				}
 				else {
 					w.SetProgress(-1);
-					w.Dispatcher.BeginInvoke(new Action(() => w.buttonCancel.Content = "Close"));
+					// Already on the UI thread here (this is a ContentRendered
+					// continuation), so no Dispatcher marshaling needed.
+					w.buttonCancel.Content = "Close";
 				}
 			};
 

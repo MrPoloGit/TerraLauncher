@@ -5,10 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using TerraLauncher.Controls.Terraria;
+using TerraLauncher.Instances;
 using TerraLauncher.Windows;
 
 namespace TerraLauncher.Setups {
@@ -57,6 +59,7 @@ namespace TerraLauncher.Setups {
 				options.Add(new SetupOption("Open Save Folder", "Folder", OpenSaveFolder));
 				options.Add(new SetupOption("Open Executable Folder", "Home", OpenExeFolder));
 				options.Add(new SetupOption("Edit Game Setup", "Gear", EditGame));
+				options.Add(new SetupOption("Remove Instance", "GameRemove", RemoveInstance));
 				return options.ToArray();
 			}
 		}
@@ -148,6 +151,46 @@ namespace TerraLauncher.Setups {
 				Config.Modified = true;
 				Config.SaveConfig();
 			}
+		}
+
+		public void RemoveInstance() {
+			if (Config.MainWindow == null) return;
+
+			// Only versions that came from the downloader own an install folder —
+			// Steam auto-detected entries and Custom-linked executables point at
+			// files this app doesn't manage, so those must never be deleted.
+			string installDir = !string.IsNullOrEmpty(Version)
+				? InstancePaths.GetInstallDirForVersion(Category, Version) : null;
+			bool hasManagedFiles = installDir != null && Directory.Exists(installDir);
+
+			string message = hasManagedFiles
+				? "Remove \"" + Name + "\" from the list and delete its files?\n\n" + installDir
+				: "Remove \"" + Name + "\" from the list?";
+
+			MessageBoxResult result = TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Warning,
+				message, "Remove Instance", MessageBoxButton.YesNo);
+			if (result != MessageBoxResult.Yes) return;
+
+			Sounds.PlayClose();
+
+			RemoveFromFolder(Config.Games, this);
+
+			if (hasManagedFiles) {
+				try { Directory.Delete(installDir, recursive: true); }
+				catch { }
+			}
+
+			Config.Modified = true;
+			Config.SaveConfig();
+			Config.MainWindow.ReloadSetups();
+		}
+
+		private static bool RemoveFromFolder(SetupFolder folder, Setup target) {
+			if (folder.Entries.Remove(target)) return true;
+			foreach (var entry in folder.Entries) {
+				if (entry is SetupFolder sub && RemoveFromFolder(sub, target)) return true;
+			}
+			return false;
 		}
 
 		#endregion

@@ -18,7 +18,6 @@ namespace TerraLauncher {
 		//=========== MEMBERS ============
 		#region Members
 
-		bool loaded = false;
 		Stack<TerrariaSetupList> gameStack = new Stack<TerrariaSetupList>();
 
 		private static readonly string[] FilterNames =
@@ -108,7 +107,8 @@ namespace TerraLauncher {
 		//=========== HELPERS ============
 		#region Helpers
 
-		private void ReloadSetups() {
+		// Public so Setup.RemoveInstance can refresh the list after removing/deleting an entry.
+		public void ReloadSetups() {
 			gridGames.Children.Clear();
 			gameStack.Clear();
 			LoadSetups();
@@ -226,7 +226,6 @@ namespace TerraLauncher {
 		private void OnWindowLoaded(object sender, RoutedEventArgs e) {
 			Sounds.PlayOpen();
 			var anim = new DoubleAnimation(0, 1, (Duration)TimeSpan.FromSeconds(0.4));
-			anim.Completed += (s, _) => { loaded = true; } ;
 			this.BeginAnimation(UIElement.OpacityProperty, anim);
 		}
 		private void OnWindowClosing(object sender, CancelEventArgs e) {
