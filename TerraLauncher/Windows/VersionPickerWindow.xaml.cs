@@ -243,11 +243,21 @@ namespace TerraLauncher.Windows {
 				Version  = entry.Version,
 				ExePath  = exePath,
 				Details  = entry.Version,
+				Icon     = DefaultIconFor(cat),
 			};
 			Config.Games.Entries.Add(game);
 			Config.Modified = true;
 			Config.SaveConfig();
 			return true;
+		}
+
+		// Keeps the main instance list visually distinct by category, matching
+		// the Add Instance tile art (tModLoader gets the jungle-tree variant).
+		private static string DefaultIconFor(GameCategory cat) {
+			switch (cat) {
+			case GameCategory.TModLoader: return "TreeJungle";
+			default:                     return "Tree";
+			}
 		}
 
 		// A Config entry alone isn't enough — if the user deleted the install

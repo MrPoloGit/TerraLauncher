@@ -1,16 +1,5 @@
 [
   {
-    "name": "Terraria (Latest)",
-    "version": "latest",
-    "description": "Current version on Steam - no manifest needed",
-    "date": "",
-    "author": "Re-Logic",
-    "url": "",
-    "depotId": 105601,
-    "manifestId": "",
-    "requiresTerrariaVersion": ""
-  },
-  {
     "name": "Terraria 1.4.5.6",
     "version": "1.4.5.6",
     "description": "",

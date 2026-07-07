@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -30,7 +31,7 @@ namespace TerraLauncher.Instances {
 		public static async Task<VersionPage> GetVersionsAsync(GameCategory category, int page = 1) {
 			switch (category) {
 			case GameCategory.Terraria:
-				return SinglePage(LoadEmbedded("TerraLauncher.Resources.VersionData.terraria-versions.json"));
+				return await FetchTerrariaAsync();
 			case GameCategory.TModLoader:
 				return await FetchTModLoaderAsync(page);
 			case GameCategory.TAPI:
@@ -55,6 +56,63 @@ namespace TerraLauncher.Instances {
 				}
 			}
 			catch { return new List<VersionEntry>(); }
+		}
+
+		// Steam manifest IDs per Terraria version, live from the same actively-maintained
+		// database used by TerrariaDepotDownloader — this is what actually determines
+		// which version is "latest", rather than trusting a snapshot that goes stale the
+		// moment Re-Logic ships an update we don't know about yet.
+		private const string TerrariaManifestCfgUrl =
+			"https://raw.githubusercontent.com/RussDev7/TerrariaDepotDownloader/main/src/TerrariaDepotDownloader/ExternalResources/ManifestVersions.cfg";
+
+		private static async Task<VersionPage> FetchTerrariaAsync() {
+			string cacheDir = Path.Combine(InstancePaths.InstancesRoot, "..", "cache");
+			string cachePath = Path.Combine(cacheDir, "terraria-manifest-versions.cfg");
+			string cfgText;
+			try {
+				cfgText = await http.GetStringAsync(TerrariaManifestCfgUrl);
+				Directory.CreateDirectory(cacheDir);
+				File.WriteAllText(cachePath, cfgText);
+			}
+			catch {
+				if (File.Exists(cachePath)) {
+					cfgText = File.ReadAllText(cachePath);
+				}
+				else {
+					// Last-resort offline fallback: a snapshot bundled at build time.
+					return SinglePage(LoadEmbedded("TerraLauncher.Resources.VersionData.terraria-versions.json"));
+				}
+			}
+			return SinglePage(ParseTerrariaManifestCfg(cfgText));
+		}
+
+		internal static List<VersionEntry> ParseTerrariaManifestCfg(string cfgText) {
+			var entries = new List<VersionEntry>();
+			foreach (var rawLine in cfgText.Split('\n')) {
+				string line = rawLine.Trim();
+				if (line.Length == 0 || line.StartsWith("#")) continue;
+
+				int comma = line.IndexOf(',');
+				if (comma < 0) continue;
+
+				string version = line.Substring(0, comma).Trim();
+				string manifest = line.Substring(comma + 1).Trim();
+
+				// Versions with no real Steam depot (e.g. pointing at a GitHub archive
+				// for pre-Steam-era releases) can't be downloaded through DepotDownloader
+				// — leave them out rather than list something that will just fail.
+				if (version.Length == 0 || manifest.Length == 0 || !manifest.All(char.IsDigit))
+					continue;
+
+				entries.Add(new VersionEntry {
+					Name       = "Terraria " + version,
+					Version    = version,
+					Author     = "Re-Logic",
+					DepotId    = 105601,
+					ManifestId = manifest,
+				});
+			}
+			return entries;
 		}
 
 		private static async Task<VersionPage> FetchTModLoaderAsync(int page) {

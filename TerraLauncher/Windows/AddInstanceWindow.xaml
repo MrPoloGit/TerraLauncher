@@ -24,7 +24,7 @@
             </controls:TerrariaButton>
             <controls:TerrariaButton Margin="6" MouseUp="OnTModLoader">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Image Source="/TerraLauncher;component/Resources/Icons/TreeView/TreeViewGameTMod.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTreeJungle.png" Width="48" Height="48" HorizontalAlignment="Center"/>
                     <TextBlock Text="tModLoader" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
                 </StackPanel>
             </controls:TerrariaButton>

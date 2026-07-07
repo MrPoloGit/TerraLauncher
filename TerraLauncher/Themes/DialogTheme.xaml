@@ -54,6 +54,17 @@
         <Setter Property="CaretBrush" Value="{StaticResource DialogTextBrush}"/>
         <Setter Property="SelectionBrush" Value="{StaticResource DialogAccentBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style TargetType="{x:Type PasswordBox}">
+        <Setter Property="Background" Value="{StaticResource DialogInputBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DialogBorderBrush}"/>
+        <Setter Property="CaretBrush" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="SelectionBrush" Value="{StaticResource DialogAccentBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <!-- Themed ComboBox: the closed box is the same pixel-art button frame used
