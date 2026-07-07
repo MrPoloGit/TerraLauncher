@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System.Windows.Media.Animation;
 using TerraLauncher.Controls.Terraria;
 using TerraLauncher.Setups;
+using TerraLauncher.Util;
 using System.ComponentModel;
 
 namespace TerraLauncher {
@@ -54,6 +55,7 @@ namespace TerraLauncher {
 		/**<summary>Loads the application settings.</summary>*/
 		private void LoadSettings() {
 			Config.LoadConfig(this);
+			EnsureSteamTModLoaderEntry();
 
 			LoadSetups();
 
@@ -63,6 +65,34 @@ namespace TerraLauncher {
 				Width = width;
 			if (height >= MinHeight)
 				Height = height;
+		}
+
+		// Steam installs tModLoader as its own separate app (1281930) next to
+		// Terraria — auto-add it to the list the same way vanilla Terraria's
+		// Steam install is auto-detected, instead of leaving the user to find
+		// and link the launch script by hand.
+		private static void EnsureSteamTModLoaderEntry() {
+			string path = TerrariaLocator.TModLoaderPath;
+			if (string.IsNullOrEmpty(path)) return;
+			if (FolderContainsExe(Config.Games, path)) return;
+
+			Config.Games.Entries.Add(new Game {
+				Name     = "tModLoader",
+				ExePath  = path,
+				Category = GameCategory.TModLoader,
+				Icon     = "TreeJungle",
+				Details  = "Steam",
+			});
+			Config.Modified = true;
+			Config.SaveConfig();
+		}
+
+		private static bool FolderContainsExe(SetupFolder folder, string path) {
+			foreach (var entry in folder.Entries) {
+				if (entry is Game g && string.Equals(g.ExePath, path, StringComparison.OrdinalIgnoreCase)) return true;
+				if (entry is SetupFolder sub && FolderContainsExe(sub, path)) return true;
+			}
+			return false;
 		}
 		/**<summary>Saves the application settings.</summary>*/
 		private void SaveSettings() {

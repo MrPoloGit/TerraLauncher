@@ -14,6 +14,8 @@ namespace TerraLauncher.Util {
 
 		/**<summary>The located or empty Terraria executable path.</summary>*/
 		public static readonly string TerrariaPath;
+		/**<summary>The located or empty Steam tModLoader launch script path.</summary>*/
+		public static readonly string TModLoaderPath;
 
 		#endregion
 		//========= CONSTRUCTORS =========
@@ -22,6 +24,7 @@ namespace TerraLauncher.Util {
 		/**<summary>Start looking for the Terraria executable.</summary>*/
 		static TerrariaLocator() {
 			TerrariaPath = FindTerrariaPath();
+			TModLoaderPath = FindTModLoaderPath();
 		}
 
 		#endregion
@@ -68,6 +71,48 @@ namespace TerraLauncher.Util {
 			}
 
 			string path = Path.Combine(steamDirectory, "SteamApps", "Common", "Terraria", "Terraria.exe");
+			if (File.Exists(path)) {
+				path = GetProperFilePathCapitalization(path);
+				if (path.Length >= 2 && path[1] == ':') {
+					path = char.ToUpper(path[0]) + path.Substring(1);
+					return path;
+				}
+			}
+			return null;
+		}
+
+		/**<summary>Starts looking for Steam's tModLoader launch script (app 1281930, installed
+		 * separately from Terraria itself).</summary>*/
+		private static string FindTModLoaderPath() {
+			try {
+				string steamPath = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
+				string result = SeekTModLoaderDirectory(steamPath);
+				if (result != null) {
+					return result;
+				}
+			}
+			catch { }
+			try {
+				foreach (KeyValuePair<string, string> envVar in Environment.GetEnvironmentVariables()) {
+					if (envVar.Key.ToLower().Contains("steam")) {
+						string result = SeekTModLoaderDirectory(envVar.Value);
+						if (result != null) {
+							return result;
+						}
+					}
+				}
+			}
+			catch { }
+			return null;
+		}
+
+		/**<summary>Seeks a directory for Steam's tModLoader launch script.</summary>*/
+		private static string SeekTModLoaderDirectory(string steamDirectory) {
+			if (steamDirectory == null || !Directory.Exists(steamDirectory)) {
+				return null;
+			}
+
+			string path = Path.Combine(steamDirectory, "SteamApps", "Common", "tModLoader", "start-tModLoader.bat");
 			if (File.Exists(path)) {
 				path = GetProperFilePathCapitalization(path);
 				if (path.Length >= 2 && path[1] == ':') {
