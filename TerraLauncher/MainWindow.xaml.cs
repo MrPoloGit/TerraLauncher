@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,56 +14,18 @@ using System.ComponentModel;
 namespace TerraLauncher {
 	/**<summary>The main window running Terraria Item Modifier.</summary>*/
 	public partial class MainWindow : Window {
-		//========== CONSTANTS ===========
-		#region Constants
-
-
-
-		#endregion
 		//=========== MEMBERS ============
 		#region Members
 
 		bool loaded = false;
 		Stack<TerrariaSetupList> gameStack = new Stack<TerrariaSetupList>();
-		Stack<TerrariaSetupList> serverStack = new Stack<TerrariaSetupList>();
-		Stack<TerrariaSetupList> toolStack = new Stack<TerrariaSetupList>();
-		SetupTypes currentTab = SetupTypes.Game;
 
-		#endregion
-		//========== PROPERTIES ==========
-		#region Properties
+		private static readonly string[] FilterNames =
+			{ "All Instances", "Terraria", "tModLoader", "tAPI", "tConfig", "Stand Alone", "Custom" };
+		private static readonly GameCategory?[] FilterCategories =
+			{ null, GameCategory.Terraria, GameCategory.TModLoader, GameCategory.TAPI,
+			  GameCategory.TConfig, GameCategory.StandAlone, GameCategory.Custom };
 
-		private Stack<TerrariaSetupList> CurrentSetupStack {
-			get {
-				switch (currentTab) {
-				case SetupTypes.Game: return gameStack;
-				case SetupTypes.Server: return serverStack;
-				case SetupTypes.Tool: return toolStack;
-				}
-				return null;
-			}
-		}
-		private SetupFolder CurrentSetupList {
-			get {
-				switch (currentTab) {
-				case SetupTypes.Game: return Config.Games;
-				case SetupTypes.Server: return Config.Servers;
-				case SetupTypes.Tool: return Config.Tools;
-				}
-				return null;
-			}
-		}
-		private Grid CurrentSetupGrid {
-			get {
-				switch (currentTab) {
-				case SetupTypes.Game: return gridGames;
-				case SetupTypes.Server: return gridServers;
-				case SetupTypes.Tool: return gridTools;
-				}
-				return null;
-			}
-		}
-		
 		#endregion
 		//========= CONSTRUCTORS =========
 		#region Constructors
@@ -71,6 +33,9 @@ namespace TerraLauncher {
 		/**<summary>Constructs the main window.</summary>*/
 		public MainWindow() {
 			InitializeComponent();
+
+			comboFilter.ItemsSource = FilterNames;
+			comboFilter.SelectedIndex = 0;
 
 			LoadSettings();
 			Opacity = 0;
@@ -98,13 +63,6 @@ namespace TerraLauncher {
 				Width = width;
 			if (height >= MinHeight)
 				Height = height;
-
-			SetupTypes setupTabsValue;
-			if (Enum.TryParse(Settings.Default.CurrentTab, out setupTabsValue)) {
-				currentTab = setupTabsValue;
-			}
-			UpdateTab();
-			UpdateFolder();
 		}
 		/**<summary>Saves the application settings.</summary>*/
 		private void SaveSettings() {
@@ -113,7 +71,6 @@ namespace TerraLauncher {
 
 			Settings.Default.WindowWidth = (int)Width;
 			Settings.Default.WindowHeight = (int)Height;
-			Settings.Default.CurrentTab = currentTab.ToString();
 			Settings.Default.Save();
 		}
 
@@ -122,14 +79,9 @@ namespace TerraLauncher {
 		#region Helpers
 
 		private void ReloadSetups() {
-			RemoveSetups(gridGames, gameStack);
-			RemoveSetups(gridServers, serverStack);
-			RemoveSetups(gridTools, toolStack);
+			gridGames.Children.Clear();
+			gameStack.Clear();
 			LoadSetups();
-		}
-		private void RemoveSetups(Grid gridList, Stack<TerrariaSetupList> stack) {
-			gridList.Children.Clear();
-			stack.Clear();
 		}
 
 		private void LoadSetups() {
@@ -139,18 +91,7 @@ namespace TerraLauncher {
 			});
 			gameStack.Push(setupList);
 			gridGames.Children.Add(setupList);
-			setupList = new TerrariaSetupList();
-			setupList.PopulateList(Config.Servers, (folder) => {
-				NavigateForward(gridServers, serverStack, folder);
-			});
-			serverStack.Push(setupList);
-			gridServers.Children.Add(setupList);
-			setupList = new TerrariaSetupList();
-			setupList.PopulateList(Config.Tools, (folder) => {
-				NavigateForward(gridTools, toolStack, folder);
-			});
-			toolStack.Push(setupList);
-			gridTools.Children.Add(setupList);
+			ApplyFilter();
 		}
 
 		private void NavigateForward(Grid gridList, Stack<TerrariaSetupList> stack, SetupFolder folder) {
@@ -170,7 +111,7 @@ namespace TerraLauncher {
 			else {
 				last.Visibility = Visibility.Hidden;
 			}
-			UpdateFolder();
+			ApplyFilter();
 		}
 		private void NavigateBack(Grid gridList, Stack<TerrariaSetupList> stack) {
 			var last = stack.Pop();
@@ -183,13 +124,75 @@ namespace TerraLauncher {
 				gridList.Children.Remove(last);
 				setupList.Visibility = Visibility.Visible;
 			}
-			UpdateFolder();
+			ApplyFilter();
 		}
-		
+
+		#endregion
+		//=========== SEARCH =============
+		#region Search
+
+		private void OnSearchChanged(object sender, TextChangedEventArgs e) {
+			textBlockSearchWatermark.Visibility = (textBoxSearch.Text.Length == 0) ? Visibility.Visible : Visibility.Collapsed;
+			ApplyFilter();
+		}
+
+		private void OnFilterChanged(object sender, SelectionChangedEventArgs e) {
+			ApplyFilter();
+		}
+
+		// Restores/filters whichever TerrariaSetupList is currently on top of the
+		// navigation stack: either the normal folder view, or a flattened list
+		// (search text and/or category) spanning every folder.
+		private void ApplyFilter() {
+			if (gameStack.Count == 0)
+				return;
+			var top = gameStack.Peek();
+			string query = (textBoxSearch.Text ?? "").Trim();
+			int filterIndex = Math.Max(0, comboFilter.SelectedIndex);
+			GameCategory? category = FilterCategories[Math.Min(filterIndex, FilterCategories.Length - 1)];
+
+			if (query.Length == 0 && category == null) {
+				var folder = top.Folder;
+				if (folder.Parent == null)
+					top.PopulateList(folder, (sub) => NavigateForward(gridGames, gameStack, sub));
+				else
+					top.PopulateList(folder, (sub) => NavigateForward(gridGames, gameStack, sub), () => NavigateBack(gridGames, gameStack));
+				return;
+			}
+
+			List<Setup> matches = new List<Setup>();
+			WalkForMatches(Config.Games, query, category, matches);
+
+			string what = category != null ? FilterNames[filterIndex] + " instances" : "instances";
+			string emptyMessage = query.Length > 0
+				? "No " + what + " match \"" + query + "\"."
+				: "No " + what + " installed.";
+			top.PopulateFlat(matches, emptyMessage);
+		}
+
+		private static void WalkForMatches(SetupFolder folder, string query, GameCategory? category, List<Setup> matches) {
+			foreach (var entry in folder.Entries) {
+				if (entry is SetupFolder subFolder) {
+					WalkForMatches(subFolder, query, category, matches);
+				}
+				else if (entry is Setup setup) {
+					if (query.Length > 0) {
+						bool nameMatch = setup.Name != null && setup.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+						bool detailsMatch = setup.Details != null && setup.Details.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+						if (!nameMatch && !detailsMatch)
+							continue;
+					}
+					if (category != null && !(setup is Game game && game.Category == category))
+						continue;
+					matches.Add(setup);
+				}
+			}
+		}
+
 		#endregion
 		//============ EVENTS ============
 		#region Events
-		
+
 		private void OnWindowLoaded(object sender, RoutedEventArgs e) {
 			Sounds.PlayOpen();
 			var anim = new DoubleAnimation(0, 1, (Duration)TimeSpan.FromSeconds(0.4));
@@ -207,91 +210,21 @@ namespace TerraLauncher {
 
 		#endregion
 
-		private void OnGamesTab(object sender, MouseButtonEventArgs e) {
-			if (currentTab != SetupTypes.Game) {
-				if (!Config.DisableTransitions) {
-					double width = CurrentSetupGrid.ActualWidth;
-					bool middlePass = false;// currentTab == SetupTypes.Tool;
-					var last = CurrentSetupStack.Peek();
-					var middle = serverStack.Peek();
-					var next = gameStack.Peek();
-					gridGames.Visibility = Visibility.Visible;
-					last.LeaveTab(true, width, middlePass, UpdateTab);
-					next.EnterTab(true, width, middlePass);
-					if (middlePass) {
-						gridServers.Visibility = Visibility.Visible;
-						middle.PassTab(true, width);
-					}
-				}
-				currentTab = SetupTypes.Game;
-				UpdateFolder();
-				if (Config.DisableTransitions)
-					UpdateTab();
-			}
-		}
-
-		private void OnServersTab(object sender, MouseButtonEventArgs e) {
-			if (currentTab != SetupTypes.Server) {
-				if (!Config.DisableTransitions) {
-					double width = CurrentSetupGrid.ActualWidth;
-					bool back = currentTab == SetupTypes.Tool;
-					var last = CurrentSetupStack.Peek();
-					var next = serverStack.Peek();
-					gridServers.Visibility = Visibility.Visible;
-					last.LeaveTab(back, width, false, UpdateTab);
-					next.EnterTab(back, width, false);
-				}
-				currentTab = SetupTypes.Server;
-				UpdateFolder();
-				if (Config.DisableTransitions)
-					UpdateTab();
-			}
-		}
-
-		private void OnToolsTab(object sender, MouseButtonEventArgs e) {
-			if (currentTab != SetupTypes.Tool) {
-				if (!Config.DisableTransitions) {
-					double width = CurrentSetupGrid.ActualWidth;
-					bool middlePass = false;// currentTab == SetupTypes.Game;
-					var last = CurrentSetupStack.Peek();
-					var middle = serverStack.Peek();
-					var next = toolStack.Peek();
-					gridTools.Visibility = Visibility.Visible;
-					last.LeaveTab(false, width, middlePass, UpdateTab);
-					next.EnterTab(false, width, middlePass);
-					if (middlePass) {
-						gridServers.Visibility = Visibility.Visible;
-						middle.PassTab(false, width);
-					}
-				}
-				currentTab = SetupTypes.Tool;
-				UpdateFolder();
-				if (Config.DisableTransitions)
-					UpdateTab();
-			}
-		}
-
-		private void UpdateTab() {
-			gridGames.Visibility = (currentTab == SetupTypes.Game ? Visibility.Visible : Visibility.Hidden);
-			gridServers.Visibility = (currentTab == SetupTypes.Server ? Visibility.Visible : Visibility.Hidden);
-			gridTools.Visibility = (currentTab == SetupTypes.Tool ? Visibility.Visible : Visibility.Hidden);
-		}
-		private void UpdateFolder() {
-			string tabLabel = currentTab.ToString() + " List";
-			if (CurrentSetupStack.Count > 1)
-				tabLabel += " " + new string('>', CurrentSetupStack.Count - 1) + " " + CurrentSetupStack.Peek().Folder.Name;
-			labelListType.Content = tabLabel;
-		}
-
 		private void OnPreviewKeyDown(object sender, KeyEventArgs e) {
 			if (e.Key == Key.Back || e.Key == Key.BrowserBack) {
-				if (CurrentSetupStack.Count > 1)
-					NavigateBack(CurrentSetupGrid, CurrentSetupStack);
+				if (!textBoxSearch.IsFocused && gameStack.Count > 1)
+					NavigateBack(gridGames, gameStack);
 			}
 		}
 
 		private void OnEditSetups(object sender, MouseButtonEventArgs e) {
-			if (SettingsWindow.ShowDialog(this, currentTab)) {
+			if (SettingsWindow.ShowDialog(this)) {
+				ReloadSetups();
+			}
+		}
+
+		private void OnAddInstance(object sender, MouseButtonEventArgs e) {
+			if (AddInstanceWindow.ShowDialog(this)) {
 				ReloadSetups();
 			}
 		}

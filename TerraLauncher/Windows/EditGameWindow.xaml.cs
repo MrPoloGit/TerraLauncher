@@ -23,6 +23,10 @@ namespace TerraLauncher.Windows {
 	/// </summary>
 	public partial class EditGameWindow : Window {
 
+		// Index-aligned with the GameCategory enum.
+		private static readonly string[] CategoryNames =
+			{ "Terraria", "tModLoader", "tAPI", "tConfig", "Stand Alone", "Custom" };
+
 		string nonDefaultSaveFolder = "";
 
 		public EditGameWindow(Game game) {
@@ -64,7 +68,9 @@ namespace TerraLauncher.Windows {
 			textBoxSaveFolder.IsEnabled = (game.SaveDirectory != "Default");
 			UpdateIcon(game.Icon);
 
-			checkBoxTMod.IsChecked = game.IsTMod;
+			foreach (string name in CategoryNames)
+				comboBoxCategory.Items.Add(name);
+			comboBoxCategory.SelectedIndex = (int)game.Category;
 
 			// Remove quotes from "Copy Path" command on paste
 			DataObject.AddPastingHandler(textBoxCustomIcon, OnTextBoxQuotesPaste);
@@ -204,7 +210,7 @@ namespace TerraLauncher.Windows {
 					game.Icon = window.textBoxCustomIcon.Text;
 				else
 					game.Icon = window.comboBoxIcon.SelectedItem as string;
-				game.IsTMod = window.checkBoxTMod.IsChecked.Value;
+				game.Category = (GameCategory)Math.Max(0, window.comboBoxCategory.SelectedIndex);
 				return true;
 			}
 			return false;

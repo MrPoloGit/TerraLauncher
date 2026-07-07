@@ -1,0 +1,79 @@
+[
+  {
+    "name": "tAPI r16",
+    "version": "r16",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r16.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tAPI r15",
+    "version": "r15",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r15.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tAPI r14a",
+    "version": "r14a",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r14a.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tAPI r14",
+    "version": "r14",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r14.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tAPI r13",
+    "version": "r13",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r13.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tAPI r12",
+    "version": "r12",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r12.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tAPI r11",
+    "version": "r11",
+    "description": "",
+    "date": "",
+    "author": "tAPI Team",
+    "url": "https://archive.org/download/tAPI-versions/r11.exe",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  }
+]

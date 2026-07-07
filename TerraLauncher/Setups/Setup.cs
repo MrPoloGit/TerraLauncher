@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Xml;
 using TAFactory.IconPack;
 using TerraLauncher.Controls.Terraria;
+using TerraLauncher.Windows;
 
 namespace TerraLauncher.Setups {
 	public class SetupOption {
@@ -82,11 +83,6 @@ namespace TerraLauncher.Setups {
 			AddIcon("TreeCrimson");
 			AddIcon("TreeCorruptionHallow");
 			AddIcon("TreeCrimsonHallow");
-			AddIcon("Server");
-			AddIcon("ServerTree");
-			AddIcon("ServerTreeJungle");
-			AddIcon("TShock");
-			AddIcon("Tool");
 			AddIcon("Folder");
 
 			AddOptionIcon("Launch");
@@ -169,38 +165,50 @@ namespace TerraLauncher.Setups {
 		public void Launch() {
 			Sounds.PlayOpen();
 			try {
-				if (File.Exists(ExePath)) {
-					ProcessStartInfo start = new ProcessStartInfo();
-					start.FileName = ExePath;
-					start.Arguments = Arguments;
-					start.WindowStyle = ProcessWindowStyle.Normal;
-					start.CreateNoWindow = true;
-					start.UseShellExecute = true;
-					start.WorkingDirectory = ExeDirectory;
-
-					Process proc = Process.Start(start);
-
-					bool close = false;
-					switch (TypeName) {
-					case "Game": close = Config.CloseOnGameLaunch; break;
-					case "Server": close = Config.CloseOnServerLaunch; break;
-					case "Tool": close = Config.CloseOnToolLaunch; break;
-					}
-					
-					bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-					bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-					if (proc != null && (close || ctrl) && !shift)
-						Config.MainWindow.Close();
+				if (!File.Exists(ExePath)) {
+					TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Error,
+						string.IsNullOrEmpty(ExePath)
+							? "No executable path is set for this entry.\n\nUse Edit to set the path."
+							: "Could not find:\n\n" + ExePath + "\n\nThe path may have moved or been deleted. Use Edit to update it.",
+						"Cannot Launch");
+					return;
 				}
+
+				ProcessStartInfo start = new ProcessStartInfo();
+				start.FileName = ExePath;
+				start.Arguments = Arguments;
+				start.WindowStyle = ProcessWindowStyle.Normal;
+				start.CreateNoWindow = true;
+				start.UseShellExecute = true;
+				start.WorkingDirectory = ExeDirectory;
+
+				Process proc = Process.Start(start);
+
+				bool close = (TypeName == "Game" && Config.CloseOnGameLaunch);
+
+				bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+				bool shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+				if (proc != null && (close || ctrl) && !shift)
+					Config.MainWindow.Close();
 			}
-			catch { }
+			catch (Exception ex) {
+				TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Error,
+					"Failed to launch " + Name + ":\n\n" + ex.Message + "\n\nPath: " + ExePath,
+					"Launch Failed");
+			}
 		}
 		public void OpenExeFolder() {
 			Sounds.PlayOpen();
+			if (Directory.Exists(ExeDirectory))
+				OpenFolder(ExeDirectory);
+		}
+
+		// .NET's Process.Start(string) defaults UseShellExecute to false, which
+		// cannot open folders (or URLs) — it can only launch executables directly.
+		// Every "open this folder" action must go through here instead.
+		protected static void OpenFolder(string path) {
 			try {
-				if (Directory.Exists(ExeDirectory)) {
-					Process.Start(ExeDirectory);
-				}
+				Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
 			}
 			catch { }
 		}

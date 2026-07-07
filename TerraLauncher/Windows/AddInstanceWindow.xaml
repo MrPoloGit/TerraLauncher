@@ -1,0 +1,58 @@
+<Window x:Class="TerraLauncher.Windows.AddInstanceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        mc:Ignorable="d"
+        Title="Add Instance" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="{x:Null}" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" FontFamily="/TerraLauncher;component/Resources/#Andy">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/DialogTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <controls:TerrariaWindow CanMinimize="False" CanResize="False">
+    <Grid Width="450" Height="240" Margin="0,44,0,0">
+        <UniformGrid Rows="2" Columns="3" Margin="8">
+            <controls:TerrariaButton Margin="6" MouseUp="OnTerraria">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTree.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Terraria" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
+                </StackPanel>
+            </controls:TerrariaButton>
+            <controls:TerrariaButton Margin="6" MouseUp="OnTModLoader">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="/TerraLauncher;component/Resources/Icons/TreeView/TreeViewGameTMod.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="tModLoader" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
+                </StackPanel>
+            </controls:TerrariaButton>
+            <controls:TerrariaButton Margin="6" MouseUp="OnTAPI">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupOptions/SetupOptionHammer.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="tAPI" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
+                </StackPanel>
+            </controls:TerrariaButton>
+            <controls:TerrariaButton Margin="6" MouseUp="OnTConfig">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupOptions/SetupOptionGear.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="tConfig" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
+                </StackPanel>
+            </controls:TerrariaButton>
+            <controls:TerrariaButton Margin="6" MouseUp="OnStandAlone">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTShock.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Stand Alone" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
+                </StackPanel>
+            </controls:TerrariaButton>
+            <controls:TerrariaButton Margin="6" MouseUp="OnCustom">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTool.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Custom" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
+                </StackPanel>
+            </controls:TerrariaButton>
+        </UniformGrid>
+    </Grid>
+    </controls:TerrariaWindow>
+</Window>

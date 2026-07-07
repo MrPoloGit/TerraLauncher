@@ -1,0 +1,46 @@
+[
+  {
+    "name": "tConfig 0.38",
+    "version": "0.38",
+    "description": "",
+    "date": "",
+    "author": "tConfig Team",
+    "url": "https://archive.org/download/tConfig-versions/tConfig%200.38.zip",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tConfig 0.36",
+    "version": "0.36",
+    "description": "",
+    "date": "",
+    "author": "tConfig Team",
+    "url": "https://archive.org/download/tConfig-versions/tConfig%200.36.zip",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tConfig 0.35.2",
+    "version": "0.35.2",
+    "description": "",
+    "date": "",
+    "author": "tConfig Team",
+    "url": "https://archive.org/download/tConfig-versions/tConfig%200.35.2.zip",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  },
+  {
+    "name": "tConfig 0.30.4",
+    "version": "0.30.4",
+    "description": "",
+    "date": "",
+    "author": "tConfig Team",
+    "url": "https://archive.org/download/tConfig-versions/tConfig%200.30.4.zip",
+    "depotId": 0,
+    "manifestId": "",
+    "requiresTerrariaVersion": ""
+  }
+]

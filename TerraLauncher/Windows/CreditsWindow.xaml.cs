@@ -20,7 +20,7 @@ namespace TerraLauncher.Windows {
 		#region Events
 
 		private void OnRequestNavigate(object sender, RequestNavigateEventArgs e) {
-			Process.Start((sender as Hyperlink).NavigateUri.ToString());
+			Process.Start(new ProcessStartInfo((sender as Hyperlink).NavigateUri.ToString()) { UseShellExecute = true });
 		}
 
 		#endregion

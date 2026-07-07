@@ -32,10 +32,28 @@ namespace TerraLauncher.Controls.Terraria {
 			get { return folder; }
 		}
 
+		// Entries reserve this much right margin so their content doesn't render
+		// under the scrollbar (ScrollContentPresenter spans both the content and
+		// scrollbar columns). When the scrollbar auto-hides because everything
+		// fits, that reserve must drop to 0 or the list looks lopsided.
+		private const double EntryRightMarginWithScrollbar = 26;
+
 		public TerrariaSetupList() {
 			InitializeComponent();
 
 			scrollViewer.ScrollSpeed = Config.ScrollSpeed;
+			scrollViewer.ScrollChanged += (s, e) => UpdateEntryMargins();
+		}
+
+		private void UpdateEntryMargins() {
+			double right = scrollViewer.ScrollableHeight > 0 ? EntryRightMarginWithScrollbar : 0;
+			foreach (object child in list.Children) {
+				if (child is FrameworkElement element) {
+					Thickness m = element.Margin;
+					if (m.Right != right)
+						element.Margin = new Thickness(m.Left, m.Top, right, m.Bottom);
+				}
+			}
 		}
 
 		public void PopulateList(SetupFolder folder, Action<SetupFolder> navigateForward, Action navigateBack = null) {
@@ -62,6 +80,28 @@ namespace TerraLauncher.Controls.Terraria {
 					TerrariaSetupEntry control = new TerrariaSetupEntry(entry);
 					list.Children.Add(control);
 				}
+			}
+		}
+
+		// Shows a flat list of entries with no folder rows or navigation — used for
+		// search results, which can span every folder in the tree.
+		public void PopulateFlat(List<Setup> entries, string emptyMessage) {
+			list.Children.Clear();
+			if (entries.Count == 0) {
+				TextBlock text = new TextBlock();
+				text.Text = emptyMessage;
+				text.Foreground = Brushes.White;
+				text.Opacity = 0.6;
+				text.FontSize = 22;
+				text.TextWrapping = TextWrapping.Wrap;
+				text.TextAlignment = TextAlignment.Center;
+				text.Margin = new Thickness(16);
+				list.Children.Add(text);
+				return;
+			}
+			foreach (Setup entry in entries) {
+				TerrariaSetupEntry control = new TerrariaSetupEntry(entry);
+				list.Children.Add(control);
 			}
 		}
 

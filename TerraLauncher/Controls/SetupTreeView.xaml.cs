@@ -25,18 +25,12 @@ namespace TerraLauncher.Controls {
 
 		static BitmapImage iconGame;
 		static BitmapImage iconGameTMod;
-		static BitmapImage iconServer;
-		static BitmapImage iconTool;
 		static BitmapImage iconFolderOpen;
 		static BitmapImage iconFolderClosed;
 
 		static BitmapImage iconAddGame;
-		static BitmapImage iconAddServer;
-		static BitmapImage iconAddTool;
 		static BitmapImage iconAddFolder;
 		static BitmapImage iconRemoveGame;
-		static BitmapImage iconRemoveServer;
-		static BitmapImage iconRemoveTool;
 		static BitmapImage iconRemoveFolder;
 		static BitmapImage iconRemove;
 
@@ -54,19 +48,13 @@ namespace TerraLauncher.Controls {
 			if (iconGame == null && !DesignerProperties.GetIsInDesignMode(this)) {
 				string uri = "pack://application:,,,/Resources/Icons/";
 				iconAddGame = new BitmapImage(new Uri(uri + "GameAdd.png"));
-				iconAddServer = new BitmapImage(new Uri(uri + "ServerAdd.png"));
-				iconAddTool = new BitmapImage(new Uri(uri + "ToolAdd.png"));
 				iconAddFolder = new BitmapImage(new Uri(uri + "FolderAdd.png"));
 				iconRemoveGame = new BitmapImage(new Uri(uri + "GameRemove.png"));
-				iconRemoveServer = new BitmapImage(new Uri(uri + "ServerRemove.png"));
-				iconRemoveTool = new BitmapImage(new Uri(uri + "ToolRemove.png"));
 				iconRemoveFolder = new BitmapImage(new Uri(uri + "FolderRemove.png"));
 				iconRemove = new BitmapImage(new Uri(uri + "Remove.png"));
 
 				iconGame = new BitmapImage(new Uri(uri + "TreeView/TreeViewGame.png"));
 				iconGameTMod = new BitmapImage(new Uri(uri + "TreeView/TreeViewGameTMod.png"));
-				iconServer = new BitmapImage(new Uri(uri + "TreeView/TreeViewServer.png"));
-				iconTool = new BitmapImage(new Uri(uri + "TreeView/TreeViewTool.png"));
 				iconFolderOpen = new BitmapImage(new Uri(uri + "TreeView/TreeViewFolderOpen.png"));
 				iconFolderClosed = new BitmapImage(new Uri(uri + "TreeView/TreeViewFolderClosed.png"));
 
@@ -99,11 +87,7 @@ namespace TerraLauncher.Controls {
 			TreeViewItem root = MakeFolderItem(folder, true);
 			treeView.Items.Add(root);
 			Populate(root, folder);
-			switch (setupType) {
-			case SetupTypes.Game: imageAddSetup.Source = iconAddGame; break;
-			case SetupTypes.Server: imageAddSetup.Source = iconAddServer; break;
-			case SetupTypes.Tool: imageAddSetup.Source = iconAddTool; break;
-			}
+			imageAddSetup.Source = iconAddGame;
 			buttonAddSetup.ToolTip = "Add " + setupType + " Setup";
 			UpdateButtons();
 		}
@@ -168,17 +152,7 @@ namespace TerraLauncher.Controls {
 			image.VerticalAlignment = VerticalAlignment.Center;
 			image.Width = 16;
 			image.Height = 16;
-			switch (setupType) {
-			case SetupTypes.Game:
-				image.Source = (((Game)setup).IsTMod ? iconGameTMod : iconGame);
-				break;
-			case SetupTypes.Server:
-				image.Source = iconServer;
-				break;
-			case SetupTypes.Tool:
-				image.Source = iconTool;
-				break;
-			}
+			image.Source = (((Game)setup).IsTMod ? iconGameTMod : iconGame);
 			stackPanel.Children.Add(image);
 
 			TextBlock name = new TextBlock();
@@ -228,9 +202,7 @@ namespace TerraLauncher.Controls {
 				else
 					details.Text = "";
 
-				if (setupType == SetupTypes.Game) {
-					image.Source = (((Game)setup).IsTMod ? iconGameTMod : iconGame);
-				}
+				image.Source = (((Game)setup).IsTMod ? iconGameTMod : iconGame);
 			}
 		}
 
@@ -270,12 +242,7 @@ namespace TerraLauncher.Controls {
 				index = parent.Items.IndexOf(child) + 1;
 			}
 
-			Setup setup = null;
-			switch (setupType) {
-			case SetupTypes.Game: setup = new Game(); break;
-			case SetupTypes.Server: setup = new Server(); break;
-			case SetupTypes.Tool: setup = new Tool(); break;
-			}
+			Setup setup = new Game();
 			TreeViewItem item = MakeSetupItem(setup);
 			parent.Items.Insert(index, item);
 			item.IsSelected = true;
@@ -321,18 +288,6 @@ namespace TerraLauncher.Controls {
 				}
 				else if (item.Tag is Game) {
 					if (EditGameWindow.ShowDialog(Window.GetWindow(this), item.Tag as Game)) {
-						UpdateItem(item);
-						Modified = true;
-					}
-				}
-				else if (item.Tag is Server) {
-					if (EditServerWindow.ShowDialog(Window.GetWindow(this), item.Tag as Server)) {
-						UpdateItem(item);
-						Modified = true;
-					}
-				}
-				else if (item.Tag is Tool) {
-					if (EditToolWindow.ShowDialog(Window.GetWindow(this), item.Tag as Tool)) {
 						UpdateItem(item);
 						Modified = true;
 					}
@@ -396,11 +351,7 @@ namespace TerraLauncher.Controls {
 				}
 				else {
 					buttonRemove.ToolTip = "Remove " + setupType + " Setup";
-					switch (setupType) {
-					case SetupTypes.Game: imageRemove.Source = iconRemoveGame; break;
-					case SetupTypes.Server: imageRemove.Source = iconRemoveServer; break;
-					case SetupTypes.Tool: imageRemove.Source = iconRemoveTool; break;
-					}
+					imageRemove.Source = iconRemoveGame;
 				}
 			}
 			else {

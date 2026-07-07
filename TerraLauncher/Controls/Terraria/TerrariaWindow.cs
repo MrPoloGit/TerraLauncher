@@ -22,6 +22,24 @@ namespace TerraLauncher.Controls.Terraria {
 		
 		bool resizing = false;
 
+		public static readonly DependencyProperty CanResizeProperty =
+			DependencyProperty.Register("CanResize", typeof(bool), typeof(TerrariaWindow), new PropertyMetadata(true));
+		public static readonly DependencyProperty CanMinimizeProperty =
+			DependencyProperty.Register("CanMinimize", typeof(bool), typeof(TerrariaWindow), new PropertyMetadata(true));
+
+		// Fixed-size (SizeToContent) dialogs must disable resizing — the manual
+		// drag-resize grips below would otherwise fight with auto-sizing.
+		public bool CanResize {
+			get { return (bool)GetValue(CanResizeProperty); }
+			set { SetValue(CanResizeProperty, value); }
+		}
+		// Owned, ShowInTaskbar="False" dialogs shouldn't be minimizable — there's no
+		// taskbar entry to restore them from once minimized.
+		public bool CanMinimize {
+			get { return (bool)GetValue(CanMinimizeProperty); }
+			set { SetValue(CanMinimizeProperty, value); }
+		}
+
 		public TerrariaWindow() {
 
 		}

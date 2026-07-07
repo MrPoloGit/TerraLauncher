@@ -4,9 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TerraLauncher.Windows"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
         mc:Ignorable="d"
-        Title="Edit Game Setup" Icon="/TerraLauncher;component/Resources/Icons/TreeView/TreeViewGame.png" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="#FFF9F9F9" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" PreviewMouseDown="OnPreviewMouseDown">
-    <Grid Width="380" Height="266">
+        Title="Edit Game Setup" Icon="/TerraLauncher;component/Resources/Icons/TreeView/TreeViewGame.png" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="{x:Null}" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" PreviewMouseDown="OnPreviewMouseDown" FontFamily="/TerraLauncher;component/Resources/#Andy">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/DialogTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <controls:TerrariaWindow CanMinimize="False" CanResize="False">
+    <Grid Width="380" Height="294" Margin="0,44,0,0">
         <Grid Width="72" Height="72" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,18,0,0" Background="Transparent" ToolTip="Icons should be at max, 68x68">
             <Rectangle Margin="2" Fill="#FF6675CC" IsHitTestVisible="False"/>
             <Image x:Name="imageIcon" Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTree.png" IsHitTestVisible="False" Width="68" Height="68" />
@@ -40,11 +49,14 @@
 
         <CheckBox x:Name="checkBoxDefaultSaveFolder" Content="Default Save Folder" HorizontalAlignment="Left" Margin="27,195,0,0" VerticalAlignment="Top" Click="OnDefaultSaveFolderChecked" Padding="4,-1,0,0"/>
         <CheckBox x:Name="checkBoxCustomIcon" Content="Custom Icon" HorizontalAlignment="Left" Margin="162,195,0,0" VerticalAlignment="Top" Click="OnCustomIconChecked" Padding="4,-1,0,0" ToolTip="The maximum size for icons is 68x68"/>
-        <CheckBox x:Name="checkBoxTMod" Content="tModLoader" HorizontalAlignment="Left" Margin="267,195,0,0" VerticalAlignment="Top" Padding="4,-1,0,0" ToolTip="Only needed to determine the default save folder"/>
-        
+
+        <Label Content="Category" HorizontalAlignment="Left" Margin="15,223,0,0" VerticalAlignment="Top" Padding="5,0,5,1" VerticalContentAlignment="Center" Height="23" Width="75" HorizontalContentAlignment="Right" ToolTip="Used for the instance filter dropdown; also determines the default save folder for tModLoader"/>
+        <ComboBox x:Name="comboBoxCategory" HorizontalAlignment="Left" Margin="95,223,0,0" VerticalAlignment="Top" Width="150" Height="23"/>
+
         <Separator VerticalAlignment="Top" Margin="20,183,20,0"/>
         
         <Button Content="OK"     Margin="0,0,95,10" Click="OnOKClicked" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True"/>
         <Button Content="Cancel" Margin="0,0,10,10" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsCancel="True"/>
     </Grid>
+    </controls:TerrariaWindow>
 </Window>

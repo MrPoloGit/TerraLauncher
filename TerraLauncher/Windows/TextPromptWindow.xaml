@@ -1,0 +1,29 @@
+<Window x:Class="TerraLauncher.Windows.TextPromptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        Title="Prompt" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="{x:Null}" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" FontFamily="/TerraLauncher;component/Resources/#Andy">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/DialogTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <controls:TerrariaWindow CanMinimize="False" CanResize="False">
+        <Grid x:Name="clientArea" Width="340" Height="196" Margin="0,44,0,0">
+            <TextBlock x:Name="textBlockMessage" Text="Message" TextWrapping="Wrap" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,10,12,0"/>
+
+            <Label x:Name="labelField1" Content="Field 1" HorizontalAlignment="Left" Margin="12,52,0,0" VerticalAlignment="Top" Padding="0,0,0,1"/>
+            <TextBox x:Name="textBox1" Height="23" Margin="12,74,12,0" VerticalAlignment="Top"/>
+
+            <StackPanel x:Name="panelField2">
+                <Label x:Name="labelField2" Content="Field 2" HorizontalAlignment="Left" Margin="12,101,0,0" VerticalAlignment="Top" Padding="0,0,0,1"/>
+                <PasswordBox x:Name="passwordBox2" Height="23" Margin="12,123,12,0" VerticalAlignment="Top"/>
+            </StackPanel>
+
+            <Button Content="OK"     Margin="0,0,95,10" Click="OnOK" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True"/>
+            <Button Content="Cancel" Margin="0,0,10,10" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsCancel="True"/>
+        </Grid>
+    </controls:TerrariaWindow>
+</Window>

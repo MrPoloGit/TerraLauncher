@@ -1,0 +1,210 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria">
+
+    <!-- Shared palette for the Terraria-themed dialog chrome (TerrariaWindow content area
+         renders #FF3F4197 by default; these are the same family of colors used by MainWindow's
+         list panel so every window reads as one consistent theme). -->
+    <SolidColorBrush x:Key="DialogPanelBrush"  Color="#FF323381"/>
+    <SolidColorBrush x:Key="DialogBorderBrush" Color="#FF14143A"/>
+    <SolidColorBrush x:Key="DialogAccentBrush" Color="#FF6675CC"/>
+    <SolidColorBrush x:Key="DialogInputBrush"  Color="#FF1E1E5A"/>
+    <SolidColorBrush x:Key="DialogTextBrush"   Color="White"/>
+    <SolidColorBrush x:Key="DialogMutedBrush"  Color="#FFAAAACC"/>
+
+    <Style TargetType="{x:Type Label}">
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+    </Style>
+
+    <Style TargetType="{x:Type CheckBox}">
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+    </Style>
+
+    <Style TargetType="{x:Type GroupBox}">
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DialogAccentBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GroupBox}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ContentPresenter Grid.Row="0" ContentSource="Header" Margin="2,0,0,2"
+                                           TextBlock.Foreground="{TemplateBinding Foreground}"
+                                           TextBlock.FontWeight="Bold"/>
+                        <Border Grid.Row="1" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="2">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="{StaticResource DialogInputBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DialogBorderBrush}"/>
+        <Setter Property="CaretBrush" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="SelectionBrush" Value="{StaticResource DialogAccentBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <!-- Themed ComboBox: the closed box is the same pixel-art button frame used
+         everywhere else (TerrariaToggleButton), and the open list is a flat dark
+         popup matching the dialog palette — no native Windows chrome. -->
+    <Style TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border x:Name="border" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource DialogAccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource DialogBorderBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type ComboBox}">
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="8,0,20,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBox}">
+                    <Grid>
+                        <controls:TerrariaToggleButton
+                            IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            Focusable="False" ClickMode="Press">
+                            <Grid>
+                                <ContentPresenter Content="{TemplateBinding SelectionBoxItem}"
+                                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                    IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Margin="{TemplateBinding Padding}"
+                                    TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                                <Path Data="M0,0 L4,4 L8,0" Fill="{TemplateBinding Foreground}" Stretch="Uniform" Width="8" Height="4"
+                                      HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" IsHitTestVisible="False"/>
+                            </Grid>
+                        </controls:TerrariaToggleButton>
+                        <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom"
+                               AllowsTransparency="True" Focusable="False" PopupAnimation="Slide" StaysOpen="False">
+                            <Border Background="{StaticResource DialogInputBrush}" BorderBrush="{StaticResource DialogAccentBrush}"
+                                    BorderThickness="1" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,2,0,0">
+                                <ScrollViewer SnapsToDevicePixels="True">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Separator}">
+        <Setter Property="Background" Value="{StaticResource DialogAccentBrush}"/>
+        <Setter Property="Height" Value="1"/>
+    </Style>
+
+    <!-- Flat button matching the dialog palette (OK/Cancel/Browse/etc. — TerrariaButton
+         instances used for the main window's icon tabs and window chrome are unaffected,
+         since that is a distinct control type). -->
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="{StaticResource DialogInputBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource DialogTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DialogAccentBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="border" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="2" SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource DialogAccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource DialogBorderBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Themed Menu/MenuItem: replaces the native white dropdown with a flat dark
+         popup matching the dialog palette. Top-level headers (e.g. "Help") and leaf
+         submenu items need separate templates since MenuItem's Role differs between them. -->
+    <Style TargetType="{x:Type Menu}">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <ControlTemplate x:Key="TerrariaTopLevelMenuItemTemplate" TargetType="{x:Type MenuItem}">
+        <Border x:Name="border" Background="Transparent" Padding="8,4">
+            <Grid>
+                <ContentPresenter ContentSource="Header" VerticalAlignment="Center"
+                                  TextBlock.Foreground="{StaticResource DialogTextBrush}"/>
+                <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsSubmenuOpen}"
+                       AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+                    <Border Background="{StaticResource DialogInputBrush}" BorderBrush="{StaticResource DialogAccentBrush}"
+                            BorderThickness="1" Padding="2">
+                        <StackPanel IsItemsHost="True"/>
+                    </Border>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="border" Property="Background" Value="{StaticResource DialogAccentBrush}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="TerrariaSubmenuMenuItemTemplate" TargetType="{x:Type MenuItem}">
+        <Border x:Name="border" Background="Transparent" Padding="6,4">
+            <StackPanel Orientation="Horizontal">
+                <ContentPresenter ContentSource="Icon" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <ContentPresenter ContentSource="Header" VerticalAlignment="Center"
+                                  TextBlock.Foreground="{StaticResource DialogTextBrush}"/>
+            </StackPanel>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="border" Property="Background" Value="{StaticResource DialogAccentBrush}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type MenuItem}">
+        <Setter Property="Template" Value="{StaticResource TerrariaSubmenuMenuItemTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="Role" Value="TopLevelHeader">
+                <Setter Property="Template" Value="{StaticResource TerrariaTopLevelMenuItemTemplate}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

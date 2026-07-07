@@ -1,0 +1,33 @@
+<Window x:Class="TerraLauncher.Windows.DownloadProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        xmlns:local="clr-namespace:TerraLauncher.Controls"
+        Title="Downloading..." SnapsToDevicePixels="True" UseLayoutRounding="True" Background="{x:Null}" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" Closing="OnWindowClosing" FontFamily="/TerraLauncher;component/Resources/#Andy">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Controls/Terraria/TerrariaScrollBar.xaml"/>
+                <ResourceDictionary Source="/Controls/Terraria/TerrariaStyles.xaml"/>
+                <ResourceDictionary Source="/Themes/DialogTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <controls:TerrariaWindow CanMinimize="False" CanResize="False">
+        <Grid Width="460" Height="320" Margin="0,44,0,0">
+            <TextBlock x:Name="labelTitle" Text="Downloading..." FontSize="18" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,0" TextTrimming="CharacterEllipsis"/>
+
+            <Border Margin="10,42,10,52" Background="#FF1E1E5A" BorderBrush="#FF14143A" BorderThickness="1">
+                <local:SpeedScrollViewer x:Name="logScroll" ScrollSpeed="0.8" Template="{DynamicResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto" Margin="4">
+                    <TextBlock x:Name="logText" TextWrapping="Wrap" FontFamily="Consolas" FontSize="12" Foreground="#FFDDDDEE"/>
+                </local:SpeedScrollViewer>
+            </Border>
+
+            <Border x:Name="progressTrack" Height="14" VerticalAlignment="Bottom" Margin="10,0,10,32" Background="#FF1E1E5A" BorderBrush="#FF14143A" BorderThickness="1">
+                <Border x:Name="progressFill" HorizontalAlignment="Left" Width="0" Background="#FF6675CC"/>
+            </Border>
+
+            <Button x:Name="buttonCancel" Content="Cancel" Click="OnCancelClicked" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,10,10"/>
+        </Grid>
+    </controls:TerrariaWindow>
+</Window>

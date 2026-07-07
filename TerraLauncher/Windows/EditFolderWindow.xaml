@@ -4,9 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TerraLauncher.Windows"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
         mc:Ignorable="d"
-        Title="Edit Folder" Icon="/TerraLauncher;component/Resources/Icons/Browse.png" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="#FFF9F9F9" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" PreviewMouseDown="OnPreviewMouseDown">
-    <Grid Width="380" Height="133">
+        Title="Edit Folder" Icon="/TerraLauncher;component/Resources/Icons/Browse.png" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="{x:Null}" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight" ShowInTaskbar="False" PreviewMouseDown="OnPreviewMouseDown" FontFamily="/TerraLauncher;component/Resources/#Andy">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/DialogTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <controls:TerrariaWindow CanMinimize="False" CanResize="False">
+    <Grid Width="380" Height="133" Margin="0,44,0,0">
         <Grid Width="72" Height="72" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18,18,0,0" Background="Transparent" ToolTip="Icons should be at max, 68x68">
             <Rectangle Margin="2" Fill="#FF6675CC" IsHitTestVisible="False"/>
             <Image x:Name="imageIcon" Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconFolder.png" IsHitTestVisible="False" Width="68" Height="68" />
@@ -29,4 +38,5 @@
         <Button Content="Cancel" Margin="0,0,10,10" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsCancel="True"/>
 
     </Grid>
+    </controls:TerrariaWindow>
 </Window>

@@ -14,7 +14,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <local:SpeedScrollViewer x:Name="scrollViewer" FocusVisualStyle="{x:Null}" ScrollSpeed="0.8" Template="{DynamicResource ScrollViewerControlTemplate}" Margin="6">
+    <local:SpeedScrollViewer x:Name="scrollViewer" FocusVisualStyle="{x:Null}" ScrollSpeed="0.8" Template="{DynamicResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto" Margin="6">
         <StackPanel x:Name="list"/>
     </local:SpeedScrollViewer>
 </UserControl>

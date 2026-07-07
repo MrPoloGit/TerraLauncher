@@ -12,9 +12,7 @@ using TerraLauncher.Util;
 
 namespace TerraLauncher {
 	public enum SetupTypes {
-		Game = 0,
-		Server = 1,
-		Tool = 2
+		Game = 0
 	}
 
 	public static class Config {
@@ -29,8 +27,6 @@ namespace TerraLauncher {
 		public static MainWindow MainWindow { get; private set; }
 
 		public static bool CloseOnGameLaunch { get; set; } = true;
-		public static bool CloseOnServerLaunch { get; set; } = false;
-		public static bool CloseOnToolLaunch { get; set; } = false;
 
 		public static bool DisableTransitions { get; set; } = false;
 		public static bool Muted { get; set; } = false;
@@ -40,8 +36,6 @@ namespace TerraLauncher {
 		public static bool Modified { get; set; } = false;
 
 		public static SetupFolder Games { get; set; } = new SetupFolder("Game List");
-		public static SetupFolder Servers { get; set; } = new SetupFolder("Server List");
-		public static SetupFolder Tools { get; set; } = new SetupFolder("Tool List");
 
 		public static bool LoadConfig(MainWindow mainWindow) {
 			try {
@@ -58,16 +52,6 @@ namespace TerraLauncher {
 					if (!string.IsNullOrEmpty(version))
 						game.Details = "v" + version;
 					Games.Entries.Add(game);
-
-					path = Path.Combine(Path.GetDirectoryName(path), "TerrariaServer.exe");
-					Server server = new Server();
-					server.Name = "Terraria Server";
-					server.Icon = "ServerTree";
-					server.ExePath = path;
-					version = FileVersionInfo.GetVersionInfo(path).FileVersion.ToString();
-					if (!string.IsNullOrEmpty(version))
-						server.Details = "v" + version;
-					Servers.Entries.Add(server);
 
 					SaveConfig();
 					return false;
@@ -95,14 +79,6 @@ namespace TerraLauncher {
 					attribute = node.Attributes["Game"];
 					if (attribute != null && bool.TryParse(attribute.InnerText, out boolValue))
 						CloseOnGameLaunch = boolValue;
-
-					attribute = node.Attributes["Server"];
-					if (attribute != null && bool.TryParse(attribute.InnerText, out boolValue))
-						CloseOnServerLaunch = boolValue;
-
-					attribute = node.Attributes["Tool"];
-					if (attribute != null && bool.TryParse(attribute.InnerText, out boolValue))
-						CloseOnToolLaunch = boolValue;
 				}
 
 				node = doc.SelectSingleNode("TerraLauncher/DisableTransitions");
@@ -123,21 +99,11 @@ namespace TerraLauncher {
 
 				#endregion
 				//--------------------------------
-				#region Games/Servers/Tools
+				#region Games
 
 				XmlElement gameFolder = doc.SelectSingleNode("TerraLauncher/Games") as XmlElement;
 				if (gameFolder != null) {
 					Games.Read<Game>(gameFolder);
-				}
-
-				XmlElement serverFolder = doc.SelectSingleNode("TerraLauncher/Servers") as XmlElement;
-				if (serverFolder != null) {
-					Servers.Read<Server>(serverFolder);
-				}
-
-				XmlElement toolFolder = doc.SelectSingleNode("TerraLauncher/Tools") as XmlElement;
-				if (toolFolder != null) {
-					Tools.Read<Tool>(toolFolder);
 				}
 
 				#endregion
@@ -165,8 +131,6 @@ namespace TerraLauncher {
 
 				element = doc.CreateElement("CloseOnLaunch");
 				element.SetAttribute("Game", CloseOnGameLaunch.ToString());
-				element.SetAttribute("Server", CloseOnServerLaunch.ToString());
-				element.SetAttribute("Tool", CloseOnToolLaunch.ToString());
 				launcher.AppendChild(element);
 				
 				element = doc.CreateElement("DisableTransitions");
@@ -187,18 +151,10 @@ namespace TerraLauncher {
 
 				#endregion
 				//--------------------------------
-				#region Games/Servers/Tools
+				#region Games
 
 				element = doc.CreateElement("Games");
 				Games.Write<Game>(element, doc);
-				launcher.AppendChild(element);
-
-				element = doc.CreateElement("Servers");
-				Servers.Write<Server>(element, doc);
-				launcher.AppendChild(element);
-
-				element = doc.CreateElement("Tools");
-				Tools.Write<Tool>(element, doc);
 				launcher.AppendChild(element);
 
 				#endregion

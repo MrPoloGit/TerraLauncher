@@ -1,0 +1,38 @@
+<Window x:Class="TerraLauncher.Windows.VersionPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TerraLauncher.Controls.Terraria"
+        xmlns:local="clr-namespace:TerraLauncher.Controls"
+        Title="Choose a Version" SnapsToDevicePixels="True" UseLayoutRounding="True" Background="{x:Null}" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" FontFamily="/TerraLauncher;component/Resources/#Andy" Width="480" Height="480" MinWidth="400" MinHeight="320">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Controls/Terraria/TerrariaScrollBar.xaml"/>
+                <ResourceDictionary Source="/Controls/Terraria/TerrariaStyles.xaml"/>
+                <ResourceDictionary Source="/Themes/DialogTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <controls:TerrariaWindow CanMinimize="False">
+        <Grid Margin="0,44,0,0">
+            <TextBlock x:Name="labelCategory" Text="Versions" FontSize="20" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,6,10,0"/>
+            <TextBlock x:Name="labelStatus" Text="Loading..." Foreground="#FFAAAACC" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,36,10,0"/>
+
+            <Border Margin="10,58,10,44" Background="#FF1E1E5A" BorderBrush="#FF14143A" BorderThickness="1">
+                <local:SpeedScrollViewer x:Name="scrollViewer" ScrollSpeed="0.8" Template="{DynamicResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto" Margin="4">
+                    <StackPanel x:Name="versionList"/>
+                </local:SpeedScrollViewer>
+            </Border>
+
+            <Button Content="Refresh" Click="OnRefresh" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10"/>
+
+            <StackPanel x:Name="panelPaging" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10">
+                <Button x:Name="buttonPrevious" Content="&lt; Previous" Click="OnPreviousPage" MinWidth="85" Padding="5,1" Margin="0,0,6,0"/>
+                <TextBox x:Name="textBoxPage" Text="1" Width="36" TextAlignment="Center" VerticalContentAlignment="Center" Margin="4,0" KeyDown="OnPageInputKeyDown" LostFocus="OnPageInputLostFocus"/>
+                <Button x:Name="buttonNext" Content="Next &gt;" Click="OnNextPage" MinWidth="85" Padding="5,1" Margin="6,0,0,0"/>
+            </StackPanel>
+
+            <Button Content="Close" IsCancel="True" MinWidth="75" Padding="5,1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,10,10"/>
+        </Grid>
+    </controls:TerrariaWindow>
+</Window>

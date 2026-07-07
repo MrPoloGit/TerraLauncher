@@ -12,12 +12,30 @@ using TerraLauncher.Controls.Terraria;
 using TerraLauncher.Windows;
 
 namespace TerraLauncher.Setups {
+	public enum GameCategory {
+		Terraria = 0,
+		TModLoader = 1,
+		TAPI = 2,
+		TConfig = 3,
+		StandAlone = 4,
+		Custom = 5
+	}
+
 	public class Game : Setup {
 		//========== PROPERTIES ==========
 		#region Properties
 
 		public string SaveDirectory { get; set; } = "Default";
-		public bool IsTMod { get; set; } = false;
+		public GameCategory Category { get; set; } = GameCategory.Terraria;
+		// The downloaded version identifier (e.g. "1.4.5.6", "r16") — set when this
+		// entry came from the version picker, used to detect "already installed"
+		// and to resolve dependencies (e.g. a tAPI build requiring a Terraria version).
+		public string Version { get; set; } = "";
+		// Kept for the save-folder logic below; derived from Category rather than
+		// stored separately so there's a single source of truth for "is this tModLoader".
+		public bool IsTMod {
+			get { return Category == GameCategory.TModLoader; }
+		}
 		public override string Arguments {
 			get {
 				if (SaveDirectory != "Default")
@@ -55,7 +73,8 @@ namespace TerraLauncher.Setups {
 			Game game = new Game();
 			CloneBase(game);
 			game.SaveDirectory = SaveDirectory;
-			game.IsTMod = IsTMod;
+			game.Category = Category;
+			game.Version = Version;
 			return game;
 		}
 
@@ -65,30 +84,44 @@ namespace TerraLauncher.Setups {
 
 		protected override void ReadSetup(XmlElement setup) {
 			XmlNode node;
-			XmlAttribute attribute;
 
 			bool boolValue;
-				
+
 			node = setup.SelectSingleNode("SaveDirectory");
 			if (node != null) {
 				SaveDirectory = node.InnerText;
 			}
 			if (SaveDirectory == "")
 				SaveDirectory = "Default";
-			
-			node = setup.SelectSingleNode("IsTMod");
-			if (node != null && bool.TryParse(node.InnerText, out boolValue))
-				IsTMod = boolValue;
+
+			node = setup.SelectSingleNode("Category");
+			GameCategory categoryValue;
+			if (node != null && Enum.TryParse(node.InnerText, out categoryValue)) {
+				Category = categoryValue;
+			}
+			else {
+				// Legacy config: only IsTMod was saved.
+				node = setup.SelectSingleNode("IsTMod");
+				if (node != null && bool.TryParse(node.InnerText, out boolValue) && boolValue)
+					Category = GameCategory.TModLoader;
+			}
+
+			node = setup.SelectSingleNode("Version");
+			if (node != null) Version = node.InnerText;
 		}
 		protected override void WriteSetup(XmlElement setup, XmlDocument doc) {
 			XmlElement element;
-			
+
 			element = doc.CreateElement("SaveDirectory");
 			element.AppendChild(doc.CreateTextNode(SaveDirectory));
 			setup.AppendChild(element);
 
-			element = doc.CreateElement("IsTMod");
-			element.AppendChild(doc.CreateTextNode(IsTMod.ToString()));
+			element = doc.CreateElement("Category");
+			element.AppendChild(doc.CreateTextNode(Category.ToString()));
+			setup.AppendChild(element);
+
+			element = doc.CreateElement("Version");
+			element.AppendChild(doc.CreateTextNode(Version));
 			setup.AppendChild(element);
 		}
 
@@ -98,18 +131,16 @@ namespace TerraLauncher.Setups {
 
 		public void OpenSaveFolder() {
 			Sounds.PlayOpen();
-			try {
-				if (SaveDirectory == "Default") {
-					string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
-					if (IsTMod)
-						path = Path.Combine(path, "ModLoader");
-					Process.Start(path);
-				}
-				else if (Directory.Exists(SaveDirectory)) {
-					Process.Start(SaveDirectory);
-				}
+			if (SaveDirectory == "Default") {
+				string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games", "Terraria");
+				if (IsTMod)
+					path = Path.Combine(path, "ModLoader");
+				if (Directory.Exists(path))
+					OpenFolder(path);
 			}
-			catch { }
+			else if (Directory.Exists(SaveDirectory)) {
+				OpenFolder(SaveDirectory);
+			}
 		}
 		public void EditGame() {
 			if (EditGameWindow.ShowDialog(Config.MainWindow, this)) {

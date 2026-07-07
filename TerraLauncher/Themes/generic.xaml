@@ -77,6 +77,21 @@
                             Cursor="SizeNESW"
                             Style="{StaticResource RectBorderStyle}" />
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="CanMinimize" Value="False">
+                            <Setter TargetName="minimizeButton" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="CanResize" Value="False">
+                            <Setter TargetName="leftSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="rightSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="topSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="bottomSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="topLeftSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="bottomRightSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="topRightSizeGrip" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="bottomLeftSizeGrip" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
