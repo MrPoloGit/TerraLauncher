@@ -30,19 +30,19 @@
             </controls:TerrariaButton>
             <controls:TerrariaButton Margin="6" MouseUp="OnTAPI">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupOptions/SetupOptionHammer.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/tAPI%20Builder_128x128_32bit.ico" Width="48" Height="48" HorizontalAlignment="Center"/>
                     <TextBlock Text="tAPI" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
                 </StackPanel>
             </controls:TerrariaButton>
             <controls:TerrariaButton Margin="6" MouseUp="OnTConfig">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupOptions/SetupOptionGear.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/tConfig_128x128_32bit.ico" Width="48" Height="48" HorizontalAlignment="Center"/>
                     <TextBlock Text="tConfig" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
                 </StackPanel>
             </controls:TerrariaButton>
             <controls:TerrariaButton Margin="6" MouseUp="OnStandAlone">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTShock.png" Width="48" Height="48" HorizontalAlignment="Center"/>
+                    <Image Source="/TerraLauncher;component/Resources/Terraria/SetupIcons/SetupIconTreeCorruptionHallow.png" Width="48" Height="48" HorizontalAlignment="Center"/>
                     <TextBlock Text="Stand Alone" Foreground="White" HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="16"/>
                 </StackPanel>
             </controls:TerrariaButton>

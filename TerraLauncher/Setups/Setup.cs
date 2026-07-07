@@ -84,6 +84,8 @@ namespace TerraLauncher.Setups {
 			AddIcon("TreeCorruptionHallow");
 			AddIcon("TreeCrimsonHallow");
 			AddIcon("Folder");
+			AddIconFromPath("TAPI", "pack://application:,,,/Resources/Terraria/SetupIcons/tAPI%20Builder_128x128_32bit.ico");
+			AddIconFromPath("TConfig", "pack://application:,,,/Resources/Terraria/SetupIcons/tConfig_128x128_32bit.ico");
 
 			AddOptionIcon("Launch");
 			AddOptionIcon("Folder");
@@ -111,6 +113,9 @@ namespace TerraLauncher.Setups {
 
 		private static void AddIcon(string name) {
 			SetupIcons.Add(name, new BitmapImage(new Uri("pack://application:,,,/Resources/Terraria/SetupIcons/SetupIcon" + name + ".png")));
+		}
+		private static void AddIconFromPath(string key, string uri) {
+			SetupIcons.Add(key, new BitmapImage(new Uri(uri)));
 		}
 		private static void AddOptionIcon(string name) {
 			SetupOptions.Add(name, new BitmapImage(new Uri("pack://application:,,,/Resources/Terraria/SetupOptions/SetupOption" + name + ".png")));

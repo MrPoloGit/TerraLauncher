@@ -255,6 +255,9 @@ namespace TerraLauncher.Windows {
 		private static string DefaultIconFor(GameCategory cat) {
 			switch (cat) {
 			case GameCategory.TModLoader: return "TreeJungle";
+			case GameCategory.TAPI:       return "TAPI";
+			case GameCategory.TConfig:    return "TConfig";
+			case GameCategory.StandAlone: return "TreeCorruptionHallow";
 			default:                     return "Tree";
 			}
 		}
