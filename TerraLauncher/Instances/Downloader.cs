@@ -19,17 +19,19 @@ namespace TerraLauncher.Instances {
 		}
 
 		// Downloads entry.Url, extracts it into installDir (if it's an archive), and
-		// returns the detected executable path (null on failure).
-		public static async Task<string> InstallFromUrlAsync(DownloadProgressWindow ui, VersionEntry entry,
-			GameCategory category, string installDir, CancellationToken ct) {
+		// returns the detected executable path (null on failure) plus, for
+		// categories that ship one, the path to a bundled mod builder/compiler tool.
+		public static async Task<(string ExePath, string ModBuilderPath)> InstallFromUrlAsync(DownloadProgressWindow ui,
+			VersionEntry entry, GameCategory category, string installDir, CancellationToken ct) {
 			if (string.IsNullOrEmpty(entry.Url)) {
 				ui.AppendLog("No download URL for this version.");
-				return null;
+				return (null, null);
 			}
 
 			Directory.CreateDirectory(installDir);
 
-			// Direct file (e.g. an installer .exe) — no extraction step.
+			// Direct file (e.g. an installer .exe) — no extraction step, so there's
+			// nothing else in installDir to detect a mod builder from.
 			if (!IsArchiveUrl(entry.Url)) {
 				string fileName = Path.GetFileName(new Uri(entry.Url).LocalPath);
 				if (string.IsNullOrEmpty(fileName)) fileName = "download.bin";
@@ -38,7 +40,7 @@ namespace TerraLauncher.Instances {
 					ui.AppendLog("Downloading " + entry.Url);
 					await DownloadFileAsync(entry.Url, dest, ui, ct);
 					ui.AppendLog("Installed: " + dest);
-					return dest;
+					return (dest, null);
 				}
 				catch (OperationCanceledException) {
 					TryDelete(dest);
@@ -47,7 +49,7 @@ namespace TerraLauncher.Instances {
 				catch (Exception ex) {
 					ui.AppendLog("Download failed: " + ex.Message);
 					TryDelete(dest);
-					return null;
+					return (null, null);
 				}
 			}
 
@@ -64,15 +66,21 @@ namespace TerraLauncher.Instances {
 
 				if (!string.IsNullOrEmpty(entry.PatchUrl)
 					&& !await ApplyPatchAsync(ui, entry.PatchUrl, installDir, ct))
-					return null;
+					return (null, null);
 
 				string exe = FindExecutable(installDir, category);
 				if (exe == null) {
 					ui.AppendLog("Extracted, but no executable found in " + installDir);
-					return null;
+					return (null, null);
 				}
 				ui.AppendLog("Installed: " + exe);
-				return exe;
+
+				string modBuilder = (category == GameCategory.TAPI || category == GameCategory.TConfig)
+					? FindModBuilder(installDir, exe) : null;
+				if (modBuilder != null)
+					ui.AppendLog("Found mod builder: " + modBuilder);
+
+				return (exe, modBuilder);
 			}
 			catch (OperationCanceledException) {
 				TryDelete(archivePath);
@@ -81,7 +89,7 @@ namespace TerraLauncher.Instances {
 			catch (Exception ex) {
 				ui.AppendLog("Download failed: " + ex.Message);
 				TryDelete(archivePath);
-				return null;
+				return (null, null);
 			}
 		}
 
@@ -175,6 +183,17 @@ namespace TerraLauncher.Instances {
 			return Directory.EnumerateFiles(dir, "*.exe", SearchOption.AllDirectories)
 				.OrderBy(f => Path.GetFileName(f).IndexOf("server", StringComparison.OrdinalIgnoreCase) >= 0 ? 1 : 0)
 				.FirstOrDefault();
+		}
+
+		// tAPI/tConfig ship a separate GUI tool for packaging mods alongside the
+		// main game exe. There's no single well-known filename across every
+		// release, so this looks for anything plausibly named for that purpose.
+		// Also used by EditGameWindow to detect a builder next to a Custom-linked exe.
+		internal static string FindModBuilder(string dir, string mainExe) {
+			return Directory.EnumerateFiles(dir, "*.exe", SearchOption.AllDirectories)
+				.FirstOrDefault(f => !string.Equals(f, mainExe, StringComparison.OrdinalIgnoreCase)
+					&& (Path.GetFileNameWithoutExtension(f).IndexOf("builder", StringComparison.OrdinalIgnoreCase) >= 0
+						|| Path.GetFileNameWithoutExtension(f).IndexOf("compiler", StringComparison.OrdinalIgnoreCase) >= 0));
 		}
 
 		private static System.Collections.Generic.IEnumerable<string> CandidateNames(GameCategory category) {

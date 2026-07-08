@@ -64,4 +64,7 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 ; Deliberately no [UninstallDelete] for {app}: TerraLauncher.xml, Instances\,
 ; and Tools\ live there too, and those can be several GB of downloaded games.
 ; The default uninstaller only removes the files it installed, leaving user
-; data untouched (and leaves the folder behind if it isn't empty).
+; data untouched (and leaves the folder behind if it isn't empty). Worlds,
+; Players, and Mods for downloaded instances live outside {app} entirely,
+; under Documents\My Games\TerraLauncher\Instances, so they're unaffected
+; either way.

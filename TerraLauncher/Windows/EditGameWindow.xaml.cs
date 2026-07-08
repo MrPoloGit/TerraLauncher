@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using TerraLauncher.Instances;
 using TerraLauncher.Setups;
 using FolderBrowserDialog = System.Windows.Forms.FolderBrowserDialog;
 using System.IO;
@@ -202,6 +203,7 @@ namespace TerraLauncher.Windows {
 				game.Name = window.textBoxName.Text;
 				game.Details = window.textBoxDetails.Text;
 				game.ExePath = window.textBoxExe.Text;
+				game.ModBuilderPath = DetectModBuilder(game.ExePath);
 				if (window.checkBoxDefaultSaveFolder.IsChecked.Value)
 					game.SaveDirectory = "Default";
 				else
@@ -214,6 +216,17 @@ namespace TerraLauncher.Windows {
 				return true;
 			}
 			return false;
+		}
+
+		// Re-run whenever the exe path is saved (Custom-linked or otherwise) so
+		// ModBuilderPath stays in sync with wherever the exe actually points.
+		private static string DetectModBuilder(string exePath) {
+			if (string.IsNullOrEmpty(exePath)) return "";
+			string dir;
+			try { dir = Path.GetDirectoryName(exePath); }
+			catch { return ""; }
+			if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir)) return "";
+			return Downloader.FindModBuilder(dir, exePath) ?? "";
 		}
 
 		private void UpdateIcon(string icon) {

@@ -204,7 +204,7 @@ namespace TerraLauncher.Windows {
 			Grid.SetColumn(info, 0);
 			grid.Children.Add(info);
 
-			bool installed = FindInstalledGame(category, entry.Version) != null;
+			bool installed = FindInstalledGame(category, entry.Version, entry.Type) != null;
 
 			Button button = new Button { Padding = new Thickness(14, 4, 14, 4), VerticalAlignment = VerticalAlignment.Center, MinWidth = 90 };
 			if (installed) {
@@ -252,7 +252,12 @@ namespace TerraLauncher.Windows {
 		}
 
 		private async Task<bool> DownloadEntryAsync(VersionEntry entry, GameCategory cat) {
-			if (FindInstalledGame(cat, entry.Version) != null) {
+			// StandAlone bundles several unrelated games (Avalon, N Terraria, ...)
+			// under one category, so their install/save folders (and "already
+			// installed" check) are keyed off VersionEntry.Type as well as version.
+			string label = cat == GameCategory.StandAlone ? entry.Type : null;
+
+			if (FindInstalledGame(cat, entry.Version, label) != null) {
 				TriggerMessageBox.Show(this, MessageIcon.Info, entry.Name + " is already installed.", "Already Installed");
 				return false;
 			}
@@ -272,13 +277,19 @@ namespace TerraLauncher.Windows {
 				return false;
 			}
 
-			string installDir = InstancePaths.GetInstallDirForVersion(cat, entry.Version);
+			string installDir = InstancePaths.GetInstallDirForVersion(cat, entry.Version, label);
 
 			string exePath = null;
+			string modBuilderPath = null;
 			bool ok = await DownloadProgressWindow.RunAsync(this, "Downloading " + entry.Name + "...", async (ui, ct) => {
-				exePath = cat == GameCategory.Terraria
-					? await DepotDownloaderService.DownloadTerrariaAsync(ui, entry, installDir, username, password, ct)
-					: await Downloader.InstallFromUrlAsync(ui, entry, cat, installDir, ct);
+				if (cat == GameCategory.Terraria) {
+					exePath = await DepotDownloaderService.DownloadTerrariaAsync(ui, entry, installDir, username, password, ct);
+				}
+				else {
+					var result = await Downloader.InstallFromUrlAsync(ui, entry, cat, installDir, ct);
+					exePath = result.ExePath;
+					modBuilderPath = result.ModBuilderPath;
+				}
 				return exePath != null;
 			});
 			if (!ok || exePath == null) return false;
@@ -290,7 +301,22 @@ namespace TerraLauncher.Windows {
 				ExePath  = exePath,
 				Details  = entry.Version,
 				Icon     = DefaultIconFor(cat),
+				SubType  = label ?? "",
 			};
+			if ((cat == GameCategory.TAPI || cat == GameCategory.TConfig) && !string.IsNullOrEmpty(modBuilderPath))
+				game.ModBuilderPath = modBuilderPath;
+
+			// Give every downloaded instance its own Worlds/Players (and, for
+			// mod-capable categories, Mods) folder under Documents instead of
+			// sharing one global save location, so installing multiple versions
+			// never mixes their saves.
+			string saveDir = InstancePaths.GetSaveDataDirForVersion(cat, entry.Version, label);
+			Directory.CreateDirectory(Path.Combine(saveDir, "Worlds"));
+			Directory.CreateDirectory(Path.Combine(saveDir, "Players"));
+			if (cat == GameCategory.TModLoader || cat == GameCategory.TAPI || cat == GameCategory.TConfig)
+				Directory.CreateDirectory(Path.Combine(saveDir, "Mods"));
+			game.SaveDirectory = saveDir;
+
 			Config.Games.Entries.Add(game);
 			Config.Modified = true;
 			Config.SaveConfig();
@@ -312,9 +338,10 @@ namespace TerraLauncher.Windows {
 		// A Config entry alone isn't enough — if the user deleted the install
 		// folder by hand, the record can be stale, so this checks the actual
 		// executable is still on disk before treating a version as "installed".
-		private static Game FindInstalledGame(GameCategory cat, string version) {
+		private static Game FindInstalledGame(GameCategory cat, string version, string label = null) {
 			if (string.IsNullOrEmpty(version)) return null;
-			return Walk(Config.Games, g => g.Category == cat && g.Version == version && File.Exists(g.ExePath));
+			return Walk(Config.Games, g => g.Category == cat && g.Version == version
+				&& g.SubType == (label ?? "") && File.Exists(g.ExePath));
 		}
 
 		private static Game Walk(SetupFolder folder, Func<Game, bool> predicate) {

@@ -95,8 +95,11 @@ locally:
   * Versions that require a specific Terraria build (e.g. tAPI/tModLoader builds) will offer to install that
     Terraria version first if it isn't already present.
   * Already-installed versions are greyed out and marked "Installed" in the picker.
-* Change the save directory per instance (defaults to the game's normal save location, e.g.
-  `Documents/My Games/Terraria`, or `.../ModLoader` for tModLoader).
+* Every instance installed through the downloader gets its own save directory under `Documents/My
+  Games/TerraLauncher/` (see below) — install ten versions of tModLoader and each keeps its own worlds,
+  players, and mods. The save directory is editable per instance if you'd rather point it elsewhere.
+* **tAPI** / **tConfig** instances get a **Launch Mod Builder** button (wrench icon) next to Launch Game
+  when the downloader finds a mod-packaging tool bundled with that version.
 * Remove an instance from the list — for versions installed via the downloader, this also deletes the
   downloaded files; Steam-detected and Custom-linked executables are only removed from the list.
 * Search and filter instances by category from the main window.
@@ -105,12 +108,17 @@ locally:
 
 ## Where things are stored
 
-Everything lives next to `TerraLauncher.exe`:
+Game files and save data are split, the same way Steam and Terraria split them (Steam's
+`steamapps/common/Terraria` vs. `Documents/My Games/Terraria`):
 
-* `TerraLauncher.xml` — your instance list and settings.
-* `Instances/<Category>/` — files for versions installed through the in-app downloader (e.g.
-  `Instances/TModLoader/TModLoader-<version>/`).
-* `Tools/DepotDownloader/` — the auto-downloaded DepotDownloader binary used for Steam downloads.
+* Next to `TerraLauncher.exe`:
+  * `TerraLauncher.xml` — your instance list and settings.
+  * `Instances/<Category>/` — the installed files for versions installed through the in-app
+    downloader (e.g. `Instances/TModLoader/TModLoader-<version>/`).
+  * `Tools/DepotDownloader/` — the auto-downloaded DepotDownloader binary used for Steam downloads.
+* Under `Documents/My Games/TerraLauncher/Instances/<Category>/<version>/` — every downloaded version
+  gets its own `Worlds/` and `Players/` folder, plus a `Mods/` folder for tModLoader, tAPI, and tConfig,
+  so installing multiple versions never mixes their saves.
 
 Steam-detected installs and Custom-linked executables are referenced in place and are never copied or moved.
 

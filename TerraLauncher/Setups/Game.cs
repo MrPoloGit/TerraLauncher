@@ -29,10 +29,19 @@ namespace TerraLauncher.Setups {
 
 		public string SaveDirectory { get; set; } = "Default";
 		public GameCategory Category { get; set; } = GameCategory.Terraria;
+		// Path to a bundled mod-packaging tool, if one was found alongside the
+		// exe - populated by the downloader for tAPI/tConfig, and re-detected by
+		// EditGameWindow whenever the exe path is set (including Custom links).
+		public string ModBuilderPath { get; set; } = "";
 		// The downloaded version identifier (e.g. "1.4.5.6", "r16") — set when this
 		// entry came from the version picker, used to detect "already installed"
 		// and to resolve dependencies (e.g. a tAPI build requiring a Terraria version).
 		public string Version { get; set; } = "";
+		// VersionEntry.Type for StandAlone downloads (e.g. "Avalon", "N Terraria") —
+		// blank for everything else. Kept so RemoveInstance can recompute the exact
+		// install/save-data folder names, which are keyed off this instead of the
+		// generic "StandAlone" category name.
+		public string SubType { get; set; } = "";
 		// Kept for the save-folder logic below; derived from Category rather than
 		// stored separately so there's a single source of truth for "is this tModLoader".
 		public bool IsTMod {
@@ -56,6 +65,8 @@ namespace TerraLauncher.Setups {
 			get {
 				List<SetupOption> options = new List<SetupOption>();
 				options.Add(new SetupOption("Launch Game", "Launch", Launch));
+				if (!string.IsNullOrEmpty(ModBuilderPath))
+					options.Add(new SetupOption("Launch Mod Builder", "Wrench", LaunchModBuilder));
 				options.Add(new SetupOption("Open Save Folder", "Folder", OpenSaveFolder));
 				options.Add(new SetupOption("Open Executable Folder", "Home", OpenExeFolder));
 				options.Add(new SetupOption("Edit Game Setup", "Gear", EditGame));
@@ -78,6 +89,8 @@ namespace TerraLauncher.Setups {
 			game.SaveDirectory = SaveDirectory;
 			game.Category = Category;
 			game.Version = Version;
+			game.ModBuilderPath = ModBuilderPath;
+			game.SubType = SubType;
 			return game;
 		}
 
@@ -111,6 +124,12 @@ namespace TerraLauncher.Setups {
 
 			node = setup.SelectSingleNode("Version");
 			if (node != null) Version = node.InnerText;
+
+			node = setup.SelectSingleNode("ModBuilderPath");
+			if (node != null) ModBuilderPath = node.InnerText;
+
+			node = setup.SelectSingleNode("SubType");
+			if (node != null) SubType = node.InnerText;
 		}
 		protected override void WriteSetup(XmlElement setup, XmlDocument doc) {
 			XmlElement element;
@@ -125,6 +144,14 @@ namespace TerraLauncher.Setups {
 
 			element = doc.CreateElement("Version");
 			element.AppendChild(doc.CreateTextNode(Version));
+			setup.AppendChild(element);
+
+			element = doc.CreateElement("ModBuilderPath");
+			element.AppendChild(doc.CreateTextNode(ModBuilderPath));
+			setup.AppendChild(element);
+
+			element = doc.CreateElement("SubType");
+			element.AppendChild(doc.CreateTextNode(SubType));
 			setup.AppendChild(element);
 		}
 
@@ -145,6 +172,25 @@ namespace TerraLauncher.Setups {
 				OpenFolder(SaveDirectory);
 			}
 		}
+		public void LaunchModBuilder() {
+			Sounds.PlayOpen();
+			if (!File.Exists(ModBuilderPath)) {
+				TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Error,
+					"Could not find the Mod Builder:\n\n" + ModBuilderPath + "\n\nThe path may have moved or been deleted.",
+					"Cannot Launch");
+				return;
+			}
+			try {
+				Process.Start(new ProcessStartInfo(ModBuilderPath) {
+					UseShellExecute = true,
+					WorkingDirectory = Path.GetDirectoryName(ModBuilderPath)
+				});
+			}
+			catch (Exception ex) {
+				TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Error,
+					"Failed to launch Mod Builder:\n\n" + ex.Message, "Launch Failed");
+			}
+		}
 		public void EditGame() {
 			if (EditGameWindow.ShowDialog(Config.MainWindow, this)) {
 				Entry?.Update();
@@ -160,8 +206,13 @@ namespace TerraLauncher.Setups {
 			// Steam auto-detected entries and Custom-linked executables point at
 			// files this app doesn't manage, so those must never be deleted.
 			string installDir = !string.IsNullOrEmpty(Version)
-				? InstancePaths.GetInstallDirForVersion(Category, Version) : null;
+				? InstancePaths.GetInstallDirForVersion(Category, Version, SubType) : null;
 			bool hasManagedFiles = installDir != null && Directory.Exists(installDir);
+
+			// Worlds/Players/Mods live separately from the install dir (see
+			// InstancePaths.GetSaveDataDir) and are asked about independently below,
+			// since losing saves is a much bigger deal than losing the game files.
+			bool hasSaveData = SaveDirectory != "Default" && Directory.Exists(SaveDirectory);
 
 			string message = hasManagedFiles
 				? "Remove \"" + Name + "\" from the list and delete its files?\n\n" + installDir
@@ -171,12 +222,25 @@ namespace TerraLauncher.Setups {
 				message, "Remove Instance", MessageBoxButton.YesNo);
 			if (result != MessageBoxResult.Yes) return;
 
+			bool deleteSaveData = false;
+			if (hasSaveData) {
+				MessageBoxResult saveResult = TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Warning,
+					"Also delete its Worlds, Players, and Mods?\n\n" + SaveDirectory
+						+ "\n\nChoose No to keep your saves and just remove the instance.",
+					"Delete Save Data", MessageBoxButton.YesNo);
+				deleteSaveData = saveResult == MessageBoxResult.Yes;
+			}
+
 			Sounds.PlayClose();
 
 			RemoveFromFolder(Config.Games, this);
 
 			if (hasManagedFiles) {
 				try { Directory.Delete(installDir, recursive: true); }
+				catch { }
+			}
+			if (deleteSaveData) {
+				try { Directory.Delete(SaveDirectory, recursive: true); }
 				catch { }
 			}
 
