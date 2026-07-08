@@ -8,7 +8,7 @@
     "url": "https://archive.org/download/tAPI-versions/r16.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   },
   {
     "name": "tAPI r15",
@@ -19,7 +19,7 @@
     "url": "https://archive.org/download/tAPI-versions/r15.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   },
   {
     "name": "tAPI r14a",
@@ -30,7 +30,7 @@
     "url": "https://archive.org/download/tAPI-versions/r14a.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   },
   {
     "name": "tAPI r14",
@@ -41,7 +41,7 @@
     "url": "https://archive.org/download/tAPI-versions/r14.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   },
   {
     "name": "tAPI r13",
@@ -52,7 +52,7 @@
     "url": "https://archive.org/download/tAPI-versions/r13.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   },
   {
     "name": "tAPI r12",
@@ -63,7 +63,7 @@
     "url": "https://archive.org/download/tAPI-versions/r12.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   },
   {
     "name": "tAPI r11",
@@ -74,6 +74,6 @@
     "url": "https://archive.org/download/tAPI-versions/r11.exe",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.2.4"
   }
 ]
