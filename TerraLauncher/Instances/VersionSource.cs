@@ -68,23 +68,49 @@ namespace TerraLauncher.Instances {
 		private static async Task<VersionPage> FetchTerrariaAsync() {
 			string cacheDir = Path.Combine(InstancePaths.InstancesRoot, "..", "cache");
 			string cachePath = Path.Combine(cacheDir, "terraria-manifest-versions.cfg");
+			List<VersionEntry> entries;
 			string cfgText;
 			try {
 				cfgText = await http.GetStringAsync(TerrariaManifestCfgUrl);
 				Directory.CreateDirectory(cacheDir);
 				File.WriteAllText(cachePath, cfgText);
+				entries = ParseTerrariaManifestCfg(cfgText);
 			}
 			catch {
 				if (File.Exists(cachePath)) {
 					cfgText = File.ReadAllText(cachePath);
+					entries = ParseTerrariaManifestCfg(cfgText);
 				}
 				else {
 					// Last-resort offline fallback: a snapshot bundled at build time.
-					return SinglePage(LoadEmbedded("TerraLauncher.Resources.VersionData.terraria-versions.json"));
+					entries = LoadEmbedded("TerraLauncher.Resources.VersionData.terraria-versions.json");
 				}
 			}
-			return SinglePage(ParseTerrariaManifestCfg(cfgText));
+			// Versions older than the manifest cfg covers (pre-1.1.2ish) have no
+			// Steam depot at all, so they're not something ManifestVersions.cfg (or
+			// its bundled snapshot) will ever list - append them here instead.
+			entries.AddRange(LegacyEntries);
+			return SinglePage(entries);
 		}
+
+		// Pre-Steam-depot Terraria builds, archived on GitHub since Steam's manifest
+		// system doesn't go back this far. Installed like any other direct-URL
+		// category (Downloader.InstallFromUrlAsync) rather than through DepotDownloader.
+		internal static readonly List<VersionEntry> LegacyEntries = new List<VersionEntry> {
+			LegacyEntry("1.1.1"), LegacyEntry("1.1"),
+			LegacyEntry("1.0.6.1"), LegacyEntry("1.0.6"), LegacyEntry("1.0.5"),
+			LegacyEntry("1.0.4"), LegacyEntry("1.0.3"), LegacyEntry("1.0.2"), LegacyEntry("1.0.1"),
+			LegacyEntry("0.7"), LegacyEntry("0.1"),
+		};
+
+		private static VersionEntry LegacyEntry(string version) => new VersionEntry {
+			Name        = "Terraria " + version,
+			Version     = version,
+			Author      = "Re-Logic",
+			Description = "Predates Steam's depot/manifest system - installed from a community archive instead of Steam.",
+			Url         = "https://raw.githubusercontent.com/RussDev7/LostTerrariaArchive/main/Terraria-v"
+				+ version + "/Terraria-v" + version + ".zip",
+		};
 
 		internal static List<VersionEntry> ParseTerrariaManifestCfg(string cfgText) {
 			var entries = new List<VersionEntry>();

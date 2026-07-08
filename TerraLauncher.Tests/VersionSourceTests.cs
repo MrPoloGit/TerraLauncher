@@ -136,5 +136,28 @@ namespace TerraLauncher.Tests {
 			Assert.Equal("", VersionSource.TrimBody("   "));
 			Assert.Equal("", VersionSource.TrimBody(null));
 		}
+
+		[Theory]
+		[InlineData("1.1.1")]
+		[InlineData("1.1")]
+		[InlineData("1.0.6.1")]
+		[InlineData("1.0.6")]
+		[InlineData("1.0.5")]
+		[InlineData("1.0.4")]
+		[InlineData("1.0.3")]
+		[InlineData("1.0.2")]
+		[InlineData("1.0.1")]
+		[InlineData("0.7")]
+		[InlineData("0.1")]
+		public void LegacyEntries_IncludesEveryPreSteamVersionWithADirectUrl(string version) {
+			var entry = VersionSource.LegacyEntries.Single(e => e.Version == version);
+
+			Assert.Equal("Terraria " + version, entry.Name);
+			Assert.Equal(
+				"https://raw.githubusercontent.com/RussDev7/LostTerrariaArchive/main/Terraria-v"
+					+ version + "/Terraria-v" + version + ".zip",
+				entry.Url);
+			Assert.Empty(entry.ManifestId);
+		}
 	}
 }

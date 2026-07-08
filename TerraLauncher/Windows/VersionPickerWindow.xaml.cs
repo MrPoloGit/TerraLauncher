@@ -262,8 +262,13 @@ namespace TerraLauncher.Windows {
 				return false;
 			}
 
+			// Versions predating Steam's depot/manifest system (pre-1.2ish) have no
+			// manifestId and instead carry a direct archive Url, so they install
+			// like any other category instead of going through DepotDownloader.
+			bool useSteam = cat == GameCategory.Terraria && string.IsNullOrEmpty(entry.Url);
+
 			string username = "", password = "";
-			if (cat == GameCategory.Terraria) {
+			if (useSteam) {
 				var login = TextPromptWindow.ShowLoginAsync(this, "Steam Login",
 					"Steam credentials are required to download Terraria.\n"
 					+ "They are passed directly to DepotDownloader and never saved.",
@@ -282,7 +287,7 @@ namespace TerraLauncher.Windows {
 			string exePath = null;
 			string modBuilderPath = null;
 			bool ok = await DownloadProgressWindow.RunAsync(this, "Downloading " + entry.Name + "...", async (ui, ct) => {
-				if (cat == GameCategory.Terraria) {
+				if (useSteam) {
 					exePath = await DepotDownloaderService.DownloadTerrariaAsync(ui, entry, installDir, username, password, ct);
 				}
 				else {

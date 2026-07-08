@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TerraLauncher.Setups;
+using TerraLauncher.Util;
 using TerraLauncher.Windows;
 
 namespace TerraLauncher.Instances {
@@ -56,13 +57,47 @@ namespace TerraLauncher.Instances {
 			string archivePath = Path.Combine(installDir, "_download" + ArchiveExtension(entry.Url));
 
 			try {
+				// tConfig only ships its own new/modified files, not a full Terraria
+				// install - it's meant to be patched directly on top of a normal
+				// Terraria copy. Seed the instance folder with the Steam-installed
+				// Terraria files first so extracting the zip over them (below,
+				// overwriting matching names) produces a complete, launchable game.
+				if (category == GameCategory.TConfig) {
+					string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
+						? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
+					if (!string.IsNullOrEmpty(terrariaDir) && Directory.Exists(terrariaDir)) {
+						ui.AppendLog("Copying Terraria files from " + terrariaDir);
+						ui.SetProgress(-1);
+						await Task.Run(() => CopyDirectory(terrariaDir, installDir, ct), ct);
+					}
+					else {
+						ui.AppendLog("No Steam install of Terraria was found - tConfig may not run without one.");
+					}
+				}
+
 				ui.AppendLog("Downloading " + entry.Url);
 				await DownloadFileAsync(entry.Url, archivePath, ui, ct);
+
+				// Some zips (e.g. archive.org's "tConfig 0.38.zip", or GitHub's
+				// "Terraria-v1.0.2.zip") wrap everything in one top-level folder
+				// rather than extracting flat, so it'd land in installDir/tConfig
+				// 0.38/ instead of installDir/ itself. Figure that out before
+				// extracting since the archive is deleted right after.
+				string zipRootFolder = GetZipRootFolder(archivePath);
 
 				ui.AppendLog("Extracting...");
 				ui.SetProgress(-1);
 				await Task.Run(() => Extract(archivePath, installDir), ct);
 				File.Delete(archivePath);
+
+				if (zipRootFolder != null) {
+					string wrapperPath = Path.Combine(installDir, zipRootFolder);
+					if (Directory.Exists(wrapperPath)) {
+						ui.AppendLog("Flattening " + zipRootFolder + "...");
+						await Task.Run(() => CopyDirectory(wrapperPath, installDir, ct), ct);
+						Directory.Delete(wrapperPath, recursive: true);
+					}
+				}
 
 				if (!string.IsNullOrEmpty(entry.PatchUrl)
 					&& !await ApplyPatchAsync(ui, entry.PatchUrl, installDir, ct))
@@ -198,6 +233,11 @@ namespace TerraLauncher.Instances {
 
 		private static System.Collections.Generic.IEnumerable<string> CandidateNames(GameCategory category) {
 			switch (category) {
+			case GameCategory.Terraria:
+				// Only reached for direct-URL Terraria downloads (pre-Steam-manifest
+				// versions) - the Steam path goes through DepotDownloaderService instead.
+				yield return "Terraria.exe";
+				break;
 			case GameCategory.TModLoader:
 				yield return "start-tModLoader.bat";
 				yield return "tModLoader.exe";
@@ -207,10 +247,54 @@ namespace TerraLauncher.Instances {
 				break;
 			case GameCategory.TConfig:
 				yield return "tConfig.exe";
+				// tConfig patches onto a copied Terraria install (see CopyDirectory
+				// above) and doesn't necessarily rename the exe, so fall back to it.
+				yield return "Terraria.exe";
 				break;
 			case GameCategory.StandAlone:
 				yield return "TerrariaServer.exe";
 				break;
+			}
+		}
+
+		// Returns the single top-level folder name every entry in a zip is nested
+		// under (e.g. "tConfig 0.38"), or null if entries sit at the zip root or
+		// span more than one top-level folder. Not attempted for tar.gz archives
+		// since nothing currently downloaded that way needs it.
+		internal static string GetZipRootFolder(string archivePath) {
+			if (!archivePath.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+				return null;
+
+			string root = null;
+			using (var zip = ZipFile.OpenRead(archivePath)) {
+				foreach (var entry in zip.Entries) {
+					if (string.IsNullOrEmpty(entry.Name) && entry.FullName.EndsWith("/"))
+						continue; // directory-only entry, no bearing on the root name
+
+					int slash = entry.FullName.IndexOf('/');
+					if (slash < 0) return null; // a file sits directly at the zip root
+
+					string top = entry.FullName.Substring(0, slash);
+					if (root == null) root = top;
+					else if (root != top) return null;
+				}
+			}
+			return root;
+		}
+
+		// Recursively copies sourceDir's contents into destDir, overwriting any
+		// files already there by the same name.
+		internal static void CopyDirectory(string sourceDir, string destDir, CancellationToken ct) {
+			Directory.CreateDirectory(destDir);
+			foreach (string dir in Directory.EnumerateDirectories(sourceDir, "*", SearchOption.AllDirectories)) {
+				ct.ThrowIfCancellationRequested();
+				Directory.CreateDirectory(Path.Combine(destDir, Path.GetRelativePath(sourceDir, dir)));
+			}
+			foreach (string file in Directory.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories)) {
+				ct.ThrowIfCancellationRequested();
+				string destFile = Path.Combine(destDir, Path.GetRelativePath(sourceDir, file));
+				Directory.CreateDirectory(Path.GetDirectoryName(destFile));
+				File.Copy(file, destFile, overwrite: true);
 			}
 		}
 
