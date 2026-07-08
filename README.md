@@ -49,8 +49,35 @@ dotnet test TerraLauncher.sln
 ```
 
 CI runs the same build and test suite on every push and pull request via
-[GitHub Actions](.github/workflows/ci.yml). Pushing a `v*` tag triggers
-[a release build](.github/workflows/release.yml) that publishes a self-contained `win-x64` zip to GitHub Releases.
+[GitHub Actions](.github/workflows/ci.yml).
+
+## Publishing
+
+Pushing a `v*` tag (e.g. `v1.2.3`) triggers [a release build](.github/workflows/release.yml) that runs the tests,
+then publishes both a portable zip and a Windows installer to GitHub Releases automatically. To do the same thing
+locally:
+
+1. Publish a self-contained, single-file build:
+
+   ```
+   dotnet publish TerraLauncher/TerraLauncher.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+   ```
+
+   This produces `publish/TerraLauncher.exe`, which runs on a machine with no .NET runtime installed at all — you
+   can zip up the `publish/` folder as-is and hand it out.
+
+2. (Optional) Build the installer from that publish output with [Inno Setup 6](https://jrsoftware.org/isinfo.php):
+
+   ```
+   iscc TerraLauncher.iss
+   iscc /DMyAppVersion=1.2.3 TerraLauncher.iss
+   ```
+
+   This produces `installer-output/TerraLauncher-<version>-Setup.exe`. The installer defaults to installing under
+   `%LocalAppData%\Programs\TerraLauncher` (no admin rights required) rather than Program Files, since TerraLauncher
+   keeps its config and all downloaded instances next to the exe and needs that folder to stay writable. Uninstalling
+   only removes the files the installer put there — `TerraLauncher.xml`, `Instances/`, and `Tools/` are left alone
+   so you don't lose downloaded games.
 
 ## Features
 

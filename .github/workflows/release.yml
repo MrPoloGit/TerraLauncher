@@ -39,8 +39,19 @@ jobs:
         run: Compress-Archive -Path publish\* -DestinationPath TerraLauncher-${{ github.ref_name }}-win-x64.zip
         shell: pwsh
 
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" TerraLauncher.iss
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: TerraLauncher-${{ github.ref_name }}-win-x64.zip
+          files: |
+            TerraLauncher-${{ github.ref_name }}-win-x64.zip
+            installer-output/TerraLauncher-*-Setup.exe
           generate_release_notes: true

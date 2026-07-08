@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -19,10 +18,10 @@ namespace TerraLauncher {
 
 		public const int ConfigVersion = 1;
 		public const string ConfigName = "TerraLauncher.xml";
-		public static readonly string ConfigPath = Path.Combine(
-			Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-			ConfigName
-		);
+		// Assembly.Location is empty for single-file published apps (the assembly
+		// never exists as its own file on disk) — AppContext.BaseDirectory works
+		// for both that and the normal multi-file build.
+		public static readonly string ConfigPath = Path.Combine(AppContext.BaseDirectory, ConfigName);
 
 		public static MainWindow MainWindow { get; private set; }
 

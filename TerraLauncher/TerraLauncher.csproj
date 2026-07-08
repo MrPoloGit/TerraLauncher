@@ -15,15 +15,18 @@
          for WinForms/GDI+ APIs used by the legacy IconPack/FolderBrowserLauncher code;
          this app only ever targets Windows, so the warning is a false positive.
          NU1510: ConfigurationManager looks "unreferenced" to package pruning even
-         though Settings.Designer.cs uses ApplicationSettingsBase directly. -->
-    <NoWarn>$(NoWarn);CA1416;NU1510</NoWarn>
+         though Settings.Designer.cs uses ApplicationSettingsBase directly.
+         IL3000: AboutWindow.GetLinkerTime() reads Assembly.Location only as a
+         guarded fallback (behind a File.Exists check) for when the primary
+         Environment.ProcessPath lookup fails - the analyzer flags the reference
+         itself without seeing that it's unreachable in a single-file publish. -->
+    <NoWarn>$(NoWarn);CA1416;NU1510;IL3000</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
   </ItemGroup>
-
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">

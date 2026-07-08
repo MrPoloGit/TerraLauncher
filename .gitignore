@@ -145,6 +145,9 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# Inno Setup installer output (built by packaging/TerraLauncher.iss)
+installer-output/
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
@@ -286,3 +289,5 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+.claude/
