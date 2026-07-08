@@ -34,13 +34,14 @@ namespace TerraLauncher.Instances {
 
 			bool isPrism = category == GameCategory.StandAlone && entry.Type == "Prism";
 
-			// tConfig, Prism, and Prepare to Die all ship as partial content meant
-			// to sit inside (or patch onto) an existing Terraria install, rather
-			// than as a full standalone game - tConfig/Prism patch files directly
-			// on top of it, Prepare to Die is a replacement exe that needs the
-			// original's Content folder alongside it. Seed the instance folder
-			// with the Steam-installed Terraria files before downloading/extracting
-			// anything else on top, so each of these ends up with everything it needs.
+			// tConfig, Prism, and Prepare to Die all need a real Terraria install
+			// alongside them - tConfig itself is a runnable build, but still reads/
+			// writes several folders (see LinkTConfigModFolders below) and behaves
+			// correctly only when it's actually sitting in a proper Terraria-shaped
+			// folder; Prism's patcher.exe patches a Terraria.exe in place; Prepare to
+			// Die is a replacement exe that needs the original's Content folder
+			// alongside it. Seed the instance folder with the Steam-installed
+			// Terraria files before downloading/extracting anything else on top.
 			if (NeedsTerrariaBaseCopy(category, entry)) {
 				string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
 					? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
@@ -138,6 +139,17 @@ namespace TerraLauncher.Instances {
 				}
 				ui.AppendLog("Installed: " + exe);
 
+				// tConfig creates its own mod-management folders (ModPacks,
+				// ModPacks_temp_runtime) relative to its own exe rather than
+				// honoring -savedirectory (it doesn't support that flag at all - see
+				// TConfigModFolders below), so they'd otherwise end up inside
+				// installDir instead of next to Worlds/Players/Mods in Documents.
+				// Redirect them with NTFS junctions (no admin rights needed, unlike
+				// symlinks) - tConfig just sees a normal-looking local folder that's
+				// actually the shared per-instance save location underneath.
+				if (category == GameCategory.TConfig)
+					LinkTConfigModFolders(ui, installDir, InstancePaths.GetSaveDataDirForVersion(category, entry.Version));
+
 				string modBuilder = (category == GameCategory.TAPI || category == GameCategory.TConfig)
 					? FindModBuilder(installDir, exe) : null;
 				if (modBuilder != null)
@@ -154,6 +166,84 @@ namespace TerraLauncher.Instances {
 				TryDelete(archivePath);
 				return (null, null);
 			}
+		}
+
+		// tConfig's own folders for installed mod packs, confirmed by pulling the
+		// literal path strings out of tConfig.exe/ModPack Builder.exe directly
+		// (both reference "\ModPacks\..." relative to their own directory) - these
+		// are created next to the exe on first run if nothing redirects them first.
+		// "Config Mod" is deliberately NOT here: tConfig.exe references
+		// "Config Mod.ini" (a file, not a folder), so junctioning a same-named
+		// directory wouldn't affect it at all - it's a small per-instance settings
+		// file, not real save data, and isn't worth chasing further. Also confirmed
+		// tConfig.exe has no "-savedirectory" string anywhere in it, meaning
+		// (unlike Terraria/tModLoader) it doesn't support that flag at all -
+		// Worlds/Players stay hardcoded to the shared Documents\My Games\Terraria
+		// and can't be isolated this way; only ModPacks can.
+		private static readonly string[] TConfigModFolders = { "ModPacks", "ModPacks_temp_runtime" };
+
+		private static void LinkTConfigModFolders(DownloadProgressWindow ui, string installDir, string saveDir) {
+			foreach (string folder in TConfigModFolders) {
+				try {
+					CreateJunction(Path.Combine(installDir, folder), Path.Combine(saveDir, folder));
+				}
+				catch (Exception ex) {
+					ui.AppendLog("Could not link " + folder + ": " + ex.Message);
+				}
+			}
+		}
+
+		// Creates an NTFS directory junction at linkPath pointing to targetPath,
+		// creating targetPath first if needed. Junctions (unlike symlinks) don't
+		// require admin rights or Developer Mode on Windows, and to anything
+		// reading/writing through linkPath they're indistinguishable from a real
+		// folder - which is what lets us redirect tConfig's hardcoded folders
+		// without touching tConfig.exe itself.
+		internal static void CreateJunction(string linkPath, string targetPath) {
+			Directory.CreateDirectory(targetPath);
+
+			if (Directory.Exists(linkPath)) {
+				// Could be a leftover real folder from a previous run (or something
+				// tConfig's own zip shipped empty). Only safe to replace with a
+				// junction if there's nothing in it - never risk deleting user data.
+				if (Directory.EnumerateFileSystemEntries(linkPath).Any())
+					return;
+				Directory.Delete(linkPath);
+			}
+
+			var psi = new ProcessStartInfo {
+				FileName = "cmd.exe",
+				Arguments = "/c mklink /J \"" + linkPath + "\" \"" + targetPath + "\"",
+				UseShellExecute = false,
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+			};
+			using (Process proc = Process.Start(psi)) {
+				proc.WaitForExit();
+				if (proc.ExitCode != 0)
+					throw new IOException("mklink failed: " + proc.StandardError.ReadToEnd().Trim());
+			}
+		}
+
+		// Directory.Delete(path, recursive: true) throws UnauthorizedAccessException
+		// when the tree contains a junction (like the ones CreateJunction makes for
+		// tConfig's mod folders) instead of just unlinking it. Used by RemoveInstance
+		// so deleting an install folder never risks touching - or failing on - the
+		// real save data a junction inside it points at.
+		internal static void DeleteDirectoryTree(string path) {
+			if (!Directory.Exists(path)) return;
+
+			foreach (string dir in Directory.GetDirectories(path)) {
+				if ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) != 0)
+					Directory.Delete(dir, recursive: false);
+				else
+					DeleteDirectoryTree(dir);
+			}
+			foreach (string file in Directory.GetFiles(path))
+				File.Delete(file);
+
+			Directory.Delete(path, recursive: false);
 		}
 
 		// Runs Prism's patcher.exe against the copied Terraria.exe (see the comment
@@ -265,8 +355,8 @@ namespace TerraLauncher.Instances {
 			}
 		}
 
-		// Categories/types that ship partial content meant to sit inside (or patch
-		// onto) an existing Terraria install rather than as a full standalone game.
+		// Categories/types that need a real Terraria install alongside them to
+		// behave correctly, rather than as a fully independent standalone game.
 		internal static bool NeedsTerrariaBaseCopy(GameCategory category, VersionEntry entry) =>
 			category == GameCategory.TConfig
 			|| (category == GameCategory.StandAlone && (entry.Type == "Prism" || entry.Type == "Prepare to Die"));
@@ -334,9 +424,6 @@ namespace TerraLauncher.Instances {
 				break;
 			case GameCategory.TConfig:
 				yield return "tConfig.exe";
-				// tConfig patches onto a copied Terraria install (see CopyDirectory
-				// above) and doesn't necessarily rename the exe, so fall back to it.
-				yield return "Terraria.exe";
 				break;
 			case GameCategory.StandAlone:
 				yield return "TerrariaServer.exe";

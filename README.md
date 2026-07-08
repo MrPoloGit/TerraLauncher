@@ -117,8 +117,9 @@ Game files and save data are split, the same way Steam and Terraria split them (
     downloader (e.g. `Instances/TModLoader/TModLoader-<version>/`).
   * `Tools/DepotDownloader/` — the auto-downloaded DepotDownloader binary used for Steam downloads.
 * Under `Documents/My Games/TerraLauncher/Instances/<Category>/<version>/` — every downloaded version
-  gets its own `Worlds/` and `Players/` folder, plus a `Mods/` folder for tModLoader, tAPI, and tConfig,
-  so installing multiple versions never mixes their saves.
+  gets its own `Worlds/` and `Players/` folder, plus a `Mods/` folder for tModLoader and tAPI, so
+  installing multiple versions never mixes their saves. tConfig instead gets its `ModPacks/` and
+  `ModPacks_temp_runtime/` folders (which is where it actually looks for mods) junctioned in here.
 
 Steam-detected installs and Custom-linked executables are referenced in place and are never copied or moved.
 

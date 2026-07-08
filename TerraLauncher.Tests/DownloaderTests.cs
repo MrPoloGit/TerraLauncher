@@ -191,6 +191,45 @@ namespace TerraLauncher.Tests {
 		}
 
 		[Fact]
+		public void CreateJunction_MakesLinkReadThroughToTarget() {
+			string root = Path.Combine(Path.GetTempPath(), "TerraLauncherTests_" + Guid.NewGuid());
+			string target = Path.Combine(root, "target");
+			string link = Path.Combine(root, "installDir", "ModPacks");
+			Directory.CreateDirectory(Path.Combine(root, "installDir"));
+			try {
+				Downloader.CreateJunction(link, target);
+				File.WriteAllText(Path.Combine(target, "pack.txt"), "hello");
+
+				Assert.True(Directory.Exists(link));
+				Assert.Equal("hello", File.ReadAllText(Path.Combine(link, "pack.txt")));
+			}
+			finally {
+				// Not Directory.Delete(root, recursive: true) - it throws on a tree
+				// containing a junction instead of just unlinking it (that's exactly
+				// the bug DeleteDirectoryTree exists to avoid).
+				Downloader.DeleteDirectoryTree(root);
+			}
+		}
+
+		[Fact]
+		public void CreateJunction_LeavesNonEmptyExistingFolderAlone() {
+			string root = Path.Combine(Path.GetTempPath(), "TerraLauncherTests_" + Guid.NewGuid());
+			string target = Path.Combine(root, "target");
+			string link = Path.Combine(root, "installDir", "ModPacks");
+			Directory.CreateDirectory(Path.Combine(root, "installDir"));
+			Directory.CreateDirectory(link);
+			File.WriteAllText(Path.Combine(link, "existing-pack.txt"), "don't lose me");
+			try {
+				Downloader.CreateJunction(link, target);
+
+				Assert.True(File.Exists(Path.Combine(link, "existing-pack.txt")));
+			}
+			finally {
+				Directory.Delete(root, recursive: true);
+			}
+		}
+
+		[Fact]
 		public void FindModBuilder_ExcludesTheMainExeItself() {
 			string dir = Path.Combine(Path.GetTempPath(), "TerraLauncherTests_" + Guid.NewGuid());
 			Directory.CreateDirectory(dir);

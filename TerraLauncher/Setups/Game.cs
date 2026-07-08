@@ -236,7 +236,10 @@ namespace TerraLauncher.Setups {
 			RemoveFromFolder(Config.Games, this);
 
 			if (hasManagedFiles) {
-				try { Directory.Delete(installDir, recursive: true); }
+				// Not a plain Directory.Delete(..., recursive: true): tConfig installs
+				// contain junctions into the save-data folder (see Downloader.
+				// CreateJunction), which that throws on instead of just unlinking.
+				try { Downloader.DeleteDirectoryTree(installDir); }
 				catch { }
 			}
 			if (deleteSaveData) {

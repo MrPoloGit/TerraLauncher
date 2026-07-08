@@ -314,11 +314,13 @@ namespace TerraLauncher.Windows {
 			// Give every downloaded instance its own Worlds/Players (and, for
 			// mod-capable categories, Mods) folder under Documents instead of
 			// sharing one global save location, so installing multiple versions
-			// never mixes their saves.
+			// never mixes their saves. tConfig doesn't get a Mods folder here -
+			// its mod folder is ModPacks, which Downloader.LinkTConfigModFolders
+			// junctions into this same saveDir on its own.
 			string saveDir = InstancePaths.GetSaveDataDirForVersion(cat, entry.Version, label);
 			Directory.CreateDirectory(Path.Combine(saveDir, "Worlds"));
 			Directory.CreateDirectory(Path.Combine(saveDir, "Players"));
-			if (cat == GameCategory.TModLoader || cat == GameCategory.TAPI || cat == GameCategory.TConfig)
+			if (cat == GameCategory.TModLoader || cat == GameCategory.TAPI)
 				Directory.CreateDirectory(Path.Combine(saveDir, "Mods"));
 			game.SaveDirectory = saveDir;
 
