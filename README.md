@@ -1,5 +1,6 @@
 # Terra Launcher ![AppIcon](https://i.imgur.com/x4eChND.png)
 
+[![CI](https://github.com/MrPoloGit/TerraLauncher/actions/workflows/ci.yml/badge.svg)](https://github.com/MrPoloGit/TerraLauncher/actions/workflows/ci.yml)
 [![Terraria Forums](https://img.shields.io/badge/terraria-forums-28A828.svg?style=flat)](https://forums.terraria.org/index.php?threads/62315/)
 [![Discord](https://img.shields.io/discord/436949335947870238.svg?style=flat&logo=discord&label=chat&colorB=7389DC&link=https://discord.gg/vB7jUbY)](https://discord.gg/vB7jUbY)
 
@@ -37,6 +38,19 @@ Robert Jordan, ported from .NET Framework 4.5.2 to .NET 10 and extended with an 
 
 NuGet packages (`Extended.Wpf.Toolkit`, `System.Configuration.ConfigurationManager`) restore automatically on
 build — no manual setup needed.
+
+## Running Tests
+
+Unit tests cover the pure logic behind the instance downloader (manifest/release parsing, install-path naming,
+archive-type detection):
+
+```
+dotnet test TerraLauncher.sln
+```
+
+CI runs the same build and test suite on every push and pull request via
+[GitHub Actions](.github/workflows/ci.yml). Pushing a `v*` tag triggers
+[a release build](.github/workflows/release.yml) that publishes a self-contained `win-x64` zip to GitHub Releases.
 
 ## Features
 

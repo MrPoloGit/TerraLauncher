@@ -56,3 +56,5 @@ using System.Windows;
 [assembly: Guid("86D6435B-8DB4-435D-9A85-FDFD98A4A380")]
 [assembly: NeutralResourcesLanguage("en-US")]
 
+[assembly: InternalsVisibleTo("TerraLauncher.Tests")]
+
