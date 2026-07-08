@@ -288,5 +288,44 @@
     "author": "N Terraria Team",
     "url": "https://archive.org/download/n-terraria-versions/N%20Terraria.zip",
     "type": "N Terraria"
+  },
+  {
+    "name": "Ulterraria 1.1",
+    "version": "1.1",
+    "description": "",
+    "date": "",
+    "author": "Ulterraria Team",
+    "url": "https://archive.org/download/ulterraria-versions/Ulterraria%20-%201.1.zip",
+    "type": "Ulterraria"
+  },
+  {
+    "name": "Prepare to Die - Original",
+    "version": "ptd-o",
+    "description": "A single executable that must be placed in an existing Terraria 1.2.4 folder alongside (not replacing) Terraria.exe.",
+    "date": "",
+    "author": "Prepare to Die Team",
+    "url": "https://archive.org/download/terraria-ptd/Terraria.PTD.o.exe",
+    "requiresTerrariaVersion": "1.2.4",
+    "type": "Prepare to Die"
+  },
+  {
+    "name": "Prepare to Die - Insane",
+    "version": "ptd-i",
+    "description": "A single executable that must be placed in an existing Terraria 1.2.4 folder alongside (not replacing) Terraria.exe.",
+    "date": "",
+    "author": "Prepare to Die Team",
+    "url": "https://archive.org/download/terraria-ptd/Terraria.PTD.i.exe",
+    "requiresTerrariaVersion": "1.2.4",
+    "type": "Prepare to Die"
+  },
+  {
+    "name": "Prepare to Die - Easy",
+    "version": "ptd-e",
+    "description": "A single executable that must be placed in an existing Terraria 1.2.4 folder alongside (not replacing) Terraria.exe.",
+    "date": "",
+    "author": "Prepare to Die Team",
+    "url": "https://archive.org/download/terraria-ptd/Terraria.PTD.e.exe",
+    "requiresTerrariaVersion": "1.2.4",
+    "type": "Prepare to Die"
   }
 ]
