@@ -21,7 +21,7 @@ namespace TerraLauncher.Windows {
 		private List<VersionEntry> allEntries = new List<VersionEntry>();
 
 		private static readonly string[] StandAloneTypes = {
-			"All Types", "Avalon", "Exxo Avalon", "N Terraria", "Ulterraria", "Prepare to Die",
+			"All Types", "Avalon", "Exxo Avalon", "N Terraria", "Ulterraria", "Prepare to Die", "Prism",
 		};
 
 		// Rows reserve this much right margin so their content doesn't render

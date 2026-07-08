@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -56,13 +57,18 @@ namespace TerraLauncher.Instances {
 
 			string archivePath = Path.Combine(installDir, "_download" + ArchiveExtension(entry.Url));
 
+			bool isPrism = category == GameCategory.StandAlone && entry.Type == "Prism";
+
 			try {
 				// tConfig only ships its own new/modified files, not a full Terraria
 				// install - it's meant to be patched directly on top of a normal
-				// Terraria copy. Seed the instance folder with the Steam-installed
-				// Terraria files first so extracting the zip over them (below,
-				// overwriting matching names) produces a complete, launchable game.
-				if (category == GameCategory.TConfig) {
+				// Terraria copy. Prism works the same way: patcher.exe patches a
+				// Terraria.exe in place to produce Prism.Terraria.dll, so it also
+				// needs a full Terraria copy to patch and to supply the Content
+				// folder. Seed the instance folder with the Steam-installed Terraria
+				// files first so extracting the zip over them (below, overwriting
+				// matching names) produces a complete, launchable game.
+				if (category == GameCategory.TConfig || isPrism) {
 					string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
 						? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
 					if (!string.IsNullOrEmpty(terrariaDir) && Directory.Exists(terrariaDir)) {
@@ -71,7 +77,7 @@ namespace TerraLauncher.Instances {
 						await Task.Run(() => CopyDirectory(terrariaDir, installDir, ct), ct);
 					}
 					else {
-						ui.AppendLog("No Steam install of Terraria was found - tConfig may not run without one.");
+						ui.AppendLog("No Steam install of Terraria was found - " + entry.Name + " may not run without one.");
 					}
 				}
 
@@ -103,10 +109,26 @@ namespace TerraLauncher.Instances {
 					&& !await ApplyPatchAsync(ui, entry.PatchUrl, installDir, ct))
 					return (null, null);
 
-				string exe = FindExecutable(installDir, category);
-				if (exe == null) {
-					ui.AppendLog("Extracted, but no executable found in " + installDir);
+				// Prism ships as a bare patcher.exe + Prism.exe, not a pre-patched
+				// game - the release's own INSTALL.md says to "drop Terraria.exe on
+				// patcher.exe" to produce Prism.Terraria.dll before Prism.exe can run.
+				if (isPrism && !await RunPrismPatcherAsync(ui, installDir, ct))
 					return (null, null);
+
+				string exe;
+				if (isPrism) {
+					exe = Path.Combine(installDir, "Prism.exe");
+					if (!File.Exists(exe)) {
+						ui.AppendLog("Patched, but Prism.exe was not found in " + installDir);
+						return (null, null);
+					}
+				}
+				else {
+					exe = FindExecutable(installDir, category);
+					if (exe == null) {
+						ui.AppendLog("Extracted, but no executable found in " + installDir);
+						return (null, null);
+					}
 				}
 				ui.AppendLog("Installed: " + exe);
 
@@ -126,6 +148,59 @@ namespace TerraLauncher.Instances {
 				TryDelete(archivePath);
 				return (null, null);
 			}
+		}
+
+		// Runs Prism's patcher.exe against the copied Terraria.exe (see the comment
+		// where this is called), waiting for Prism.Terraria.dll to appear next to it.
+		// patcher.exe is an old, unmaintained third-party tool we don't fully trust
+		// to always exit cleanly headless, so this bounds the wait and kills it
+		// rather than risking the download hanging forever.
+		private static async Task<bool> RunPrismPatcherAsync(DownloadProgressWindow ui, string installDir, CancellationToken ct) {
+			string terrariaExe = Path.Combine(installDir, "Terraria.exe");
+			string patcherExe = Path.Combine(installDir, "patcher.exe");
+			if (!File.Exists(terrariaExe) || !File.Exists(patcherExe)) {
+				ui.AppendLog("Missing " + (File.Exists(terrariaExe) ? "patcher.exe" : "Terraria.exe") + " - cannot patch Prism.");
+				return false;
+			}
+
+			ui.AppendLog("Running Prism's patcher against the copied Terraria.exe...");
+			ui.SetProgress(-1);
+
+			var psi = new ProcessStartInfo {
+				FileName = patcherExe,
+				// Passing the path as an argument (equivalent to dropping the file
+				// onto patcher.exe) avoids its interactive "ask for a Terraria.exe" prompt.
+				Arguments = "\"" + terrariaExe + "\"",
+				WorkingDirectory = installDir,
+				UseShellExecute = false,
+				CreateNoWindow = true,
+			};
+
+			try {
+				using (Process proc = Process.Start(psi)) {
+					if (proc == null) {
+						ui.AppendLog("Failed to start patcher.exe.");
+						return false;
+					}
+					Task exited = proc.WaitForExitAsync(ct);
+					Task timeout = Task.Delay(TimeSpan.FromMinutes(3), ct);
+					if (await Task.WhenAny(exited, timeout) == timeout) {
+						ui.AppendLog("patcher.exe timed out after 3 minutes.");
+						try { proc.Kill(entireProcessTree: true); } catch { }
+						return false;
+					}
+				}
+			}
+			catch (OperationCanceledException) { throw; }
+			catch (Exception ex) {
+				ui.AppendLog("Failed to run patcher.exe: " + ex.Message);
+				return false;
+			}
+
+			bool patched = File.Exists(Path.Combine(installDir, "Prism.Terraria.dll"));
+			if (!patched)
+				ui.AppendLog("patcher.exe exited, but Prism.Terraria.dll was not produced.");
+			return patched;
 		}
 
 		// Downloads a second archive and extracts it over the base install,

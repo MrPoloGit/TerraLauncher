@@ -327,5 +327,24 @@
     "url": "https://archive.org/download/terraria-ptd/Terraria.PTD.e.exe",
     "requiresTerrariaVersion": "1.2.4",
     "type": "Prepare to Die"
+  },
+  {
+    "name": "Prism v1.0.0.0 (Terraria 1.3.1)",
+    "version": "1.0.0.0-pre-t131",
+    "description": "Patches a copy of Terraria via patcher.exe during install (see the project's INSTALL.md).",
+    "date": "2016-05-28",
+    "author": "PoroCYon",
+    "url": "https://github.com/TerrariaPrismTeam/Prism/releases/download/v1.0.0.0-pre-t131/Prism-win-1000-pre-t131.zip",
+    "requiresTerrariaVersion": "1.3.1",
+    "type": "Prism"
+  },
+  {
+    "name": "Prism v1.0.0.0 (early prerelease)",
+    "version": "1.0.0.0-prerelease",
+    "description": "Patches a copy of Terraria via patcher.exe during install. Targets an early Terraria 1.3.0 build - exact version compatibility isn't documented.",
+    "date": "2015-08-28",
+    "author": "PoroCYon",
+    "url": "https://github.com/TerrariaPrismTeam/Prism/releases/download/v1.0.0.0-prerelease/Prism-1000-pre.zip",
+    "type": "Prism"
   }
 ]
