@@ -121,6 +121,22 @@ Steam-detected installs and Custom-linked executables are referenced in place an
 * Downloading Terraria requires a Steam account that owns the game; credentials are passed directly to
   DepotDownloader for that single download and are never saved by the launcher.
 
+Windows
+Upon fresh install and first launch of Terraria
+Documents/My Games/Terraria
+Players
+Worlds
+Program Files (x86)/Steam/userdata/279170712/105600/remote
+ModLoader
+players
+Worlds
+Need a way to install and store seperate world/player files
+Get DepotDownloader fully working
+Observer the result of downloading TModLoader
+should maybe use tModLoader first to do it
+Then tConfig
+Figure out how to take a
+
 ## License
 
 MIT — see [License](License).

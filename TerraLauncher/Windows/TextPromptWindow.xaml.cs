@@ -23,8 +23,9 @@ namespace TerraLauncher.Windows {
 			w.Title = title;
 			w.textBlockMessage.Text = message;
 			w.labelField1.Content = fieldLabel;
-			w.panelField2.Visibility = Visibility.Collapsed;
-			w.clientArea.Height -= 96;
+			w.labelField2.Visibility = Visibility.Collapsed;
+			w.passwordBox2.Visibility = Visibility.Collapsed;
+			w.clientArea.Height = 158;
 
 			w.ShowDialog();
 			return w.ok ? w.textBox1.Text : null;

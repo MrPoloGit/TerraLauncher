@@ -42,15 +42,15 @@
                 </MenuItem>
             </Menu>
             <Grid Width="340" Height="252">
-                <CheckBox x:Name="checkBoxCloseGame" Content="Close when launching Games" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Padding="4,-1,0,0"/>
+                <CheckBox x:Name="checkBoxCloseGame" Content="Close when launching Games" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Padding="4,-2,0,0"/>
                 <Label Content="Hold Shift while launching to keep open" HorizontalAlignment="Left" Margin="6,35,0,0" VerticalAlignment="Top" FontSize="11" Opacity="0.7"/>
                 <Label Content="Hold Ctrl while launching to close" HorizontalAlignment="Left" Margin="6,59,0,0" VerticalAlignment="Top" FontSize="11" Opacity="0.7"/>
 
                 <Separator VerticalAlignment="Top" Margin="10,90,10,0"/>
 
-                <CheckBox x:Name="checkBoxDisableTransitions" Content="Disable Transitions" HorizontalAlignment="Left" Margin="10,102,0,0" VerticalAlignment="Top" Padding="4,-1,0,0"/>
-                <CheckBox x:Name="checkBoxMuted" Content="Mute Menu Sounds" HorizontalAlignment="Left" Margin="10,127,0,0" VerticalAlignment="Top" Padding="4,-1,0,0"/>
-                <CheckBox x:Name="checkBoxIntegration" Content="Integrate with Other Trigger Tools" HorizontalAlignment="Left" Margin="10,152,0,0" VerticalAlignment="Top" Padding="4,-1,0,0">
+                <CheckBox x:Name="checkBoxDisableTransitions" Content="Disable Transitions" HorizontalAlignment="Left" Margin="10,102,0,0" VerticalAlignment="Top" Padding="4,-2,0,0"/>
+                <CheckBox x:Name="checkBoxMuted" Content="Mute Menu Sounds" HorizontalAlignment="Left" Margin="10,127,0,0" VerticalAlignment="Top" Padding="4,-2,0,0"/>
+                <CheckBox x:Name="checkBoxIntegration" Content="Integrate with Other Trigger Tools" HorizontalAlignment="Left" Margin="10,152,0,0" VerticalAlignment="Top" Padding="4,-2,0,0">
                     <CheckBox.ToolTip>
                         <TextBlock Text="If set, when using the launch Terraria option from other Trigger Tools,&#xD;&#xA;they will attempt to use the save directory configured in Terra Launcher." Foreground="Black"/>
                     </CheckBox.ToolTip>
