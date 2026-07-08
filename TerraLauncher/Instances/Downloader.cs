@@ -32,6 +32,35 @@ namespace TerraLauncher.Instances {
 
 			Directory.CreateDirectory(installDir);
 
+			bool isPrism = category == GameCategory.StandAlone && entry.Type == "Prism";
+
+			// tConfig, Prism, and Prepare to Die all ship as partial content meant
+			// to sit inside (or patch onto) an existing Terraria install, rather
+			// than as a full standalone game - tConfig/Prism patch files directly
+			// on top of it, Prepare to Die is a replacement exe that needs the
+			// original's Content folder alongside it. Seed the instance folder
+			// with the Steam-installed Terraria files before downloading/extracting
+			// anything else on top, so each of these ends up with everything it needs.
+			if (NeedsTerrariaBaseCopy(category, entry)) {
+				string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
+					? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
+				if (!string.IsNullOrEmpty(terrariaDir) && Directory.Exists(terrariaDir)) {
+					ui.AppendLog("Copying Terraria files from " + terrariaDir);
+					ui.SetProgress(-1);
+					try {
+						await Task.Run(() => CopyDirectory(terrariaDir, installDir, ct), ct);
+					}
+					catch (OperationCanceledException) { throw; }
+					catch (Exception ex) {
+						ui.AppendLog("Failed to copy Terraria files: " + ex.Message);
+						return (null, null);
+					}
+				}
+				else {
+					ui.AppendLog("No Steam install of Terraria was found - " + entry.Name + " may not run without one.");
+				}
+			}
+
 			// Direct file (e.g. an installer .exe) — no extraction step, so there's
 			// nothing else in installDir to detect a mod builder from.
 			if (!IsArchiveUrl(entry.Url)) {
@@ -57,30 +86,7 @@ namespace TerraLauncher.Instances {
 
 			string archivePath = Path.Combine(installDir, "_download" + ArchiveExtension(entry.Url));
 
-			bool isPrism = category == GameCategory.StandAlone && entry.Type == "Prism";
-
 			try {
-				// tConfig only ships its own new/modified files, not a full Terraria
-				// install - it's meant to be patched directly on top of a normal
-				// Terraria copy. Prism works the same way: patcher.exe patches a
-				// Terraria.exe in place to produce Prism.Terraria.dll, so it also
-				// needs a full Terraria copy to patch and to supply the Content
-				// folder. Seed the instance folder with the Steam-installed Terraria
-				// files first so extracting the zip over them (below, overwriting
-				// matching names) produces a complete, launchable game.
-				if (category == GameCategory.TConfig || isPrism) {
-					string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
-						? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
-					if (!string.IsNullOrEmpty(terrariaDir) && Directory.Exists(terrariaDir)) {
-						ui.AppendLog("Copying Terraria files from " + terrariaDir);
-						ui.SetProgress(-1);
-						await Task.Run(() => CopyDirectory(terrariaDir, installDir, ct), ct);
-					}
-					else {
-						ui.AppendLog("No Steam install of Terraria was found - " + entry.Name + " may not run without one.");
-					}
-				}
-
 				ui.AppendLog("Downloading " + entry.Url);
 				await DownloadFileAsync(entry.Url, archivePath, ui, ct);
 
@@ -258,6 +264,12 @@ namespace TerraLauncher.Instances {
 				}
 			}
 		}
+
+		// Categories/types that ship partial content meant to sit inside (or patch
+		// onto) an existing Terraria install rather than as a full standalone game.
+		internal static bool NeedsTerrariaBaseCopy(GameCategory category, VersionEntry entry) =>
+			category == GameCategory.TConfig
+			|| (category == GameCategory.StandAlone && (entry.Type == "Prism" || entry.Type == "Prepare to Die"));
 
 		internal static bool IsArchiveUrl(string url) =>
 			url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)

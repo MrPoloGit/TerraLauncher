@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using TerraLauncher.Instances;
+using TerraLauncher.Setups;
 using Xunit;
 
 namespace TerraLauncher.Tests {
@@ -158,6 +159,35 @@ namespace TerraLauncher.Tests {
 			finally {
 				Directory.Delete(dir, recursive: true);
 			}
+		}
+
+		[Fact]
+		public void NeedsTerrariaBaseCopy_TrueForTConfig() {
+			Assert.True(Downloader.NeedsTerrariaBaseCopy(GameCategory.TConfig, new VersionEntry()));
+		}
+
+		[Theory]
+		[InlineData("Prism")]
+		[InlineData("Prepare to Die")]
+		public void NeedsTerrariaBaseCopy_TrueForStandAloneTypesThatNeedIt(string type) {
+			Assert.True(Downloader.NeedsTerrariaBaseCopy(GameCategory.StandAlone, new VersionEntry { Type = type }));
+		}
+
+		[Theory]
+		[InlineData(GameCategory.Terraria)]
+		[InlineData(GameCategory.TModLoader)]
+		[InlineData(GameCategory.TAPI)]
+		public void NeedsTerrariaBaseCopy_FalseForOtherCategories(GameCategory category) {
+			Assert.False(Downloader.NeedsTerrariaBaseCopy(category, new VersionEntry()));
+		}
+
+		[Theory]
+		[InlineData("Avalon")]
+		[InlineData("N Terraria")]
+		[InlineData("Ulterraria")]
+		[InlineData("")]
+		public void NeedsTerrariaBaseCopy_FalseForOtherStandAloneTypes(string type) {
+			Assert.False(Downloader.NeedsTerrariaBaseCopy(GameCategory.StandAlone, new VersionEntry { Type = type }));
 		}
 
 		[Fact]
