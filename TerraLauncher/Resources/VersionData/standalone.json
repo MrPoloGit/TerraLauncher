@@ -1,1 +1,220 @@
-[]
+[
+  {
+    "name": "Avalon 1.1 Remastered v2.1.0",
+    "version": "2.1.0",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v2.1.0.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v2.0.0",
+    "version": "2.0.0",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v2.0.0.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.8.5",
+    "version": "1.8.5",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.5.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.8.4",
+    "version": "1.8.4",
+    "description": "Installs v1.8.4 and applies the official hotfix on top.",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.4.zip",
+    "patchUrl": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.4%20hotfix.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.8.3",
+    "version": "1.8.3",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.3.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.8.2",
+    "version": "1.8.2",
+    "description": "Installs v1.8.1 and replaces the executable with the v1.8.2 EXE-only release.",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.1.zip",
+    "patchUrl": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.2%20-%20EXE%20ONLY.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.8.1",
+    "version": "1.8.1",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.1.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.8.0",
+    "version": "1.8.0",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.8.0.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.7.2",
+    "version": "1.7.2",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.7.2.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.7.0",
+    "version": "1.7.0",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.7.0.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.6.0 (BETA v19)",
+    "version": "1.6.0-beta-v19",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.6.0%20-%20v19.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.5.4 (BETA v17)",
+    "version": "1.5.4-beta-v17",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.5.4%20-%20v17.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.5.2 (BETA v15)",
+    "version": "1.5.2-beta-v15",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.5.2%20-%20v15.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.5.1 (BETA v14)",
+    "version": "1.5.1-beta-v14",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.5.1%20-%20BETA%20v14.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.5.0 (BETA v13)",
+    "version": "1.5.0-beta-v13",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.5.0%20-%20BETA%20v13.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.6 (BETA v12)",
+    "version": "1.4.6-beta-v12",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.6%20-%20BETA%20v12.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.5 (BETA v11)",
+    "version": "1.4.5-beta-v11",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.5%20-%20BETA%20v11.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.4 (BETA v10)",
+    "version": "1.4.4-beta-v10",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.4%20-%20BETA%20v10.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.3 (BETA v9)",
+    "version": "1.4.3-beta-v9",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.3%20-%20BETA%20v9.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.2 (BETA v8)",
+    "version": "1.4.2-beta-v8",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.2%20-%20BETA%20v8.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.1 (BETA v7)",
+    "version": "1.4.1-beta-v7",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.1%20-%20BETA%20v7.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered v1.4.0 (BETA v6)",
+    "version": "1.4.0-beta-v6",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20v1.4.0%20-%20BETA%20v6.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered BETA v5",
+    "version": "beta-v5",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20BETA%20v5.zip",
+    "type": "Avalon"
+  },
+  {
+    "name": "Avalon 1.1 Remastered BETA v4",
+    "version": "beta-v4",
+    "description": "",
+    "date": "",
+    "author": "Avalon Team",
+    "url": "https://archive.org/download/avalon-1.1-remastered-versions/Avalon%201.1%20Remastered%20BETA%20v4.zip",
+    "type": "Avalon"
+  }
+]

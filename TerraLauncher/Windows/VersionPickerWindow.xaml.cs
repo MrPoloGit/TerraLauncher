@@ -15,6 +15,14 @@ namespace TerraLauncher.Windows {
 		private readonly GameCategory category;
 		private int currentPage = 1;
 		private bool hasNextPage = false;
+		// Full, unfiltered set of entries from the last fetch — Stand Alone bundles
+		// several unrelated standalone games under one category, so type/search
+		// filtering happens client-side over this rather than re-fetching.
+		private List<VersionEntry> allEntries = new List<VersionEntry>();
+
+		private static readonly string[] StandAloneTypes = {
+			"All Types", "Avalon", "Exxo Avalon", "N Terraria", "Ulterraria", "Prepare to Die",
+		};
 
 		// Rows reserve this much right margin so their content doesn't render
 		// under the scrollbar (ScrollContentPresenter spans both the content and
@@ -29,6 +37,15 @@ namespace TerraLauncher.Windows {
 			// Only tModLoader's GitHub releases are paginated — every other
 			// category is a single, already-complete local/embedded list.
 			panelPaging.Visibility = category == GameCategory.TModLoader ? Visibility.Visible : Visibility.Collapsed;
+
+			if (category == GameCategory.StandAlone) {
+				frameTypeSearch.Visibility = Visibility.Visible;
+				comboType.Visibility = Visibility.Visible;
+				borderList.Margin = new Thickness(10, 90, 10, 44);
+				comboType.ItemsSource = StandAloneTypes;
+				comboType.SelectedIndex = 0;
+			}
+
 			ContentRendered += async (s, e) => await LoadVersionsAsync();
 			scrollViewer.ScrollChanged += (s, e) => UpdateRowMargins();
 		}
@@ -106,15 +123,45 @@ namespace TerraLauncher.Windows {
 			buttonPrevious.IsEnabled = currentPage > 1;
 			buttonNext.IsEnabled = hasNextPage;
 
-			if (page.Entries.Count == 0) {
+			allEntries = page.Entries;
+			RenderFilteredEntries();
+		}
+
+		private void OnVersionSearchChanged(object sender, TextChangedEventArgs e) {
+			labelSearchWatermark.Visibility = textBoxVersionSearch.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+			RenderFilteredEntries();
+		}
+		private void OnTypeFilterChanged(object sender, SelectionChangedEventArgs e) => RenderFilteredEntries();
+
+		private void RenderFilteredEntries() {
+			versionList.Children.Clear();
+
+			IEnumerable<VersionEntry> filtered = allEntries;
+
+			if (category == GameCategory.StandAlone) {
+				string type = comboType.SelectedItem as string;
+				if (!string.IsNullOrEmpty(type) && type != "All Types")
+					filtered = filtered.Where(v => v.Type == type);
+			}
+
+			string search = (textBoxVersionSearch?.Text ?? "").Trim();
+			if (search.Length > 0)
+				filtered = filtered.Where(v => v.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0);
+
+			List<VersionEntry> results = filtered.ToList();
+			if (allEntries.Count == 0) {
 				labelStatus.Text = "No versions found.";
 				return;
 			}
+			if (results.Count == 0) {
+				labelStatus.Text = "No versions match your search.";
+				return;
+			}
 
-			foreach (var entry in page.Entries)
+			foreach (var entry in results)
 				versionList.Children.Add(BuildRow(entry));
 
-			labelStatus.Text = page.Entries.Count + " version(s)";
+			labelStatus.Text = results.Count + " version(s)";
 		}
 
 		private UIElement BuildRow(VersionEntry entry) {

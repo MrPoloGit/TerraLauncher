@@ -62,6 +62,10 @@ namespace TerraLauncher.Instances {
 				await Task.Run(() => Extract(archivePath, installDir), ct);
 				File.Delete(archivePath);
 
+				if (!string.IsNullOrEmpty(entry.PatchUrl)
+					&& !await ApplyPatchAsync(ui, entry.PatchUrl, installDir, ct))
+					return null;
+
 				string exe = FindExecutable(installDir, category);
 				if (exe == null) {
 					ui.AppendLog("Extracted, but no executable found in " + installDir);
@@ -78,6 +82,33 @@ namespace TerraLauncher.Instances {
 				ui.AppendLog("Download failed: " + ex.Message);
 				TryDelete(archivePath);
 				return null;
+			}
+		}
+
+		// Downloads a second archive and extracts it over the base install,
+		// overwriting matching files — used for versions distributed as
+		// "base build + hotfix/replacement" (see VersionEntry.PatchUrl).
+		private static async Task<bool> ApplyPatchAsync(DownloadProgressWindow ui, string patchUrl,
+			string installDir, CancellationToken ct) {
+			string patchPath = Path.Combine(installDir, "_patch" + ArchiveExtension(patchUrl));
+			try {
+				ui.AppendLog("Downloading patch " + patchUrl);
+				await DownloadFileAsync(patchUrl, patchPath, ui, ct);
+
+				ui.AppendLog("Applying patch...");
+				ui.SetProgress(-1);
+				await Task.Run(() => Extract(patchPath, installDir), ct);
+				File.Delete(patchPath);
+				return true;
+			}
+			catch (OperationCanceledException) {
+				TryDelete(patchPath);
+				throw;
+			}
+			catch (Exception ex) {
+				ui.AppendLog("Patch failed: " + ex.Message);
+				TryDelete(patchPath);
+				return false;
 			}
 		}
 

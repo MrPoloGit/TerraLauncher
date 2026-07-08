@@ -32,8 +32,8 @@ Robert Jordan, ported from .NET Framework 4.5.2 to .NET 10 and extended with an 
 3. Build and run:
 
    ```
-   dotnet build TerraLauncher.csproj -c Debug
-   dotnet run --project TerraLauncher.csproj -c Debug
+   dotnet build TerraLauncher/TerraLauncher.csproj -c Debug
+   dotnet run --project TerraLauncher/TerraLauncher.csproj -c Debug
    ```
 
 NuGet packages (`Extended.Wpf.Toolkit`, `System.Configuration.ConfigurationManager`) restore automatically on

@@ -18,7 +18,15 @@
             <TextBlock x:Name="labelCategory" Text="Versions" FontSize="20" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,6,10,0"/>
             <TextBlock x:Name="labelStatus" Text="Loading..." Foreground="#FFAAAACC" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,36,10,0"/>
 
-            <Border Margin="10,58,10,44" Background="#FF1E1E5A" BorderBrush="#FF14143A" BorderThickness="1">
+            <controls:TerrariaFrame x:Name="frameTypeSearch" Visibility="Collapsed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,58,0,0" Width="150" Height="26" Padding="6,0">
+                <Grid>
+                    <TextBlock x:Name="labelSearchWatermark" Text="Search..." Foreground="#FFAAAACC" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                    <TextBox x:Name="textBoxVersionSearch" Background="Transparent" BorderThickness="0" Foreground="White" CaretBrush="White" VerticalAlignment="Center" Margin="0" TextChanged="OnVersionSearchChanged"/>
+                </Grid>
+            </controls:TerrariaFrame>
+            <ComboBox x:Name="comboType" Visibility="Collapsed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="166,58,0,0" Width="150" Height="26" SelectionChanged="OnTypeFilterChanged"/>
+
+            <Border x:Name="borderList" Margin="10,58,10,44" Background="#FF1E1E5A" BorderBrush="#FF14143A" BorderThickness="1">
                 <local:SpeedScrollViewer x:Name="scrollViewer" ScrollSpeed="0.8" Template="{DynamicResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto" Margin="4">
                     <StackPanel x:Name="versionList"/>
                 </local:SpeedScrollViewer>
