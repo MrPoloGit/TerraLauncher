@@ -16,8 +16,14 @@ Robert Jordan, ported from .NET Framework 4.5.2 to .NET 10 and extended with an 
 ## About
 
 * **Original Author:** Robert Jordan
+* **Fork Maintainer:** [MrPoloGit](https://github.com/MrPoloGit)
 * **Language:** C#, WPF
 * **Target Framework:** .NET 10 (Windows only)
+
+> **Update note:** this fork's .NET 10 port and everything under "Features" below — the in-app instance
+> downloader, per-instance Worlds/Players/Mods isolation, Steam/GitHub/archive.org installers, and the
+> tConfig/Prism/Avalon/Prepare to Die setup handling — were built with the help of AI pair-programming
+> (Claude Code by Anthropic) on top of the original project.
 
 ## Requirements for Running
 
@@ -120,6 +126,10 @@ Game files and save data are split, the same way Steam and Terraria split them (
   gets its own `Worlds/` and `Players/` folder, plus a `Mods/` folder for tModLoader and tAPI, so
   installing multiple versions never mixes their saves. tConfig instead gets its `ModPacks/` and
   `ModPacks_temp_runtime/` folders (which is where it actually looks for mods) junctioned in here.
+* tConfig, Prism, Prepare to Die, and Avalon are all distributed as partial builds rather than full,
+  self-contained games — each install first copies your Steam-installed Terraria files into the new
+  instance folder, then extracts/patches that version's own files on top (Avalon's zip, for example,
+  overwrites `Terraria.exe` and its other changed files onto that copy).
 
 Steam-detected installs and Custom-linked executables are referenced in place and are never copied or moved.
 

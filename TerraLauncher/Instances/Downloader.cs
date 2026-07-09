@@ -34,14 +34,17 @@ namespace TerraLauncher.Instances {
 
 			bool isPrism = category == GameCategory.StandAlone && entry.Type == "Prism";
 
-			// tConfig, Prism, and Prepare to Die all need a real Terraria install
-			// alongside them - tConfig itself is a runnable build, but still reads/
-			// writes several folders (see LinkTConfigModFolders below) and behaves
-			// correctly only when it's actually sitting in a proper Terraria-shaped
-			// folder; Prism's patcher.exe patches a Terraria.exe in place; Prepare to
-			// Die is a replacement exe that needs the original's Content folder
-			// alongside it. Seed the instance folder with the Steam-installed
-			// Terraria files before downloading/extracting anything else on top.
+			// tConfig, Prism, Prepare to Die, and Avalon all need a real Terraria
+			// install alongside them - tConfig itself is a runnable build, but still
+			// reads/writes several folders (see LinkTConfigModFolders below) and
+			// behaves correctly only when it's actually sitting in a proper
+			// Terraria-shaped folder; Prism's patcher.exe patches a Terraria.exe in
+			// place; Prepare to Die is a replacement exe that needs the original's
+			// Content folder alongside it; Avalon's zips only ship its own changed
+			// files and overwrite them onto a real Terraria install rather than
+			// including a full Content folder of their own. Seed the instance folder
+			// with the Steam-installed Terraria files before downloading/extracting
+			// anything else on top.
 			if (NeedsTerrariaBaseCopy(category, entry)) {
 				string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
 					? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
@@ -131,7 +134,7 @@ namespace TerraLauncher.Instances {
 					}
 				}
 				else {
-					exe = FindExecutable(installDir, category);
+					exe = FindExecutable(installDir, category, entry.Type);
 					if (exe == null) {
 						ui.AppendLog("Extracted, but no executable found in " + installDir);
 						return (null, null);
@@ -359,7 +362,8 @@ namespace TerraLauncher.Instances {
 		// behave correctly, rather than as a fully independent standalone game.
 		internal static bool NeedsTerrariaBaseCopy(GameCategory category, VersionEntry entry) =>
 			category == GameCategory.TConfig
-			|| (category == GameCategory.StandAlone && (entry.Type == "Prism" || entry.Type == "Prepare to Die"));
+			|| (category == GameCategory.StandAlone
+				&& (entry.Type == "Prism" || entry.Type == "Prepare to Die" || entry.Type == "Avalon"));
 
 		internal static bool IsArchiveUrl(string url) =>
 			url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)
@@ -385,8 +389,8 @@ namespace TerraLauncher.Instances {
 		}
 
 		// Locates the file the launcher should start for a freshly extracted instance.
-		public static string FindExecutable(string dir, GameCategory category) {
-			foreach (var candidate in CandidateNames(category)) {
+		public static string FindExecutable(string dir, GameCategory category, string standAloneType = null) {
+			foreach (var candidate in CandidateNames(category, standAloneType)) {
 				var match = Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories)
 					.FirstOrDefault(f => string.Equals(Path.GetFileName(f), candidate, StringComparison.OrdinalIgnoreCase));
 				if (match != null) return match;
@@ -408,7 +412,7 @@ namespace TerraLauncher.Instances {
 						|| Path.GetFileNameWithoutExtension(f).IndexOf("compiler", StringComparison.OrdinalIgnoreCase) >= 0));
 		}
 
-		private static System.Collections.Generic.IEnumerable<string> CandidateNames(GameCategory category) {
+		private static System.Collections.Generic.IEnumerable<string> CandidateNames(GameCategory category, string standAloneType = null) {
 			switch (category) {
 			case GameCategory.Terraria:
 				// Only reached for direct-URL Terraria downloads (pre-Steam-manifest
@@ -426,6 +430,15 @@ namespace TerraLauncher.Instances {
 				yield return "tConfig.exe";
 				break;
 			case GameCategory.StandAlone:
+				// Avalon ships its own "Avalon 1.1 Remastered.exe" (confirmed across
+				// every release, beta v4 through v2.1.0) alongside the copied Steam
+				// Terraria files (see NeedsTerrariaBaseCopy) rather than replacing
+				// Terraria.exe, so that copied exe must not win here - it's a plain
+				// Steam build that fails at startup (missing SteamAPI_Init) when run
+				// outside Steam's own launch path.
+				if (standAloneType == "Avalon")
+					yield return "Avalon 1.1 Remastered.exe";
+				yield return "Terraria.exe";
 				yield return "TerrariaServer.exe";
 				break;
 			}

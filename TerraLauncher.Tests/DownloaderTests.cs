@@ -169,6 +169,7 @@ namespace TerraLauncher.Tests {
 		[Theory]
 		[InlineData("Prism")]
 		[InlineData("Prepare to Die")]
+		[InlineData("Avalon")]
 		public void NeedsTerrariaBaseCopy_TrueForStandAloneTypesThatNeedIt(string type) {
 			Assert.True(Downloader.NeedsTerrariaBaseCopy(GameCategory.StandAlone, new VersionEntry { Type = type }));
 		}
@@ -182,7 +183,6 @@ namespace TerraLauncher.Tests {
 		}
 
 		[Theory]
-		[InlineData("Avalon")]
 		[InlineData("N Terraria")]
 		[InlineData("Ulterraria")]
 		[InlineData("")]
