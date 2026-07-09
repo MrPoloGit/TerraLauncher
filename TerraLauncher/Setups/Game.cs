@@ -48,12 +48,31 @@ namespace TerraLauncher.Setups {
 			get { return Category == GameCategory.TModLoader; }
 		}
 		public override string Arguments {
-			get {
-				if (SaveDirectory != "Default")
-					return "-savedirectory \"" + SaveDirectory + "\"";
-				return "";
-			}
+			get { return BuildLaunchArguments(Category, SaveDirectory); }
 			set { }
+		}
+
+		// Split out from the Arguments getter so it's testable without needing a
+		// real Game (constructing one touches Setup's static ctor, which loads
+		// pack:// icon URIs and needs a live WPF Application to resolve).
+		internal static string BuildLaunchArguments(GameCategory category, string saveDirectory) {
+			if (saveDirectory == "Default")
+				return "";
+
+			// tModLoader ignores -savedirectory for its own data: per its source
+			// (Program.TML.cs, SetSavePath()), it takes whatever -savedirectory
+			// resolved to and appends its own "tModLoader" subfolder onto it, so
+			// Mods/ModConfigs/ModSources would land one level deeper than every
+			// other category's SaveDirectory. -tmlsavedirectory is tModLoader's
+			// own flag for exactly this - it points AT the final save folder
+			// directly (no subfolder appended), so Worlds/Players/Mods all end up
+			// together in our per-instance folder like everywhere else. Passing
+			// both keeps this working on older tModLoader builds that might
+			// predate -tmlsavedirectory and only look for -savedirectory.
+			if (category == GameCategory.TModLoader)
+				return "-savedirectory \"" + saveDirectory + "\" -tmlsavedirectory \"" + saveDirectory + "\"";
+
+			return "-savedirectory \"" + saveDirectory + "\"";
 		}
 		protected override string TypeName {
 			get { return "Game"; }
