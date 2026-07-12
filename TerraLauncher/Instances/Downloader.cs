@@ -46,8 +46,7 @@ namespace TerraLauncher.Instances {
 			// with the Steam-installed Terraria files before downloading/extracting
 			// anything else on top.
 			if (NeedsTerrariaBaseCopy(category, entry)) {
-				string terrariaDir = !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
-					? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
+				string terrariaDir = FindTerrariaBaseCopySource(entry);
 				if (!string.IsNullOrEmpty(terrariaDir) && Directory.Exists(terrariaDir)) {
 					ui.AppendLog("Copying Terraria files from " + terrariaDir);
 					ui.SetProgress(-1);
@@ -59,6 +58,10 @@ namespace TerraLauncher.Instances {
 						ui.AppendLog("Failed to copy Terraria files: " + ex.Message);
 						return (null, null);
 					}
+				}
+				else if (!string.IsNullOrEmpty(entry.RequiresTerrariaVersion)) {
+					ui.AppendLog(entry.Name + " needs Terraria " + entry.RequiresTerrariaVersion + " as a base, but it " +
+						"isn't installed - download it first (Add Instance > Terraria), then reinstall " + entry.Name + ".");
 				}
 				else {
 					ui.AppendLog("No Steam install of Terraria was found - " + entry.Name + " may not run without one.");
@@ -364,6 +367,23 @@ namespace TerraLauncher.Instances {
 			category == GameCategory.TConfig
 			|| (category == GameCategory.StandAlone
 				&& (entry.Type == "Prism" || entry.Type == "Prepare to Die" || entry.Type == "Avalon"));
+
+		// Prefers the exact Terraria version this entry was built against - already
+		// downloaded as its own instance via the "Requires Terraria X" dependency
+		// prompt in VersionPickerWindow - over whatever's currently Steam-installed.
+		// Old builds (tConfig especially, which predates Terraria 1.2's Steam
+		// depot/manifest system entirely) expect era-correct native DLLs (XNA/FNA,
+		// SDL2, etc.); copying in a modern Terraria's DLLs instead makes them fail
+		// to even load at startup rather than just misbehave in-game.
+		internal static string FindTerrariaBaseCopySource(VersionEntry entry) {
+			if (!string.IsNullOrEmpty(entry.RequiresTerrariaVersion)) {
+				string requiredDir = InstancePaths.GetInstallDirForVersion(GameCategory.Terraria, entry.RequiresTerrariaVersion);
+				if (File.Exists(Path.Combine(requiredDir, "Terraria.exe")))
+					return requiredDir;
+			}
+			return !string.IsNullOrEmpty(TerrariaLocator.TerrariaPath)
+				? Path.GetDirectoryName(TerrariaLocator.TerrariaPath) : null;
+		}
 
 		internal static bool IsArchiveUrl(string url) =>
 			url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)

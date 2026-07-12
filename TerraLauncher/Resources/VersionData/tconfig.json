@@ -19,7 +19,7 @@
     "url": "https://archive.org/download/tConfig-versions/tConfig%200.36.zip",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.1.2"
   },
   {
     "name": "tConfig 0.35.2",
@@ -30,7 +30,7 @@
     "url": "https://archive.org/download/tConfig-versions/tConfig%200.35.2.zip",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.1.2"
   },
   {
     "name": "tConfig 0.30.4",
@@ -41,6 +41,6 @@
     "url": "https://archive.org/download/tConfig-versions/tConfig%200.30.4.zip",
     "depotId": 0,
     "manifestId": "",
-    "requiresTerrariaVersion": ""
+    "requiresTerrariaVersion": "1.1.2"
   }
 ]

@@ -191,6 +191,38 @@ namespace TerraLauncher.Tests {
 		}
 
 		[Fact]
+		public void FindTerrariaBaseCopySource_PrefersInstalledRequiredVersionOverSteamPath() {
+			// InstancePaths roots everything under Config.ConfigPath's directory
+			// (the test binary's own bin folder in this process), so this is safe
+			// to create/delete without touching a real Documents\...\Terraria -
+			// unlike TerrariaLocator.TerrariaPath, which reads the real Steam
+			// install and can't be substituted here, so that fallback path isn't
+			// covered by this test.
+			string requiredDir = TerraLauncher.Instances.InstancePaths.GetInstallDirForVersion(GameCategory.Terraria, "1.1.2");
+			Directory.CreateDirectory(requiredDir);
+			string exePath = Path.Combine(requiredDir, "Terraria.exe");
+			File.WriteAllBytes(exePath, Array.Empty<byte>());
+			try {
+				string found = Downloader.FindTerrariaBaseCopySource(new VersionEntry { RequiresTerrariaVersion = "1.1.2" });
+
+				Assert.Equal(requiredDir, found);
+			}
+			finally {
+				Directory.Delete(requiredDir, recursive: true);
+			}
+		}
+
+		[Fact]
+		public void FindTerrariaBaseCopySource_IgnoresRequiredVersionWhenNotInstalled() {
+			string requiredDir = TerraLauncher.Instances.InstancePaths.GetInstallDirForVersion(GameCategory.Terraria, "1.1.2-not-installed");
+			Assert.False(Directory.Exists(requiredDir));
+
+			string found = Downloader.FindTerrariaBaseCopySource(new VersionEntry { RequiresTerrariaVersion = "1.1.2-not-installed" });
+
+			Assert.NotEqual(requiredDir, found);
+		}
+
+		[Fact]
 		public void CreateJunction_MakesLinkReadThroughToTarget() {
 			string root = Path.Combine(Path.GetTempPath(), "TerraLauncherTests_" + Guid.NewGuid());
 			string target = Path.Combine(root, "target");

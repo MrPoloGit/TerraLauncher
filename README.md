@@ -127,8 +127,12 @@ Game files and save data are split, the same way Steam and Terraria split them (
   installing multiple versions never mixes their saves. tConfig instead gets its `ModPacks/` and
   `ModPacks_temp_runtime/` folders (which is where it actually looks for mods) junctioned in here.
 * tConfig, Prism, Prepare to Die, and Avalon are all distributed as partial builds rather than full,
-  self-contained games — each install first copies your Steam-installed Terraria files into the new
-  instance folder, then extracts that version's own files on top. Avalon ships its own separately-named
+  self-contained games — each install first copies Terraria's own files into the new instance folder,
+  then extracts that version's own files on top. If the version was downloaded with a "Requires Terraria
+  X" dependency (some tConfig versions, for instance, predate Steam's depot system entirely and need
+  Terraria 1.1.2) and that exact Terraria version was already installed through the launcher, its files
+  are copied instead of whatever's currently Steam-installed — old builds expect era-correct native DLLs
+  and can fail to even start against a modern Terraria install's. Avalon ships its own separately-named
   `Avalon 1.1 Remastered.exe` alongside the copy rather than replacing `Terraria.exe`, so that's what
   actually gets launched.
 * Terraria itself only gained the `-savedirectory` launch flag in Desktop 1.3.0.8 — older downloaded
