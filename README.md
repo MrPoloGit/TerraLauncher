@@ -30,6 +30,12 @@ Robert Jordan, ported from .NET Framework 4.5.2 to .NET 10 and extended with an 
 * [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) (Windows) — not required if you use
   a self-contained build
 * Windows 10 or later
+* Files from tConfig
+  * ModPack_Objs
+  * ModPack
+  * ModPacks_temp_runtime
+  * Config Mod
+  * in worlds, there is a tConfig folder
 
 ## Running from Source
 
