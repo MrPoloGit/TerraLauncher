@@ -186,6 +186,8 @@ namespace TerraLauncher.Setups {
 					return;
 				}
 
+				OnBeforeLaunch();
+
 				ProcessStartInfo start = new ProcessStartInfo();
 				start.FileName = ExePath;
 				start.Arguments = Arguments;
@@ -195,6 +197,7 @@ namespace TerraLauncher.Setups {
 				start.WorkingDirectory = ExeDirectory;
 
 				Process proc = Process.Start(start);
+				OnProcessStarted(proc);
 
 				bool close = (TypeName == "Game" && Config.CloseOnGameLaunch);
 
@@ -204,11 +207,20 @@ namespace TerraLauncher.Setups {
 					Config.MainWindow.Close();
 			}
 			catch (Exception ex) {
+				OnLaunchFailed();
 				TriggerMessageBox.Show(Config.MainWindow, MessageIcon.Error,
 					"Failed to launch " + Name + ":\n\n" + ex.Message + "\n\nPath: " + ExePath,
 					"Launch Failed");
 			}
 		}
+		// Hooks for subclasses that need to do work around the actual process
+		// launch (currently just Game, for pre-1.3.0.8 Terraria's save-folder
+		// redirect - see LegacySaveRedirect). No-ops here since Launch() itself
+		// is generic across every Setup type.
+		protected virtual void OnBeforeLaunch() { }
+		protected virtual void OnProcessStarted(Process proc) { }
+		protected virtual void OnLaunchFailed() { }
+
 		public void OpenExeFolder() {
 			Sounds.PlayOpen();
 			if (Directory.Exists(ExeDirectory))

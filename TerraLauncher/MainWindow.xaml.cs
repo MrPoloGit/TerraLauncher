@@ -53,6 +53,11 @@ namespace TerraLauncher {
 
 		/**<summary>Loads the application settings.</summary>*/
 		private void LoadSettings() {
+			// Recovers Documents\My Games\Terraria if a previous run redirected it
+			// for a pre-1.3.0.8 Terraria launch and closed (Close Launcher on Game
+			// Launch) before it could restore automatically - see LegacySaveRedirect.
+			TerraLauncher.Instances.LegacySaveRedirect.SelfHeal();
+
 			Config.LoadConfig(this);
 			EnsureSteamTModLoaderEntry();
 

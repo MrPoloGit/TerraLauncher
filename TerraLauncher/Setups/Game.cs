@@ -178,6 +178,25 @@ namespace TerraLauncher.Setups {
 		//=========== OPTIONS ============
 		#region Options
 
+		// Only real pre-1.3.0.8 Terraria with save isolation actually turned on
+		// (SaveDirectory != "Default", the same gate BuildLaunchArguments uses)
+		// needs the shared-folder redirect - see LegacySaveRedirect.
+		private bool NeedsLegacySaveRedirect =>
+			SaveDirectory != "Default" && LegacySaveRedirect.NeedsRedirect(Category, Version);
+
+		protected override void OnBeforeLaunch() {
+			if (NeedsLegacySaveRedirect)
+				LegacySaveRedirect.RedirectBeforeLaunch(SaveDirectory);
+		}
+		protected override void OnProcessStarted(Process proc) {
+			if (NeedsLegacySaveRedirect)
+				LegacySaveRedirect.AttachRestore(proc);
+		}
+		protected override void OnLaunchFailed() {
+			if (NeedsLegacySaveRedirect)
+				LegacySaveRedirect.RestoreImmediately();
+		}
+
 		public void OpenSaveFolder() {
 			Sounds.PlayOpen();
 			if (SaveDirectory == "Default") {

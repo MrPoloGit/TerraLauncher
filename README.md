@@ -128,8 +128,14 @@ Game files and save data are split, the same way Steam and Terraria split them (
   `ModPacks_temp_runtime/` folders (which is where it actually looks for mods) junctioned in here.
 * tConfig, Prism, Prepare to Die, and Avalon are all distributed as partial builds rather than full,
   self-contained games — each install first copies your Steam-installed Terraria files into the new
-  instance folder, then extracts/patches that version's own files on top (Avalon's zip, for example,
-  overwrites `Terraria.exe` and its other changed files onto that copy).
+  instance folder, then extracts that version's own files on top. Avalon ships its own separately-named
+  `Avalon 1.1 Remastered.exe` alongside the copy rather than replacing `Terraria.exe`, so that's what
+  actually gets launched.
+* Terraria itself only gained the `-savedirectory` launch flag in Desktop 1.3.0.8 — older downloaded
+  versions ignore it and always use the real `Documents\My Games\Terraria`. To still give those isolated
+  saves, TerraLauncher temporarily redirects that shared folder to the instance's own save folder for the
+  duration of the run (swapping the real folder back afterward) instead of leaving you to hit Terraria's
+  own "backup and remove your existing Documents\My Games\Terraria" error.
 
 Steam-detected installs and Custom-linked executables are referenced in place and are never copied or moved.
 
